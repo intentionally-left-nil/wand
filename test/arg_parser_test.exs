@@ -48,5 +48,16 @@ defmodule Wand.CLI.ArgParserTest do
       assert Wand.CLI.ArgParser.parse(["add", "poison", "--test", "--dev"]) ==
                {:add, [%Wand.CLI.Commands.Add.Args{package: "poison", environments: [:test, :dev]}]}
     end
+
+    test "a package for a custom env" do
+      assert Wand.CLI.ArgParser.parse(["add", "ex_doc", "--env=docs"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Args{package: "ex_doc", environments: [:docs]}]}
+    end
+
+    test "add multiple custom environments and prod" do
+      command = OptionParser.split("add ex_doc --env=dogs --env=cat --prod")
+      assert Wand.CLI.ArgParser.parse(command) ==
+               {:add, [%Wand.CLI.Commands.Add.Args{package: "ex_doc", environments: [:prod, :dogs, :cat]}]}
+    end
   end
 end

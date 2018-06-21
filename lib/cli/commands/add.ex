@@ -12,6 +12,7 @@ defmodule Wand.CLI.Commands.Add do
       dev: :boolean,
       prod: :boolean,
       test: :boolean,
+      env: :keep,
     ]
     {switches, ["add" | commands], errors} = OptionParser.parse(args, strict: flags)
 
@@ -51,15 +52,25 @@ defmodule Wand.CLI.Commands.Add do
     end
   end
 
-  defp get_environments(switches) do
-    environments = [:dev, :test, :prod]
-    |> Enum.reduce([], fn name, environments ->
+  defp add_predefined_environments(environments, switches) do
+    [:dev, :test, :prod]
+    |> Enum.reduce(environments, fn name, environments ->
       if Keyword.has_key?(switches, name) do
         [name | environments]
       else
         environments
       end
     end)
+  end
+
+  defp add_custom_environments(environments, switches) do
+    environments ++ (Keyword.get_values(switches, :env)
+    |> Enum.map(&String.to_atom/1))
+  end
+
+  defp get_environments(switches) do
+    environments = add_predefined_environments([], switches)
+    |> add_custom_environments(switches)
 
     case environments do
       [] -> [:all]
