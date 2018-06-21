@@ -1,0 +1,2 @@
+defmodule Wand do
+end
