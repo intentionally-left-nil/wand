@@ -1,37 +1,36 @@
 defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
 
+  defmodule Git do
+    defstruct uri: nil,
+              ref: nil,
+              branch: nil,
+              tag: nil,
+              sparse: nil,
+              submodules: nil
+  end
+
+  defmodule Hex do
+    defstruct hex_name: nil,
+              organization: nil,
+              repo: nil,
+              version: :latest
+  end
+
+  defmodule Path do
+    defstruct path: nil,
+              in_umbrella: nil
+  end
+
   defmodule Package do
     defstruct compile_env: nil,
+              details: %Hex{},
               environments: [:all],
-              git: nil,
               name: nil,
               optional: nil,
               override: nil,
-              path: nil,
               read_app_file: nil,
-              runtime: nil,
-              version: :latest
-
-    defmodule Git do
-      defstruct uri: nil,
-                ref: nil,
-                branch: nil,
-                tag: nil,
-                sparse: nil,
-                submodules: nil
-    end
-
-    defmodule Hex do
-      defstruct hex_name: nil,
-                organization: nil,
-                repo: nil
-    end
-
-    defmodule Path do
-      defstruct path: nil,
-                in_umbrella: nil
-    end
+              runtime: nil
   end
 
   def validate(args) do
@@ -60,7 +59,7 @@ defmodule Wand.CLI.Commands.Add do
         {name, version} = split_version(name)
 
         %Package{base_package | name: name}
-        |> add_version(version, switches)
+        |> add_details(version, switches)
       end)
 
     {:ok, packages}
@@ -82,16 +81,21 @@ defmodule Wand.CLI.Commands.Add do
     end
   end
 
-  defp add_version(package, "file:" <> file, switches) do
-    path = %Package.Path{
+  defp add_details(package, "file:" <> file, switches) do
+    details = %Path{
       path: file,
       in_umbrella: Keyword.get(switches, :in_umbrella)
     }
 
-    %Package{package | path: path}
+    %Package{package | details: details}
   end
 
-  defp add_version(package, version, _switches), do: %Package{package | version: version}
+  defp add_details(package, version, _switches) do
+    details = %Hex{
+      version: version
+    }
+    %Package{package | details: details}
+  end
 
   defp add_predefined_environments(environments, switches) do
     [:dev, :test, :prod]

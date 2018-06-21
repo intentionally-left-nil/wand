@@ -1,7 +1,7 @@
 defmodule ArgParserTest do
   use ExUnit.Case
   alias Wand.CLI.ArgParser
-  alias Wand.CLI.Commands.Add.Package
+  alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
 
   describe "help" do
     test "no args are given" do
@@ -46,7 +46,7 @@ defmodule ArgParserTest do
 
     test "a package with a specific version" do
       assert ArgParser.parse(["add", "poison@3.1"]) ==
-               {:add, [%Package{name: "poison", version: "3.1"}]}
+               {:add, [%Package{name: "poison", details: %Hex{version: "3.1"}}]}
     end
 
     test "a package only for the test environment" do
@@ -92,7 +92,7 @@ defmodule ArgParserTest do
          [
            %Package{
              name: "test",
-             path: %Package.Path{
+             details: %Path{
                path: "../test"
              }
            }
