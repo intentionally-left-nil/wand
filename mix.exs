@@ -3,8 +3,8 @@ defmodule Wand.MixProject do
 
   @version "0.2.0"
   @description "A CLI tool to manage package dependencies"
-  @cli_env  [
-    "coveralls": :test,
+  @cli_env [
+    coveralls: :test,
     "coveralls.detail": :test,
     "coveralls.post": :test,
     "coveralls.html": :test
