@@ -57,9 +57,10 @@ defmodule Wand.CLI.Commands.Add do
     packages =
       Enum.map(names, fn name ->
         {name, version} = split_version(name)
+        type = version_type(version)
 
         %Package{base_package | name: name}
-        |> add_details(version, switches)
+        |> add_details(type, version, switches)
       end)
 
     {:ok, packages}
@@ -81,16 +82,22 @@ defmodule Wand.CLI.Commands.Add do
     end
   end
 
-  defp add_details(package, "file:" <> file, switches) do
+  defp add_details(package, :file, "file:" <> file, switches) do
     details = %Path{
       path: file,
-      in_umbrella: Keyword.get(switches, :in_umbrella)
+      in_umbrella: Keyword.get(switches, :umbrella)
     }
-
     %Package{package | details: details}
   end
 
-  defp add_details(package, version, _switches) do
+  defp add_details(package, :git, git_url, switches) do
+    details = %Git{
+      uri: git_url,
+    }
+    %Package{package | details: details}
+  end
+
+  defp add_details(package, :hex, version, _switches) do
     details = %Hex{
       version: version
     }
@@ -126,6 +133,8 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defp version_type("file:" <> _), do: :file
+  defp version_type("https://" <> _), do: :git
+  defp version_type("git@" <> _), do: :git
   defp version_type(_), do: :hex
 
   defp allowed_flags(args) do

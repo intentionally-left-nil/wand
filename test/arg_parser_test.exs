@@ -107,9 +107,18 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["add", "test@file:../test"]) == expected
     end
 
-    # test "a http github package" do
-    #   assert ArgParser.parse(["add", "poison@https://github.com/devinus/poison.git"]) ==
-    #            {:add, [%Package{name: "test", path: "../test"}]}
-    # end
+    test "a http github package" do
+      expected =
+        {:add,
+         [
+           %Package{
+             name: "poison",
+             details: %Git{
+               uri: "https://github.com/devinus/poison.git"
+             }
+           }
+         ]}
+      assert ArgParser.parse(["add", "poison@https://github.com/devinus/poison.git"]) == expected
+    end
   end
 end
