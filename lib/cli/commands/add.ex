@@ -91,9 +91,10 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defp add_details(package, :git, git_url, switches) do
-    details = %Git{
-      uri: git_url,
-    }
+    details = case String.split(git_url, "#", parts: 2) do
+      [git_url] ->  %Git{uri: git_url}
+      [git_url, ref] ->  %Git{uri: git_url, ref: ref}
+    end
     %Package{package | details: details}
   end
 
@@ -147,6 +148,9 @@ defmodule Wand.CLI.Commands.Add do
     ]
 
     git_flags = [
+      branch: :boolean,
+      ref: :boolean,
+      tag: :boolean,
       sparse: :string,
       submodules: :boolean,
     ]

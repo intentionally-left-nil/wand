@@ -37,7 +37,6 @@ defmodule ArgParserTest do
     end
 
     test "returns help if a flag for the wrong file type is given" do
-
       command = OptionParser.split("add ex_doc@file:/test --hex-name=foo")
       assert ArgParser.parse(command) == {:help, :add, {:invalid_flag, "--hex-name"}}
     end
@@ -133,6 +132,21 @@ defmodule ArgParserTest do
            }
          ]}
       assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison"]) == expected
+    end
+
+    test "a ssh github package with a ref" do
+      expected =
+        {:add,
+         [
+           %Package{
+             name: "poison",
+             details: %Git{
+               uri: "git@github.com:devinus/poison",
+               ref: "123"
+             }
+           }
+         ]}
+      assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison#123"]) == expected
     end
   end
 end
