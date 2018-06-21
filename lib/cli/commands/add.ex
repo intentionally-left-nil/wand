@@ -125,13 +125,26 @@ defmodule Wand.CLI.Commands.Add do
     end
   end
 
+  defp version_type("file:" <> _), do: :file
+  defp version_type(_), do: :hex
+
   defp allowed_flags(args) do
-    single_package_flags = [
-      compile_env: :boolean,
+    hex_flags = [
       hex_name: :string,
-      read_app_file: :boolean,
+    ]
+
+    file_flags = [
+      umbrella: :boolean,
+    ]
+
+    git_flags = [
       sparse: :string,
       submodules: :boolean,
+    ]
+
+    common_single_package_flags = [
+      compile_env: :boolean,
+      read_app_file: :boolean,
     ]
 
     multi_package_flags = [
@@ -147,9 +160,19 @@ defmodule Wand.CLI.Commands.Add do
     ]
 
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
-    case commands do
-      [_item] -> single_package_flags ++ multi_package_flags
-      _ -> multi_package_flags
+    if (length(commands) == 1) do
+      type = hd(commands)
+      |> split_version
+      |> elem(1)
+      |> version_type
+      flags = case type do
+        :file -> file_flags
+        :git -> git_flags
+        :hex -> hex_flags
+      end
+      flags ++ common_single_package_flags ++ multi_package_flags
+    else
+      multi_package_flags
     end
   end
 end

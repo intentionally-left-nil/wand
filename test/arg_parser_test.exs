@@ -36,6 +36,12 @@ defmodule ArgParserTest do
       assert ArgParser.parse(command) == {:help, :add, {:invalid_flag, "--sparse"}}
     end
 
+    test "returns help if a flag for the wrong file type is given" do
+
+      command = OptionParser.split("add ex_doc@file:/test --hex-name=foo")
+      assert ArgParser.parse(command) == {:help, :add, {:invalid_flag, "--hex-name"}}
+    end
+
     test "a simple package" do
       assert ArgParser.parse(["add", "poison"]) == {:add, [%Package{name: "poison"}]}
     end
