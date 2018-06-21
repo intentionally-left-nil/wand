@@ -13,11 +13,20 @@ defmodule Wand.CLI.Commands.Add do
       prod: :boolean,
       test: :boolean,
     ]
-    {switches, ["add" | commands], _errors} = OptionParser.parse(args, strict: flags)
-    get_packages(commands, switches)
+    {switches, ["add" | commands], errors} = OptionParser.parse(args, strict: flags)
+
+    case parse_errors(errors) do
+      :ok -> get_packages(commands, switches)
+      error -> error
+    end
   end
 
-  defp get_packages([], switches), do: {:error, :missing_package}
+  defp parse_errors([]), do: :ok
+  defp parse_errors([{flag, _} | _rest]) do
+    {:error, {:invalid_flag, flag}}
+  end
+
+  defp get_packages([], _switches), do: {:error, :missing_package}
 
   defp get_packages(packages, switches) do
     environments = get_environments(switches)

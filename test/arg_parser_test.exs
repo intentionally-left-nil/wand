@@ -3,15 +3,15 @@ defmodule Wand.CLI.ArgParserTest do
 
   describe "help" do
     test "no args are given" do
-      assert Wand.CLI.ArgParser.parse([]) == {:help, nil}
+      assert Wand.CLI.ArgParser.parse([]) == {:help, nil, nil}
     end
 
     test "the argument of help is given" do
-      assert Wand.CLI.ArgParser.parse(["help"]) == {:help, nil}
+      assert Wand.CLI.ArgParser.parse(["help"]) == {:help, nil, nil}
     end
 
     test "with --? passed in" do
-      assert Wand.CLI.ArgParser.parse(["--?"]) == {:help, nil}
+      assert Wand.CLI.ArgParser.parse(["--?"]) == {:help, nil, nil}
     end
 
     test "an unrecognized command is given" do
@@ -22,7 +22,11 @@ defmodule Wand.CLI.ArgParserTest do
 
   describe "add" do
     test "returns help if no args are given" do
-      assert Wand.CLI.ArgParser.parse(["add"]) == {:help, {:add, :missing_package}}
+      assert Wand.CLI.ArgParser.parse(["add"]) == {:help, :add, :missing_package}
+    end
+
+    test "returns help if invalid flags are given" do
+      assert Wand.CLI.ArgParser.parse(["add", "poison", "--wrong-flag"]) == {:help, :add, {:invalid_flag, "--wrong-flag"}}
     end
 
     test "a simple package" do

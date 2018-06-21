@@ -3,8 +3,8 @@ defmodule Wand.CLI.ArgParser do
     {_, main_commands, _} = OptionParser.parse(args)
 
     case main_commands do
-      [] -> {:help, nil}
-      ["help"] -> {:help, nil}
+      [] -> {:help, nil, nil}
+      ["help"] -> {:help, nil, nil}
       ["add" | _rest] -> validate("add", args)
       [command | _rest] -> {:help, {:unrecognized, command}}
     end
@@ -16,7 +16,7 @@ defmodule Wand.CLI.ArgParser do
 
     case Kernel.apply(module, :validate, [args]) do
       {:ok, response} -> {a_name, response}
-      {:error, reason} -> {:help, {a_name, reason}}
+      {:error, reason} -> {:help, a_name, reason}
     end
   end
 end
