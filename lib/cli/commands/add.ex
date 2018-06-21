@@ -1,10 +1,11 @@
 defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
 
-  defmodule Args do
-    defstruct package: nil,
+  defmodule Package do
+    defstruct name: nil,
               version: :latest,
-              environments: [:all]
+              environments: [:all],
+              runtime: true
   end
 
   def validate(args) do
@@ -13,6 +14,7 @@ defmodule Wand.CLI.Commands.Add do
       prod: :boolean,
       test: :boolean,
       env: :keep,
+      runtime: :boolean,
     ]
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
@@ -30,19 +32,28 @@ defmodule Wand.CLI.Commands.Add do
   defp get_packages([], _switches), do: {:error, :missing_package}
 
   defp get_packages(packages, switches) do
-    environments = get_environments(switches)
+    base_package = get_base_package(switches)
     packages =
       Enum.map(packages, fn package ->
-        {package, version} = split_version(package)
+        {name, version} = split_version(package)
 
-        %Args{
-          package: package,
+        %Package{
+          base_package |
+          name: name,
           version: version,
-          environments: environments,
         }
       end)
 
     {:ok, packages}
+  end
+
+  defp get_base_package(switches) do
+    environments = get_environments(switches)
+    runtime = Keyword.get(switches, :runtime, true)
+    %Package {
+      environments: environments,
+      runtime: runtime,
+    }
   end
 
   defp split_version(package) do
