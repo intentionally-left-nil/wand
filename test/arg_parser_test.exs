@@ -148,5 +148,38 @@ defmodule ArgParserTest do
          ]}
       assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison#123"]) == expected
     end
+
+    test "a ssh github package with a branch" do
+      expected =
+        {:add,
+         [
+           %Package{
+             name: "poison",
+             details: %Git{
+               uri: "git@github.com:devinus/poison",
+               branch: "master"
+             }
+           }
+         ]}
+      assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison#master", "--branch"]) == expected
+    end
+
+    test "ssh github package with a tag, sparse, and submodules" do
+      expected =
+        {:add,
+         [
+           %Package{
+             name: "poison",
+             details: %Git{
+               uri: "git@github.com:devinus/poison",
+               tag: "123",
+               sparse: "my_folder",
+               submodules: true
+             }
+           }
+         ]}
+      command = OptionParser.split("add poison@git@github.com:devinus/poison#123 --tag --sparse=my_folder --submodules")
+      assert ArgParser.parse(command) == expected
+    end
   end
 end

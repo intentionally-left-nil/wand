@@ -19,7 +19,7 @@ defmodule Wand.CLI.Commands.Add do
 
   defmodule Path do
     defstruct path: nil,
-              in_umbrella: nil
+              umbrella: nil
   end
 
   defmodule Package do
@@ -85,16 +85,27 @@ defmodule Wand.CLI.Commands.Add do
   defp add_details(package, :file, "file:" <> file, switches) do
     details = %Path{
       path: file,
-      in_umbrella: Keyword.get(switches, :umbrella)
+      umbrella: Keyword.get(switches, :umbrella)
     }
     %Package{package | details: details}
   end
 
-  defp add_details(package, :git, git_url, switches) do
-    details = case String.split(git_url, "#", parts: 2) do
-      [git_url] ->  %Git{uri: git_url}
-      [git_url, ref] ->  %Git{uri: git_url, ref: ref}
+  defp add_details(package, :git, git_uri, switches) do
+    details = case String.split(git_uri, "#", parts: 2) do
+      [git_uri] ->  %Git{uri: git_uri}
+      [git_uri, ref] ->
+        key = [:branch, :ref, :tag]
+        |> Enum.find(:ref, &Keyword.get(switches, &1))
+
+        data = %{uri: git_uri}
+        |> Map.put(key, ref)
+        struct(Git, data)
     end
+    details = %Git{ details |
+      sparse: Keyword.get(switches, :sparse),
+      submodules: Keyword.get(switches, :submodules),
+    }
+
     %Package{package | details: details}
   end
 
