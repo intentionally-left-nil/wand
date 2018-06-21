@@ -69,5 +69,15 @@ defmodule Wand.CLI.ArgParserTest do
       assert Wand.CLI.ArgParser.parse(["add", "poison", "--runtime=false"]) ==
                {:add, [%Wand.CLI.Commands.Add.Package{name: "poison", runtime: false}]}
     end
+
+    test "set the override flag to true" do
+      assert Wand.CLI.ArgParser.parse(["add", "poison", "--override"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Package{name: "poison", override: true}]}
+    end
+
+    test "set the optional flag to true" do
+      assert Wand.CLI.ArgParser.parse(["add", "poison", "--optional"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Package{name: "poison", optional: true}]}
+    end
   end
 end

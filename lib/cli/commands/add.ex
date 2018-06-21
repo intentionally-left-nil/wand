@@ -2,19 +2,23 @@ defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
 
   defmodule Package do
-    defstruct name: nil,
-              version: :latest,
-              environments: [:all],
-              runtime: true
+    defstruct environments: [:all],
+              name: nil,
+              optional: false,
+              override: false,
+              runtime: true,
+              version: :latest
   end
 
   def validate(args) do
     flags = [
       dev: :boolean,
-      prod: :boolean,
-      test: :boolean,
       env: :keep,
+      optional: :boolean,
+      override: :boolean,
+      prod: :boolean,
       runtime: :boolean,
+      test: :boolean,
     ]
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
@@ -48,11 +52,11 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defp get_base_package(switches) do
-    environments = get_environments(switches)
-    runtime = Keyword.get(switches, :runtime, true)
     %Package {
-      environments: environments,
-      runtime: runtime,
+      environments: get_environments(switches),
+      optional: Keyword.get(switches, :optional, false),
+      override: Keyword.get(switches, :override, false),
+      runtime: Keyword.get(switches, :runtime, true),
     }
   end
 
