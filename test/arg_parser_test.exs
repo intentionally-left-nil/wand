@@ -34,5 +34,15 @@ defmodule Wand.CLI.ArgParserTest do
       assert Wand.CLI.ArgParser.parse(["add", "poison@3.1"]) ==
                {:add, [%Wand.CLI.Commands.Add.Args{package: "poison", version: "3.1"}]}
     end
+
+    test "a package only for the test environment" do
+      assert Wand.CLI.ArgParser.parse(["add", "poison", "--test"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Args{package: "poison", environments: [:test]}]}
+    end
+
+    test "a package for dev and test" do
+      assert Wand.CLI.ArgParser.parse(["add", "poison", "--test", "--dev"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Args{package: "poison", environments: [:test, :dev]}]}
+    end
   end
 end
