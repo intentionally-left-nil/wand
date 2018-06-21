@@ -79,5 +79,10 @@ defmodule Wand.CLI.ArgParserTest do
       assert Wand.CLI.ArgParser.parse(["add", "poison", "--optional"]) ==
                {:add, [%Wand.CLI.Commands.Add.Package{name: "poison", optional: true}]}
     end
+
+    test "a local package" do
+      assert Wand.CLI.ArgParser.parse(["add", "test@file:../test"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Package{name: "test", path: "../test"}]}
+    end
   end
 end

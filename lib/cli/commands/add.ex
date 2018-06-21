@@ -6,6 +6,7 @@ defmodule Wand.CLI.Commands.Add do
               name: nil,
               optional: false,
               override: false,
+              path: nil,
               runtime: true,
               version: :latest
   end
@@ -16,10 +17,12 @@ defmodule Wand.CLI.Commands.Add do
       env: :keep,
       optional: :boolean,
       override: :boolean,
+      path: :string,
       prod: :boolean,
       runtime: :boolean,
       test: :boolean,
     ]
+
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case parse_errors(errors) do
@@ -35,28 +38,30 @@ defmodule Wand.CLI.Commands.Add do
 
   defp get_packages([], _switches), do: {:error, :missing_package}
 
-  defp get_packages(packages, switches) do
+  defp get_packages(names, switches) do
     base_package = get_base_package(switches)
     packages =
-      Enum.map(packages, fn package ->
-        {name, version} = split_version(package)
-
-        %Package{
-          base_package |
-          name: name,
-          version: version,
-        }
+      Enum.map(names, fn name ->
+          {name, version} = split_version(name)
+          %Package{base_package | name: name}
+          |> add_version(version)
       end)
 
     {:ok, packages}
   end
 
+  defp get_switch(switches, key) do
+    Keyword.get_lazy(switches, key, fn ->
+      Map.fetch!(%Package{}, key)
+    end)
+  end
+
   defp get_base_package(switches) do
     %Package {
       environments: get_environments(switches),
-      optional: Keyword.get(switches, :optional, false),
-      override: Keyword.get(switches, :override, false),
-      runtime: Keyword.get(switches, :runtime, true),
+      optional: get_switch(switches, :optional),
+      override: get_switch(switches, :override),
+      runtime: get_switch(switches, :runtime),
     }
   end
 
@@ -66,6 +71,9 @@ defmodule Wand.CLI.Commands.Add do
       [package] -> {package, :latest}
     end
   end
+
+  defp add_version(package, "file:" <> path), do: %Package{package | path: path}
+  defp add_version(package, version), do: %Package{package | version: version}
 
   defp add_predefined_environments(environments, switches) do
     [:dev, :test, :prod]
