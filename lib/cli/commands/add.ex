@@ -76,7 +76,7 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defp split_version(package) do
-    case String.split(package, "@") do
+    case String.split(package, "@", parts: 2) do
       [package, version] -> {package, version}
       [package] -> {package, :latest}
     end

@@ -120,5 +120,19 @@ defmodule ArgParserTest do
          ]}
       assert ArgParser.parse(["add", "poison@https://github.com/devinus/poison.git"]) == expected
     end
+
+    test "a ssh github package" do
+      expected =
+        {:add,
+         [
+           %Package{
+             name: "poison",
+             details: %Git{
+               uri: "git@github.com:devinus/poison"
+             }
+           }
+         ]}
+      assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison"]) == expected
+    end
   end
 end
