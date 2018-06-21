@@ -3,6 +3,12 @@ defmodule Wand.MixProject do
 
   @version "0.2.0"
   @description "A CLI tool to manage package dependencies"
+  @cli_env  [
+    "coveralls": :test,
+    "coveralls.detail": :test,
+    "coveralls.post": :test,
+    "coveralls.html": :test
+  ]
 
   def project do
     [
@@ -11,6 +17,8 @@ defmodule Wand.MixProject do
       version: @version,
       description: @description,
       elixir: "~> 1.6",
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: @cli_env,
       escript: [main_module: Wand.CLI],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -39,6 +47,7 @@ defmodule Wand.MixProject do
 
   defp deps do
     [
+      {:excoveralls, "~> 0.9.1", only: :test},
       {:mox, "~> 0.3.2", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
