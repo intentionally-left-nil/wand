@@ -4,7 +4,18 @@ defmodule Wand.CLI.ArgParser do
     case main_commands do
       [] -> {:help, nil}
       ["help"] -> {:help, nil}
+      ["add" | _rest] -> validate("add", args)
       [command | _rest] -> {:help, {:unrecognized, command}}
+    end
+  end
+
+  defp validate(name, args) do
+    module = Module.concat(Wand.CLI.Commands, String.capitalize(name))
+    a_name = String.to_atom(name)
+
+    case Kernel.apply(module, :validate, [args]) do
+      {:ok, response} -> {a_name, response}
+      {:error, reason} -> {:help, {a_name, reason}}
     end
   end
 end

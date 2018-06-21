@@ -17,4 +17,14 @@ defmodule Wand.CLI.ArgParserTest do
       assert Wand.CLI.ArgParser.parse(["wrong_command"]) == {:help, {:unrecognized, "wrong_command"}}
     end
   end
+
+  describe "add" do
+    test "returns help if no args are given" do
+      assert Wand.CLI.ArgParser.parse(["add"]) == {:help, {:add, :missing_package}}
+    end
+
+    test "a simple package" do
+      assert Wand.CLI.ArgParser.parse(["add", "poison"]) == {:add, [%Wand.CLI.Commands.Add.Args{package: "poison"}]}
+    end
+  end
 end
