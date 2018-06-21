@@ -31,6 +31,11 @@ defmodule ArgParserTest do
                {:help, :add, {:invalid_flag, "--wrong-flag"}}
     end
 
+    test "returns help if single-package flags are used to install multiple packages" do
+      command = OptionParser.split("add poison ex_doc --sparse=foo")
+      assert ArgParser.parse(command) == {:help, :add, {:invalid_flag, "--sparse"}}
+    end
+
     test "a simple package" do
       assert ArgParser.parse(["add", "poison"]) == {:add, [%Package{name: "poison"}]}
     end
@@ -92,6 +97,7 @@ defmodule ArgParserTest do
              }
            }
          ]}
+
       assert ArgParser.parse(["add", "test@file:../test"]) == expected
     end
 

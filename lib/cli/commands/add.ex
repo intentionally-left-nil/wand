@@ -2,13 +2,15 @@ defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
 
   defmodule Package do
-    defstruct environments: [:all],
+    defstruct compile_env: nil,
+              environments: [:all],
               git: nil,
               name: nil,
-              optional: false,
-              override: false,
+              optional: nil,
+              override: nil,
               path: nil,
-              runtime: true,
+              read_app_file: nil,
+              runtime: nil,
               version: :latest
 
     defmodule Git do
@@ -16,27 +18,24 @@ defmodule Wand.CLI.Commands.Add do
                 ref: nil,
                 branch: nil,
                 tag: nil,
-                sparse: false
+                sparse: nil,
+                submodules: nil
+    end
+
+    defmodule Hex do
+      defstruct hex_name: nil,
+                organization: nil,
+                repo: nil
     end
 
     defmodule Path do
       defstruct path: nil,
-                in_umbrella: false
+                in_umbrella: nil
     end
   end
 
   def validate(args) do
-    flags = [
-      dev: :boolean,
-      env: :keep,
-      optional: :boolean,
-      override: :boolean,
-      path: :string,
-      prod: :boolean,
-      runtime: :boolean,
-      test: :boolean
-    ]
-
+    flags = allowed_flags(args)
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case parse_errors(errors) do
@@ -67,16 +66,12 @@ defmodule Wand.CLI.Commands.Add do
     {:ok, packages}
   end
 
-  defp get_switch(switches, key, default_map \\ %Package{}) do
-    Keyword.get(switches, key, Map.fetch!(default_map, key))
-  end
-
   defp get_base_package(switches) do
     %Package{
       environments: get_environments(switches),
-      optional: get_switch(switches, :optional),
-      override: get_switch(switches, :override),
-      runtime: get_switch(switches, :runtime)
+      optional: Keyword.get(switches, :optional),
+      override: Keyword.get(switches, :override),
+      runtime: Keyword.get(switches, :runtime)
     }
   end
 
@@ -90,7 +85,7 @@ defmodule Wand.CLI.Commands.Add do
   defp add_version(package, "file:" <> file, switches) do
     path = %Package.Path{
       path: file,
-      in_umbrella: get_switch(switches, :in_umbrella, %Package.Path{})
+      in_umbrella: Keyword.get(switches, :in_umbrella)
     }
 
     %Package{package | path: path}
@@ -123,6 +118,34 @@ defmodule Wand.CLI.Commands.Add do
     case environments do
       [] -> [:all]
       environments -> environments
+    end
+  end
+
+  defp allowed_flags(args) do
+    single_package_flags = [
+      compile_env: :boolean,
+      hex_name: :string,
+      read_app_file: :boolean,
+      sparse: :string,
+      submodules: :boolean,
+    ]
+
+    multi_package_flags = [
+      dev: :boolean,
+      env: :keep,
+      optional: :boolean,
+      organization: :string,
+      override: :boolean,
+      prod: :boolean,
+      repo: :string,
+      runtime: :boolean,
+      test: :boolean,
+    ]
+
+    {_switches, [_ | commands], _errors} = OptionParser.parse(args)
+    case commands do
+      [_item] -> single_package_flags ++ multi_package_flags
+      _ -> multi_package_flags
     end
   end
 end
