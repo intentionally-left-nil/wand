@@ -6,6 +6,7 @@ defmodule Wand.CLI.ArgParser do
       [] -> {:help, nil, nil}
       ["help"] -> {:help, nil, nil}
       ["add" | _rest] -> validate("add", args)
+      ["a" | _rest] -> validate("add", args)
       [command | _rest] -> {:help, {:unrecognized, command}}
     end
   end

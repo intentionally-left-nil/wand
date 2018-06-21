@@ -14,7 +14,7 @@ defmodule Wand.CLI.Commands.Add do
       test: :boolean,
       env: :keep,
     ]
-    {switches, ["add" | commands], errors} = OptionParser.parse(args, strict: flags)
+    {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case parse_errors(errors) do
       :ok -> get_packages(commands, switches)

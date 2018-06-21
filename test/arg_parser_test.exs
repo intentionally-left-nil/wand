@@ -34,6 +34,11 @@ defmodule Wand.CLI.ArgParserTest do
                {:add, [%Wand.CLI.Commands.Add.Args{package: "poison"}]}
     end
 
+    test "using the shorthand a" do
+      assert Wand.CLI.ArgParser.parse(["a", "poison"]) ==
+               {:add, [%Wand.CLI.Commands.Add.Args{package: "poison"}]}
+    end
+
     test "a package with a specific version" do
       assert Wand.CLI.ArgParser.parse(["add", "poison@3.1"]) ==
                {:add, [%Wand.CLI.Commands.Add.Args{package: "poison", version: "3.1"}]}
