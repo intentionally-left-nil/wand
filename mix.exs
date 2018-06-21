@@ -14,7 +14,7 @@ defmodule Wand.MixProject do
       escript: [main_module: Wand.CLI],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package(),
+      package: package()
     ]
   end
 
@@ -26,7 +26,7 @@ defmodule Wand.MixProject do
 
   defp aliases do
     [
-      build: [&build_cli/1],
+      build: [&build_cli/1]
     ]
   end
 
@@ -40,17 +40,18 @@ defmodule Wand.MixProject do
   defp deps do
     [
       {:mox, "~> 0.3.2", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
   defp package do
-    [ name: :wand,
+    [
+      name: :wand,
       files: ["lib", "mix.exs"],
       docs: [extras: ["README.md"]],
       maintainers: ["Anil Kulkarni"],
       licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/AnilRedshift/wand-cli"},
+      links: %{"Github" => "https://github.com/AnilRedshift/wand-cli"}
     ]
   end
 end
