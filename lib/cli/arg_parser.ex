@@ -1,14 +1,25 @@
 defmodule Wand.CLI.ArgParser do
   def parse(args) do
-    {_, main_commands, _} = OptionParser.parse(args)
+    global_flags = [
+      version: :boolean
+    ]
+    {flags, commands, _} = OptionParser.parse(args, strict: global_flags)
 
-    case main_commands do
+    cond do
+      Keyword.has_key?(flags, :version) -> validate("version", args)
+      true -> parse_main(args, commands)
+    end
+  end
+
+  defp parse_main(args, commands) do
+    case commands do
       [] -> {:help, nil, nil}
       ["help"] -> {:help, nil, nil}
       ["add" | _rest] -> validate("add", args)
       ["a" | _rest] -> validate("add", args)
       ["remove" | _rest] -> validate("remove", args)
       ["r" | _rest] -> validate("remove", args)
+      ["version" | _rest] -> validate("version", args)
       [command | _rest] -> {:help, {:unrecognized, command}}
     end
   end

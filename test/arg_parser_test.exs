@@ -263,4 +263,14 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["remove", "poison", "ex_doc"]) == {:remove, ["poison", "ex_doc"]}
     end
   end
+
+  describe "version" do
+    test "wand --version returns the version" do
+      assert ArgParser.parse(["--version"]) == {:version, []}
+    end
+
+    test "wand version returns the version" do
+      assert ArgParser.parse(["version"]) == {:version, []}
+    end
+  end
 end
