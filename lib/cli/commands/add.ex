@@ -40,16 +40,10 @@ defmodule Wand.CLI.Commands.Add do
     flags = allowed_flags(args)
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
-    case parse_errors(errors) do
+    case Wand.CLI.Command.parse_errors(errors) do
       :ok -> get_packages(commands, switches)
       error -> error
     end
-  end
-
-  defp parse_errors([]), do: :ok
-
-  defp parse_errors([{flag, _} | _rest]) do
-    {:error, {:invalid_flag, flag}}
   end
 
   defp get_packages([], _switches), do: {:error, :missing_package}
