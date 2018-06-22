@@ -130,6 +130,16 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["add", "test@file:../test"]) == expected
     end
 
+    test "an exact match" do
+      assert ArgParser.parse(["add", "ex_doc", "--exact"]) ==
+               {:add, [%Package{name: "ex_doc", mode: :exact}]}
+    end
+
+    test "Install the closest minor version" do
+      assert ArgParser.parse(["add", "ex_doc", "--around"]) ==
+               {:add, [%Package{name: "ex_doc", mode: :around}]}
+    end
+
     test "a local umbrella package" do
       expected =
         {:add,

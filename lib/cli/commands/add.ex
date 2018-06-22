@@ -28,6 +28,7 @@ defmodule Wand.CLI.Commands.Add do
               details: %Hex{},
               download: true,
               environments: [:all],
+              mode: :normal,
               name: nil,
               optional: nil,
               override: nil,
@@ -76,6 +77,7 @@ defmodule Wand.CLI.Commands.Add do
       compile_env: Keyword.get(switches, :compile_env),
       download: download,
       environments: get_environments(switches),
+      mode: get_mode(switches),
       optional: Keyword.get(switches, :optional),
       override: Keyword.get(switches, :override),
       read_app_file: Keyword.get(switches, :read_app_file),
@@ -154,6 +156,16 @@ defmodule Wand.CLI.Commands.Add do
     end
   end
 
+  defp get_mode(switches) do
+    exact = Keyword.get(switches, :exact)
+    around = Keyword.get(switches, :around)
+    cond do
+      exact -> :exact
+      around -> :around
+      true -> :normal
+    end
+  end
+
   defp version_type("file:" <> _), do: :file
   defp version_type("https://" <> _), do: :git
   defp version_type("git@" <> _), do: :git
@@ -182,10 +194,12 @@ defmodule Wand.CLI.Commands.Add do
     ]
 
     multi_package_flags = [
+      around: :boolean,
+      compile: :boolean,
       dev: :boolean,
       download: :boolean,
-      compile: :boolean,
       env: :keep,
+      exact: :boolean,
       optional: :boolean,
       organization: :string,
       override: :boolean,
