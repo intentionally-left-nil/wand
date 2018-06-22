@@ -25,24 +25,6 @@ defmodule ArgParserTest do
     end
   end
 
-  describe "remove" do
-    test "returns help if no args are given" do
-      assert ArgParser.parse(["remove"]) == {:help, :remove, :missing_package}
-    end
-
-    test "returns an array of one package to remove" do
-      assert ArgParser.parse(["remove", "poison"]) == {:remove, ["poison"]}
-    end
-
-    test "shorthand" do
-      assert ArgParser.parse(["r", "poison"]) == {:remove, ["poison"]}
-    end
-
-    test "returns an array of multiple packages to remove" do
-      assert ArgParser.parse(["remove", "poison", "ex_doc"]) == {:remove, ["poison", "ex_doc"]}
-    end
-  end
-
   describe "version" do
     test "wand --version returns the version" do
       assert ArgParser.parse(["--version"]) == {:version, []}
