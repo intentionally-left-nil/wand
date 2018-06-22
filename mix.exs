@@ -29,7 +29,6 @@ defmodule Wand.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      env: env(),
     ]
   end
 
@@ -52,12 +51,6 @@ defmodule Wand.MixProject do
       {:mox, "~> 0.3.2", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:junit_formatter, "~> 2.2", only: [:test]}
-    ]
-  end
-
-  defp env do
-    [
-      system: System
     ]
   end
 

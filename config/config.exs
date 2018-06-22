@@ -1,12 +1,6 @@
 use Mix.Config
 
-impls = case Mix.env() do
-  :test -> [
-    system: Wand.CLI.SystemMock
-  ]
-  _ -> [
-    system: System
-  ]
+if Mix.env() == :test do
+  config :wand,
+  system: Wand.CLI.SystemMock
 end
-
-config :wand, impls

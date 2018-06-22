@@ -1,5 +1,5 @@
 defmodule Wand.CLI do
-  @system Application.get_env(:wand, :system)
+  @system Application.get_env(:wand, :system, System)
   def main(args) do
     Wand.CLI.ArgParser.parse(args)
     |> route
