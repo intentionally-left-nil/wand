@@ -4,7 +4,7 @@ defmodule ArgParserTest do
   alias Wand.CLI.Commands.Add.Package
 
   test "no arguments" do
-    assert ArgParser.parse([]) == {:help, :help, nil}
+    assert ArgParser.parse([]) == {:help, :help, :banner}
   end
 
   test "an unrecognized command is given" do
