@@ -11,10 +11,6 @@ defmodule RemoveTest do
       assert Remove.validate(["remove", "poison"]) == {:ok, ["poison"]}
     end
 
-    test "shorthand" do
-      assert Remove.validate(["r", "poison"]) == {:ok, ["poison"]}
-    end
-
     test "returns an array of multiple packages to remove" do
       assert Remove.validate(["remove", "poison", "ex_doc"]) == {:ok, ["poison", "ex_doc"]}
     end

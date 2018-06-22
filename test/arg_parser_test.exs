@@ -1,10 +1,40 @@
 defmodule ArgParserTest do
   use ExUnit.Case, async: true
   alias Wand.CLI.ArgParser
+  alias Wand.CLI.Commands.Add.Package
 
-  describe "help" do
-    test "an unrecognized command is given" do
-      assert ArgParser.parse(["wrong_command"]) == {:help, {:unrecognized, "wrong_command"}}
-    end
+  test "no arguments" do
+    assert ArgParser.parse([]) == {:help, :help, nil}
+  end
+  test "an unrecognized command is given" do
+    assert ArgParser.parse(["wrong_command"]) == {:help, {:unrecognized, "wrong_command"}}
+  end
+
+  test "--version" do
+    assert ArgParser.parse(["--version"]) == {:version, []}
+  end
+
+  test "add shorthand" do
+    assert ArgParser.parse(["a", "poison"]) == {:add, [%Package{name: "poison"}]}
+  end
+
+  test "remove shorthand" do
+    assert ArgParser.parse(["r", "poison"]) == {:remove, ["poison"]}
+  end
+
+  test "upgrade shorthand" do
+    assert ArgParser.parse(["u", "poison"]) == {:upgrade, {["poison"], :major}}
+  end
+
+  test "ok responses get converted to key, response" do
+    assert ArgParser.parse(["version"]) == {:version, []}
+  end
+
+  test "error responses get converted to :help, key, reason" do
+    assert ArgParser.parse(["init", "--wrong-flag"]) == {:help, :init, {:invalid_flag, "--wrong-flag"}}
+  end
+
+  test "help is left untouched" do
+    assert ArgParser.parse(["help", "add"]) == {:help, :add, nil}
   end
 end

@@ -12,10 +12,6 @@ defmodule UpgradeTest do
       assert Upgrade.validate(["upgrade", "poison"]) == {:ok, {["poison"], :major}}
     end
 
-    test "a single package with the shorthand" do
-      assert Upgrade.validate(["u", "poison"]) == {:ok, {["poison"], :major}}
-    end
-
     test "--latest is the same as major" do
       assert Upgrade.validate(["upgrade", "poison", "--patch", "--latest"]) ==
                {:ok, {["poison"], :major}}

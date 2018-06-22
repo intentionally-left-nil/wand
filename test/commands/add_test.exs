@@ -37,10 +37,6 @@ defmodule AddTest do
                {:ok, [%Package{name: "poison", download: false, compile: false}]}
     end
 
-    test "using the shorthand a" do
-      assert Add.validate(["a", "poison"]) == {:ok, [%Package{name: "poison"}]}
-    end
-
     test "with an organization and a repo" do
       expected = {
         :ok,
