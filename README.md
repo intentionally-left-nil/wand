@@ -1,4 +1,5 @@
 # Wand
+[![Coverage Status](https://coveralls.io/repos/github/AnilRedshift/wand/badge.svg?branch=circle)](https://coveralls.io/github/AnilRedshift/wand?branch=circle)[![CircleCI](https://circleci.com/gh/AnilRedshift/wand.svg?style=svg)](https://circleci.com/gh/AnilRedshift/wand)
 
 **TODO: Add description**
 
