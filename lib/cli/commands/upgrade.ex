@@ -3,6 +3,7 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   def validate(args) do
     flags = [
+      latest: :boolean,
       major: :boolean,
       minor: :boolean,
       patch: :boolean,
@@ -24,6 +25,7 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   defp get_level(switches) do
     cond do
+      Keyword.get(switches, :latest) -> :major
       Keyword.get(switches, :major) -> :major
       Keyword.get(switches, :minor) -> :minor
       Keyword.get(switches, :patch) -> :patch

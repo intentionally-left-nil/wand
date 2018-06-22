@@ -280,22 +280,27 @@ defmodule ArgParserTest do
                {:help, :upgrade, {:invalid_flag, "--wrong-flag"}}
     end
 
-    test "upgrades a single package" do
+    test "a single package" do
       assert ArgParser.parse(["upgrade", "poison"]) ==
                {:upgrade, {["poison"], :major}}
     end
 
-    test "upgrades a single package with the shorthand" do
+    test "a single package with the shorthand" do
       assert ArgParser.parse(["u", "poison"]) ==
                {:upgrade, {["poison"], :major}}
     end
 
-    test "upgrades a single package to the next minor version" do
+    test "--latest is the same as major" do
+      assert ArgParser.parse(["upgrade", "poison", "--patch", "--latest"]) ==
+               {:upgrade, {["poison"], :major}}
+    end
+
+    test "a single package to the next minor version" do
       assert ArgParser.parse(["upgrade", "poison", "--minor"]) ==
                {:upgrade, {["poison"], :minor}}
     end
 
-    test "upgrades a single package to the next patch version" do
+    test "a single package to the next patch version" do
       assert ArgParser.parse(["upgrade", "poison", "--patch"]) ==
                {:upgrade, {["poison"], :patch}}
     end
