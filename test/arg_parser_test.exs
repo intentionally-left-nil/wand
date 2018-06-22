@@ -310,5 +310,11 @@ defmodule ArgParserTest do
                {:upgrade, {["poison", "ex_doc"], :patch}}
 
     end
+
+    test "upgrade all packages if none passed in" do
+      assert ArgParser.parse(["upgrade", "--patch"]) ==
+               {:upgrade, {:all, :patch}}
+
+    end
   end
 end
