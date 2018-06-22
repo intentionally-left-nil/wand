@@ -1,7 +1,6 @@
 defmodule ArgParserTest do
   use ExUnit.Case, async: true
   alias Wand.CLI.ArgParser
-  alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
 
   describe "help" do
     test "no args are given" do
@@ -22,16 +21,6 @@ defmodule ArgParserTest do
 
     test "help add" do
       assert ArgParser.parse(["help", "add"]) == {:help, :add, nil}
-    end
-  end
-
-  describe "version" do
-    test "wand --version returns the version" do
-      assert ArgParser.parse(["--version"]) == {:version, []}
-    end
-
-    test "wand version returns the version" do
-      assert ArgParser.parse(["version"]) == {:version, []}
     end
   end
 end
