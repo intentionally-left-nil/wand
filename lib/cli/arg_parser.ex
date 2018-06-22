@@ -7,6 +7,8 @@ defmodule Wand.CLI.ArgParser do
       ["help"] -> {:help, nil, nil}
       ["add" | _rest] -> validate("add", args)
       ["a" | _rest] -> validate("add", args)
+      ["remove" | _rest] -> validate("remove", args)
+      ["r" | _rest] -> validate("remove", args)
       [command | _rest] -> {:help, {:unrecognized, command}}
     end
   end
