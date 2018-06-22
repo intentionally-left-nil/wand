@@ -2,7 +2,6 @@ defmodule Wand.CLI.Commands.Outdated do
   @behaviour Wand.CLI.Command
 
   def help(_type) do
-
   end
 
   def validate([]), do: {:ok, []}

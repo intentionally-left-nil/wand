@@ -23,13 +23,13 @@ defmodule Wand.MixProject do
       preferred_cli_env: @cli_env,
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: @version,
+      version: @version
     ]
   end
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger]
     ]
   end
 

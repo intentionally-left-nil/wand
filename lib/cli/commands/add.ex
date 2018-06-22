@@ -37,7 +37,6 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   def help(_type) do
-
   end
 
   def validate(args) do

@@ -25,6 +25,7 @@ defmodule Wand.CLI.Commands.Help do
     """
     |> @display.print()
   end
+
   def validate(["help", name]), do: {:help, String.to_atom(name), nil}
   def validate(_args), do: {:error, :banner}
 end

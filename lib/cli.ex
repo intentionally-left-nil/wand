@@ -9,5 +9,4 @@ defmodule Wand.CLI do
     Wand.CLI.Command.route(key, :help, [data])
     @system.halt(1)
   end
-
 end
