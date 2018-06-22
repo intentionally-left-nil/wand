@@ -60,8 +60,8 @@ defmodule Wand.MixProject do
       files: ["lib", "mix.exs"],
       docs: [extras: ["README.md"]],
       maintainers: ["Anil Kulkarni"],
-      licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/AnilRedshift/wand-cli"}
+      licenses: ["BSD-3"],
+      links: %{"Github" => "https://github.com/AnilRedshift/wand"}
     ]
   end
 end
