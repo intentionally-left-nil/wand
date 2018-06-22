@@ -7,6 +7,7 @@ defmodule Wand.CLI.Command do
   end
 
   defp get_module(name) when is_atom(name), do: get_module(to_string(name))
+
   defp get_module(name) do
     Module.concat(Wand.CLI.Commands, String.capitalize(name))
   end

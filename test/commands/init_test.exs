@@ -4,8 +4,7 @@ defmodule InitTest do
 
   describe "validate" do
     test "returns help if invalid flags are given" do
-      assert Init.validate(["init", "--wrong-flag"]) ==
-               {:error, {:invalid_flag, "--wrong-flag"}}
+      assert Init.validate(["init", "--wrong-flag"]) == {:error, {:invalid_flag, "--wrong-flag"}}
     end
 
     test "initializes the current path if no args are given" do

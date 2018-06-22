@@ -6,6 +6,7 @@ defmodule ArgParserTest do
   test "no arguments" do
     assert ArgParser.parse([]) == {:help, :help, nil}
   end
+
   test "an unrecognized command is given" do
     assert ArgParser.parse(["wrong_command"]) == {:help, {:unrecognized, "wrong_command"}}
   end
@@ -31,7 +32,8 @@ defmodule ArgParserTest do
   end
 
   test "error responses get converted to :help, key, reason" do
-    assert ArgParser.parse(["init", "--wrong-flag"]) == {:help, :init, {:invalid_flag, "--wrong-flag"}}
+    assert ArgParser.parse(["init", "--wrong-flag"]) ==
+             {:help, :init, {:invalid_flag, "--wrong-flag"}}
   end
 
   test "help is left untouched" do
