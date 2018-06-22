@@ -1,4 +1,5 @@
 defmodule Wand.CLI.ArgParser do
+  alias Wand.CLI.Command
   def parse(args) do
     global_flags = [
       version: :boolean
@@ -7,12 +8,12 @@ defmodule Wand.CLI.ArgParser do
     {flags, commands, _} = OptionParser.parse(args, strict: global_flags)
 
     cond do
-      Keyword.has_key?(flags, :version) -> validate("version", args)
+      Keyword.has_key?(flags, :version) -> validate(:version, args)
       true -> parse_main(args, commands)
     end
   end
 
-  defp parse_main(args, []), do: validate("help", args)
+  defp parse_main(args, []), do: validate(:help, args)
   @commands ["add", "a", "help", "init", "outdated", "remove", "r", "upgrade", "u", "version"]
   defp parse_main(args, [command | _rest]) when command in @commands do
     %{
@@ -21,18 +22,16 @@ defmodule Wand.CLI.ArgParser do
       "u" => "upgrade"
     }
     |> Map.get(command, command)
+    |> String.to_atom()
     |> validate(args)
   end
 
   defp parse_main(_args, [command | _rest]), do: {:help, {:unrecognized, command}}
 
-  defp validate(name, args) do
-    module = Module.concat(Wand.CLI.Commands, String.capitalize(name))
-    a_name = String.to_atom(name)
-
-    case Kernel.apply(module, :validate, [args]) do
-      {:ok, response} -> {a_name, response}
-      {:error, reason} -> {:help, a_name, reason}
+  defp validate(key, args) do
+    case Command.route(key, :validate, [args]) do
+      {:ok, response} -> {key, response}
+      {:error, reason} -> {:help, key, reason}
       {:help, module, reason} -> {:help, module, reason}
     end
   end
