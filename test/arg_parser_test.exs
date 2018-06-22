@@ -322,4 +322,11 @@ defmodule ArgParserTest do
 
     end
   end
+
+  describe "outdated" do
+    test "returns help when arguments are given" do
+      assert ArgParser.parse(["outdated", "poison"]) ==
+               {:help, :outdated, :wrong_command}
+    end
+  end
 end

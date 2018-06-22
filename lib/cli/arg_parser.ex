@@ -17,6 +17,7 @@ defmodule Wand.CLI.ArgParser do
       ["help"] -> {:help, nil, nil}
       ["add" | _rest] -> validate("add", args)
       ["a" | _rest] -> validate("add", args)
+      ["outdated" | _rest] -> validate("outdated", args)
       ["remove" | _rest] -> validate("remove", args)
       ["r" | _rest] -> validate("remove", args)
       ["upgrade" | _rest] -> validate("upgrade", args)
