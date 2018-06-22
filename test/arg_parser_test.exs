@@ -82,28 +82,4 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["outdated", "poison"]) == {:help, :outdated, :wrong_command}
     end
   end
-
-  describe "init" do
-    test "returns help if invalid flags are given" do
-      assert ArgParser.parse(["init", "--wrong-flag"]) ==
-               {:help, :init, {:invalid_flag, "--wrong-flag"}}
-    end
-
-    test "initializes the current path if no args are given" do
-      assert ArgParser.parse(["init"]) == {:init, {"./", []}}
-    end
-
-    test "uses a custom path" do
-      assert ArgParser.parse(["init", "../foo"]) == {:init, {"../foo", []}}
-    end
-
-    test "passes in overwrite" do
-      assert ArgParser.parse(["init", "--overwrite"]) == {:init, {"./", [overwrite: true]}}
-    end
-
-    test "passes in task_only and force" do
-      assert ArgParser.parse(["init", "--overwrite", "--task-only"]) ==
-               {:init, {"./", [overwrite: true, task_only: true]}}
-    end
-  end
 end
