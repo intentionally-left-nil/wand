@@ -17,11 +17,11 @@ defmodule Wand.CLI.Display.Renderer do
   end
 
   defp render_block(%Heading{content: content}) do
-    [ANSI.underline(), content, ANSI.no_underline()]
+    [ANSI.underline(), content, ANSI.no_underline(), "\n"]
   end
 
   defp render_block(%Para{lines: lines}) do
-    Enum.join(lines)
+    Enum.join(lines, "\n")
   end
 end
 

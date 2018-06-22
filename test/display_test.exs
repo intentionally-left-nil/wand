@@ -9,7 +9,20 @@ defmodule DisplayTest do
   end
 
   test "Adds underline to a title" do
-    assert print("# Hello") == "#{ANSI.underline()}Hello#{ANSI.no_underline()}\n"
+    assert print("# Hello") == "#{ANSI.underline()}Hello#{ANSI.no_underline()}\n\n"
+  end
+
+  test "combine text and an a title" do
+    message = """
+    # Lyrics
+    This is America
+    Don't catch you slippin' up
+    """
+    assert print(message) == """
+    #{ANSI.underline()}Lyrics#{ANSI.no_underline()}
+    This is America
+    Don't catch you slippin' up
+    """
   end
 
   defp print(message) do
