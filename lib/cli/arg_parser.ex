@@ -11,20 +11,19 @@ defmodule Wand.CLI.ArgParser do
     end
   end
 
-  defp parse_main(_args, []), do: {:help, nil, nil}
-  @commands ["add", "init", "outdated", "remove", "upgrade", "version"]
+  defp parse_main(args, []), do: validate("help", args)
+  @commands ["add", "a", "help", "init", "outdated", "remove", "r", "upgrade", "u", "version"]
   defp parse_main(args, [command | _rest]) when command in @commands do
-    validate(command, args)
+    %{
+      "a" => "add",
+      "r" => "remove",
+      "u" => "upgrade",
+    }
+    |> Map.get(command, command)
+    |> validate(args)
   end
-  defp parse_main(args, [command | _rest]) do
-    case command do
-      "help" -> {:help, nil, nil}
-      "a" -> validate("add", args)
-      "r" -> validate("remove", args)
-      "u" -> validate("upgrade", args)
-      command -> {:help, {:unrecognized, command}}
-    end
-  end
+  defp parse_main(_args, [command | _rest]), do: {:help, {:unrecognized, command}}
+
 
   defp validate(name, args) do
     module = Module.concat(Wand.CLI.Commands, String.capitalize(name))
@@ -33,6 +32,7 @@ defmodule Wand.CLI.ArgParser do
     case Kernel.apply(module, :validate, [args]) do
       {:ok, response} -> {a_name, response}
       {:error, reason} -> {:help, a_name, reason}
+      {:help, module, reason} -> {:help, module, reason}
     end
   end
 end
