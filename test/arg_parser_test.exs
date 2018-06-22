@@ -1,5 +1,5 @@
 defmodule ArgParserTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias Wand.CLI.ArgParser
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
 
