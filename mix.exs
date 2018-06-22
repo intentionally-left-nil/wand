@@ -14,15 +14,16 @@ defmodule Wand.MixProject do
     [
       aliases: aliases(),
       app: :wand,
-      version: @version,
+      deps: deps(),
       description: @description,
       elixir: "~> 1.6",
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: @cli_env,
+      elixirc_paths: elixirc_paths(Mix.env()),
       escript: [main_module: Wand.CLI],
+      package: package(),
+      preferred_cli_env: @cli_env,
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      package: package()
+      test_coverage: [tool: ExCoveralls],
+      version: @version,
     ]
   end
 
@@ -53,6 +54,9 @@ defmodule Wand.MixProject do
       {:junit_formatter, "~> 2.2", only: [:test]}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["test/support", "lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp package do
     [
