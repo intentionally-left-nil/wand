@@ -45,6 +45,14 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["add", "poison"]) == {:add, [%Package{name: "poison"}]}
     end
 
+    test "skip compiling" do
+      assert ArgParser.parse(["add", "poison", "--compile=false"]) == {:add, [%Package{name: "poison", compile: false}]}
+    end
+
+    test "skip downloading" do
+      assert ArgParser.parse(["add", "poison", "--download=false"]) == {:add, [%Package{name: "poison", download: false, compile: false}]}
+    end
+
     test "using the shorthand a" do
       assert ArgParser.parse(["a", "poison"]) == {:add, [%Package{name: "poison"}]}
     end

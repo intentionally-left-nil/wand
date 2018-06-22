@@ -23,8 +23,10 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defmodule Package do
-    defstruct compile_env: nil,
+    defstruct compile: true,
+              compile_env: nil,
               details: %Hex{},
+              download: true,
               environments: [:all],
               name: nil,
               optional: nil,
@@ -67,8 +69,12 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defp get_base_package(switches) do
+    download = Keyword.get(switches, :download, true)
+    compile = download and Keyword.get(switches, :compile, true)
     %Package{
+      compile: compile,
       compile_env: Keyword.get(switches, :compile_env),
+      download: download,
       environments: get_environments(switches),
       optional: Keyword.get(switches, :optional),
       override: Keyword.get(switches, :override),
@@ -177,6 +183,8 @@ defmodule Wand.CLI.Commands.Add do
 
     multi_package_flags = [
       dev: :boolean,
+      download: :boolean,
+      compile: :boolean,
       env: :keep,
       optional: :boolean,
       organization: :string,
