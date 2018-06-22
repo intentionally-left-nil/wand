@@ -72,6 +72,7 @@ defmodule Wand.CLI.Commands.Add do
   defp get_base_package(switches) do
     download = Keyword.get(switches, :download, true)
     compile = download and Keyword.get(switches, :compile, true)
+
     %Package{
       compile: compile,
       compile_env: Keyword.get(switches, :compile_env),
@@ -97,23 +98,32 @@ defmodule Wand.CLI.Commands.Add do
       path: file,
       umbrella: Keyword.get(switches, :umbrella)
     }
+
     %Package{package | details: details}
   end
 
   defp add_details(package, :git, git_uri, switches) do
-    details = case String.split(git_uri, "#", parts: 2) do
-      [git_uri] ->  %Git{uri: git_uri}
-      [git_uri, ref] ->
-        key = [:branch, :ref, :tag]
-        |> Enum.find(:ref, &Keyword.get(switches, &1))
+    details =
+      case String.split(git_uri, "#", parts: 2) do
+        [git_uri] ->
+          %Git{uri: git_uri}
 
-        data = %{uri: git_uri}
-        |> Map.put(key, ref)
-        struct(Git, data)
-    end
-    details = %Git{ details |
-      sparse: Keyword.get(switches, :sparse),
-      submodules: Keyword.get(switches, :submodules),
+        [git_uri, ref] ->
+          key =
+            [:branch, :ref, :tag]
+            |> Enum.find(:ref, &Keyword.get(switches, &1))
+
+          data =
+            %{uri: git_uri}
+            |> Map.put(key, ref)
+
+          struct(Git, data)
+      end
+
+    details = %Git{
+      details
+      | sparse: Keyword.get(switches, :sparse),
+        submodules: Keyword.get(switches, :submodules)
     }
 
     %Package{package | details: details}
@@ -123,8 +133,9 @@ defmodule Wand.CLI.Commands.Add do
     details = %Hex{
       version: version,
       organization: Keyword.get(switches, :organization),
-      repo: Keyword.get(switches, :repo),
+      repo: Keyword.get(switches, :repo)
     }
+
     %Package{package | details: details}
   end
 
@@ -159,6 +170,7 @@ defmodule Wand.CLI.Commands.Add do
   defp get_mode(switches) do
     exact = Keyword.get(switches, :exact)
     around = Keyword.get(switches, :around)
+
     cond do
       exact -> :exact
       around -> :around
@@ -173,11 +185,11 @@ defmodule Wand.CLI.Commands.Add do
 
   defp allowed_flags(args) do
     hex_flags = [
-      hex_name: :string,
+      hex_name: :string
     ]
 
     file_flags = [
-      umbrella: :boolean,
+      umbrella: :boolean
     ]
 
     git_flags = [
@@ -185,12 +197,12 @@ defmodule Wand.CLI.Commands.Add do
       ref: :boolean,
       tag: :boolean,
       sparse: :string,
-      submodules: :boolean,
+      submodules: :boolean
     ]
 
     common_single_package_flags = [
       compile_env: :string,
-      read_app_file: :boolean,
+      read_app_file: :boolean
     ]
 
     multi_package_flags = [
@@ -206,20 +218,25 @@ defmodule Wand.CLI.Commands.Add do
       prod: :boolean,
       repo: :string,
       runtime: :boolean,
-      test: :boolean,
+      test: :boolean
     ]
 
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
-    if (length(commands) == 1) do
-      type = hd(commands)
-      |> split_version
-      |> elem(1)
-      |> version_type
-      flags = case type do
-        :file -> file_flags
-        :git -> git_flags
-        :hex -> hex_flags
-      end
+
+    if length(commands) == 1 do
+      type =
+        hd(commands)
+        |> split_version
+        |> elem(1)
+        |> version_type
+
+      flags =
+        case type do
+          :file -> file_flags
+          :git -> git_flags
+          :hex -> hex_flags
+        end
+
       flags ++ common_single_package_flags ++ multi_package_flags
     else
       multi_package_flags

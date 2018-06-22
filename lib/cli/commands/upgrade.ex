@@ -6,9 +6,11 @@ defmodule Wand.CLI.Commands.Upgrade do
       latest: :boolean,
       major: :boolean,
       minor: :boolean,
-      patch: :boolean,
+      patch: :boolean
     ]
+
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
+
     case parse_errors(errors) do
       :ok -> {:ok, {get_packages(commands), get_level(switches)}}
       error -> error
@@ -19,6 +21,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   defp get_packages(commands), do: commands
 
   defp parse_errors([]), do: :ok
+
   defp parse_errors([{flag, _} | _rest]) do
     {:error, {:invalid_flag, flag}}
   end

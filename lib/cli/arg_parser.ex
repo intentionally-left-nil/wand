@@ -3,6 +3,7 @@ defmodule Wand.CLI.ArgParser do
     global_flags = [
       version: :boolean
     ]
+
     {flags, commands, _} = OptionParser.parse(args, strict: global_flags)
 
     cond do
@@ -17,13 +18,13 @@ defmodule Wand.CLI.ArgParser do
     %{
       "a" => "add",
       "r" => "remove",
-      "u" => "upgrade",
+      "u" => "upgrade"
     }
     |> Map.get(command, command)
     |> validate(args)
   end
-  defp parse_main(_args, [command | _rest]), do: {:help, {:unrecognized, command}}
 
+  defp parse_main(_args, [command | _rest]), do: {:help, {:unrecognized, command}}
 
   defp validate(name, args) do
     module = Module.concat(Wand.CLI.Commands, String.capitalize(name))

@@ -21,7 +21,7 @@ defmodule ArgParserTest do
     end
 
     test "help add" do
-        assert ArgParser.parse(["help", "add"]) == {:help, :add, nil}
+      assert ArgParser.parse(["help", "add"]) == {:help, :add, nil}
     end
   end
 
@@ -50,11 +50,13 @@ defmodule ArgParserTest do
     end
 
     test "skip compiling" do
-      assert ArgParser.parse(["add", "poison", "--compile=false"]) == {:add, [%Package{name: "poison", compile: false}]}
+      assert ArgParser.parse(["add", "poison", "--compile=false"]) ==
+               {:add, [%Package{name: "poison", compile: false}]}
     end
 
     test "skip downloading" do
-      assert ArgParser.parse(["add", "poison", "--download=false"]) == {:add, [%Package{name: "poison", download: false, compile: false}]}
+      assert ArgParser.parse(["add", "poison", "--download=false"]) ==
+               {:add, [%Package{name: "poison", download: false, compile: false}]}
     end
 
     test "using the shorthand a" do
@@ -69,12 +71,14 @@ defmodule ArgParserTest do
             name: "poison",
             details: %Hex{
               organization: "mycompany",
-              repo: "nothexpm",
+              repo: "nothexpm"
             }
           }
         ]
       }
-      assert ArgParser.parse(["add", "poison", "--repo=nothexpm", "--organization=mycompany"]) == expected
+
+      assert ArgParser.parse(["add", "poison", "--repo=nothexpm", "--organization=mycompany"]) ==
+               expected
     end
 
     test "a package with a specific version" do
@@ -152,10 +156,11 @@ defmodule ArgParserTest do
              name: "test",
              details: %Path{
                path: "../test",
-               umbrella: true,
+               umbrella: true
              }
            }
          ]}
+
       assert ArgParser.parse(["add", "test@file:../test", "--umbrella"]) == expected
     end
 
@@ -166,11 +171,13 @@ defmodule ArgParserTest do
           %Package{
             name: "poison",
             compile_env: "prod",
-            read_app_file: false,
+            read_app_file: false
           }
         ]
       }
-      assert ArgParser.parse(["add", "poison", "--compile-env=prod", "--read-app-file=false"]) == expected
+
+      assert ArgParser.parse(["add", "poison", "--compile-env=prod", "--read-app-file=false"]) ==
+               expected
     end
 
     test "a http github package" do
@@ -184,6 +191,7 @@ defmodule ArgParserTest do
              }
            }
          ]}
+
       assert ArgParser.parse(["add", "poison@https://github.com/devinus/poison.git"]) == expected
     end
 
@@ -198,6 +206,7 @@ defmodule ArgParserTest do
              }
            }
          ]}
+
       assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison"]) == expected
     end
 
@@ -213,6 +222,7 @@ defmodule ArgParserTest do
              }
            }
          ]}
+
       assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison#123"]) == expected
     end
 
@@ -228,7 +238,9 @@ defmodule ArgParserTest do
              }
            }
          ]}
-      assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison#master", "--branch"]) == expected
+
+      assert ArgParser.parse(["add", "poison@git@github.com:devinus/poison#master", "--branch"]) ==
+               expected
     end
 
     test "ssh github package with a tag, sparse, and submodules" do
@@ -245,7 +257,12 @@ defmodule ArgParserTest do
              }
            }
          ]}
-      command = OptionParser.split("add poison@git@github.com:devinus/poison#123 --tag --sparse=my_folder --submodules")
+
+      command =
+        OptionParser.split(
+          "add poison@git@github.com:devinus/poison#123 --tag --sparse=my_folder --submodules"
+        )
+
       assert ArgParser.parse(command) == expected
     end
   end
@@ -285,13 +302,11 @@ defmodule ArgParserTest do
     end
 
     test "a single package" do
-      assert ArgParser.parse(["upgrade", "poison"]) ==
-               {:upgrade, {["poison"], :major}}
+      assert ArgParser.parse(["upgrade", "poison"]) == {:upgrade, {["poison"], :major}}
     end
 
     test "a single package with the shorthand" do
-      assert ArgParser.parse(["u", "poison"]) ==
-               {:upgrade, {["poison"], :major}}
+      assert ArgParser.parse(["u", "poison"]) == {:upgrade, {["poison"], :major}}
     end
 
     test "--latest is the same as major" do
@@ -300,13 +315,11 @@ defmodule ArgParserTest do
     end
 
     test "a single package to the next minor version" do
-      assert ArgParser.parse(["upgrade", "poison", "--minor"]) ==
-               {:upgrade, {["poison"], :minor}}
+      assert ArgParser.parse(["upgrade", "poison", "--minor"]) == {:upgrade, {["poison"], :minor}}
     end
 
     test "a single package to the next patch version" do
-      assert ArgParser.parse(["upgrade", "poison", "--patch"]) ==
-               {:upgrade, {["poison"], :patch}}
+      assert ArgParser.parse(["upgrade", "poison", "--patch"]) == {:upgrade, {["poison"], :patch}}
     end
 
     test "If both major and minor are passed in, prefer major" do
@@ -317,20 +330,16 @@ defmodule ArgParserTest do
     test "upgrade multiple packages" do
       assert ArgParser.parse(["upgrade", "poison", "ex_doc", "--patch"]) ==
                {:upgrade, {["poison", "ex_doc"], :patch}}
-
     end
 
     test "upgrade all packages if none passed in" do
-      assert ArgParser.parse(["upgrade", "--patch"]) ==
-               {:upgrade, {:all, :patch}}
-
+      assert ArgParser.parse(["upgrade", "--patch"]) == {:upgrade, {:all, :patch}}
     end
   end
 
   describe "outdated" do
     test "returns help when arguments are given" do
-      assert ArgParser.parse(["outdated", "poison"]) ==
-               {:help, :outdated, :wrong_command}
+      assert ArgParser.parse(["outdated", "poison"]) == {:help, :outdated, :wrong_command}
     end
   end
 
@@ -341,18 +350,15 @@ defmodule ArgParserTest do
     end
 
     test "initializes the current path if no args are given" do
-      assert ArgParser.parse(["init"]) ==
-               {:init, {"./", []}}
+      assert ArgParser.parse(["init"]) == {:init, {"./", []}}
     end
 
     test "uses a custom path" do
-      assert ArgParser.parse(["init", "../foo"]) ==
-               {:init, {"../foo", []}}
+      assert ArgParser.parse(["init", "../foo"]) == {:init, {"../foo", []}}
     end
 
     test "passes in overwrite" do
-      assert ArgParser.parse(["init", "--overwrite"]) ==
-               {:init, {"./", [overwrite: true]}}
+      assert ArgParser.parse(["init", "--overwrite"]) == {:init, {"./", [overwrite: true]}}
     end
 
     test "passes in task_only and force" do
