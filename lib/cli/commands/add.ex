@@ -109,9 +109,11 @@ defmodule Wand.CLI.Commands.Add do
     %Package{package | details: details}
   end
 
-  defp add_details(package, :hex, version, _switches) do
+  defp add_details(package, :hex, version, switches) do
     details = %Hex{
-      version: version
+      version: version,
+      organization: Keyword.get(switches, :organization),
+      repo: Keyword.get(switches, :repo),
     }
     %Package{package | details: details}
   end

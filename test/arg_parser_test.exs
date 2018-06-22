@@ -49,6 +49,22 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["a", "poison"]) == {:add, [%Package{name: "poison"}]}
     end
 
+    test "with an organization and a repo" do
+      expected = {
+        :add,
+        [
+          %Package{
+            name: "poison",
+            details: %Hex{
+              organization: "mycompany",
+              repo: "nothexpm",
+            }
+          }
+        ]
+      }
+      assert ArgParser.parse(["add", "poison", "--repo=nothexpm", "--organization=mycompany"]) == expected
+    end
+
     test "a package with a specific version" do
       assert ArgParser.parse(["add", "poison@3.1"]) ==
                {:add, [%Package{name: "poison", details: %Hex{version: "3.1"}}]}
