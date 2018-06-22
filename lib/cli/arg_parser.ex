@@ -11,20 +11,18 @@ defmodule Wand.CLI.ArgParser do
     end
   end
 
-  defp parse_main(args, commands) do
-    case commands do
-      [] -> {:help, nil, nil}
-      ["help"] -> {:help, nil, nil}
-      ["add" | _rest] -> validate("add", args)
-      ["a" | _rest] -> validate("add", args)
-      ["init" | _rest] -> validate("init", args)
-      ["outdated" | _rest] -> validate("outdated", args)
-      ["remove" | _rest] -> validate("remove", args)
-      ["r" | _rest] -> validate("remove", args)
-      ["upgrade" | _rest] -> validate("upgrade", args)
-      ["u" | _rest] -> validate("upgrade", args)
-      ["version" | _rest] -> validate("version", args)
-      [command | _rest] -> {:help, {:unrecognized, command}}
+  defp parse_main(_args, []), do: {:help, nil, nil}
+  @commands ["add", "init", "outdated", "remove", "upgrade", "version"]
+  defp parse_main(args, [command | _rest]) when command in @commands do
+    validate(command, args)
+  end
+  defp parse_main(args, [command | _rest]) do
+    case command do
+      "help" -> {:help, nil, nil}
+      "a" -> validate("add", args)
+      "r" -> validate("remove", args)
+      "u" -> validate("upgrade", args)
+      command -> {:help, {:unrecognized, command}}
     end
   end
 
