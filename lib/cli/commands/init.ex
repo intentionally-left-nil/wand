@@ -1,6 +1,10 @@
 defmodule Wand.CLI.Commands.Init do
   @behaviour Wand.CLI.Command
 
+  def help(_type) do
+
+  end
+
   def validate(args) do
     flags = [
       overwrite: :boolean,

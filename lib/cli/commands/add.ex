@@ -36,6 +36,10 @@ defmodule Wand.CLI.Commands.Add do
               runtime: nil
   end
 
+  def help(_type) do
+
+  end
+
   def validate(args) do
     flags = allowed_flags(args)
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)

@@ -1,6 +1,10 @@
 defmodule Wand.CLI.Commands.Upgrade do
   @behaviour Wand.CLI.Command
 
+  def help(_type) do
+
+  end
+  
   def validate(args) do
     flags = [
       latest: :boolean,
