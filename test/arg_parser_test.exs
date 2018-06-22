@@ -122,6 +122,35 @@ defmodule ArgParserTest do
       assert ArgParser.parse(["add", "test@file:../test"]) == expected
     end
 
+    test "a local umbrella package" do
+      expected =
+        {:add,
+         [
+           %Package{
+             name: "test",
+             details: %Path{
+               path: "../test",
+               umbrella: true,
+             }
+           }
+         ]}
+      assert ArgParser.parse(["add", "test@file:../test", "--umbrella"]) == expected
+    end
+
+    test "Set the compile environment and disable-reading the app file" do
+      expected = {
+        :add,
+        [
+          %Package{
+            name: "poison",
+            compile_env: "prod",
+            read_app_file: false,
+          }
+        ]
+      }
+      assert ArgParser.parse(["add", "poison", "--compile-env=prod", "--read-app-file=false"]) == expected
+    end
+
     test "a http github package" do
       expected =
         {:add,

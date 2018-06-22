@@ -68,9 +68,11 @@ defmodule Wand.CLI.Commands.Add do
 
   defp get_base_package(switches) do
     %Package{
+      compile_env: Keyword.get(switches, :compile_env),
       environments: get_environments(switches),
       optional: Keyword.get(switches, :optional),
       override: Keyword.get(switches, :override),
+      read_app_file: Keyword.get(switches, :read_app_file),
       runtime: Keyword.get(switches, :runtime)
     }
   end
@@ -169,7 +171,7 @@ defmodule Wand.CLI.Commands.Add do
     ]
 
     common_single_package_flags = [
-      compile_env: :boolean,
+      compile_env: :string,
       read_app_file: :boolean,
     ]
 
