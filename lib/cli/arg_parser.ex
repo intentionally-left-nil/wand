@@ -19,6 +19,8 @@ defmodule Wand.CLI.ArgParser do
       ["a" | _rest] -> validate("add", args)
       ["remove" | _rest] -> validate("remove", args)
       ["r" | _rest] -> validate("remove", args)
+      ["upgrade" | _rest] -> validate("upgrade", args)
+      ["u" | _rest] -> validate("upgrade", args)
       ["version" | _rest] -> validate("version", args)
       [command | _rest] -> {:help, {:unrecognized, command}}
     end
