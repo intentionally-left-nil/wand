@@ -11,14 +11,15 @@ defmodule Wand.CLI.Display.Renderer do
   def br(), do: "\n"
   def codespan(text), do: "`#{text}`"
   def em(text), do: ANSI.bright() <> text <> ANSI.normal()
+  def strong(text), do: em(text)
 
   defp render_block(%Heading{content: content}, _context) do
-    [ANSI.underline(), content, ANSI.no_underline(), "\n"]
+    [ANSI.underline(), content, ANSI.no_underline(), "\n", "\n"]
   end
 
   defp render_block(%Para{lnb: lnb, lines: lines}, context) do
     %{value: value} = Earmark.Inline.convert(lines, lnb, context)
-    unescape(value)
+    unescape(value) <> "\n"
   end
 
   defp unescape(text) do
@@ -39,6 +40,7 @@ defmodule Wand.CLI.Display do
     {blocks, context} = Earmark.parse(message, options)
     Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
+    |> String.trim_trailing("\n")
     |> @io.puts
   end
 end

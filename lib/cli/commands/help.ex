@@ -3,7 +3,7 @@ defmodule Wand.CLI.Commands.Help do
   @behaviour Wand.CLI.Command
   def help(:banner) do
     """
-
+    
     Usage: wand [command] [flags]
 
     Available commands:
@@ -16,7 +16,7 @@ defmodule Wand.CLI.Commands.Help do
     upgrade     Upgrade a dependency in your project
     version     Get the version of wand installed on the system
 
-    You can type `**wand help**` [command] to see more information.
+    You can type **wand help** [command] to see more information.
 
     Options:
 

@@ -12,13 +12,14 @@ defmodule DisplayTest do
   end
 
   test "Adds underline to a title" do
-    stub_io("#{ANSI.underline()}Hello#{ANSI.no_underline()}\n")
+    stub_io("#{ANSI.underline()}Hello#{ANSI.no_underline()}")
     Display.print("# Hello")
   end
 
   test "combine text and an a title" do
     """
     #{ANSI.underline()}Lyrics#{ANSI.no_underline()}
+    
     This is America
     Don't catch you slippin' up
     """
