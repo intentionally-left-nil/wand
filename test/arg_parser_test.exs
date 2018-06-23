@@ -8,7 +8,7 @@ defmodule ArgParserTest do
   end
 
   test "an unrecognized command is given" do
-    assert ArgParser.parse(["wrong_command"]) == {:help, {:unrecognized, "wrong_command"}}
+    assert ArgParser.parse(["wrong_command"]) == {:help, :help, {:unrecognized, "wrong_command"}}
   end
 
   test "--version" do

@@ -1,6 +1,6 @@
 defmodule Wand do
   @moduledoc """
-  Displays detailed help documentation for wand
+  A CLI tool for managing Elixir dependencies
   ## Usage
   **wand** [command] [flags]
 
@@ -15,7 +15,8 @@ defmodule Wand do
   version     Get the version of wand installed on the system
   </pre>
 
-  You can type **wand help** [command] to see more information.
+  Type **wand help --verbose** to see more detailed documentation, or
+  Type **wand help [command]** to see information on a specific command
 
   ## Options
   <pre>

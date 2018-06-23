@@ -14,7 +14,7 @@ defmodule Wand.CLI.ArgParser do
     end
   end
 
-  defp parse_main(args, []), do: validate(:help, args)
+  defp parse_main(_args, []), do: validate(:help, ["help"])
   @commands ["add", "a", "help", "init", "outdated", "remove", "r", "upgrade", "u", "version"]
   defp parse_main(args, [command | _rest]) when command in @commands do
     %{
@@ -27,7 +27,7 @@ defmodule Wand.CLI.ArgParser do
     |> validate(args)
   end
 
-  defp parse_main(_args, [command | _rest]), do: {:help, {:unrecognized, command}}
+  defp parse_main(_args, [command | _rest]), do: {:help, :help, {:unrecognized, command}}
 
   defp validate(key, args) do
     case Command.route(key, :validate, [args]) do
