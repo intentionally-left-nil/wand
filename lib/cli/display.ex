@@ -1,11 +1,3 @@
-defmodule Wand.CLI.Display do
-  @callback print(message :: String.t()) :: :ok
-
-  def impl() do
-    Application.get_env(:wand, :display, Wand.CLI.Display.Impl)
-  end
-end
-
 defmodule Wand.CLI.Display.Renderer do
   alias Earmark.Block.{Heading,Para}
   alias IO.ANSI
@@ -25,15 +17,12 @@ defmodule Wand.CLI.Display.Renderer do
   end
 end
 
-defmodule Wand.CLI.Display.Impl do
-  @behaviour Wand.CLI.Display
-
+defmodule Wand.CLI.Display do
+  @io Wand.CLI.IO.impl()
   def print(message) do
     {blocks, context} = Earmark.parse(message)
     Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
-    |> IO.puts
-
-    :ok
+    |> @io.puts
   end
 end

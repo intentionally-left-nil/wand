@@ -1,7 +1,6 @@
 defmodule Wand.CLI.Commands.Help do
+  alias Wand.CLI.Display
   @behaviour Wand.CLI.Command
-  @display Wand.CLI.Display.impl()
-
   def help(:banner) do
     """
 
@@ -23,7 +22,7 @@ defmodule Wand.CLI.Commands.Help do
 
     --version   Get the version of wand installed on the system
     """
-    |> @display.print()
+    |> Display.print()
   end
 
   def validate(["help", name]), do: {:help, String.to_atom(name), nil}

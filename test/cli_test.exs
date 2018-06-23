@@ -6,7 +6,7 @@ defmodule CliTest do
 
   test "help returns a status code of 1" do
     stub_exit(1)
-    stub_display()
+    stub_io()
     CLI.main(["help"])
   end
 
@@ -14,7 +14,7 @@ defmodule CliTest do
     expect(CLI.SystemMock, :halt, fn ^status -> :ok end)
   end
 
-  defp stub_display() do
-    expect(CLI.DisplayMock, :print, fn _message -> :ok end)
+  defp stub_io() do
+    expect(CLI.IOMock, :puts, fn _message -> :ok end)
   end
 end
