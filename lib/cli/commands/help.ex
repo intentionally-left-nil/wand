@@ -18,9 +18,10 @@ defmodule Wand.CLI.Commands.Help do
   version     Get the version of wand installed on the system
   </pre>
 
-  ## Main Options
+  ## Options
   <pre>
-  --version   Get the version of wand installed on the system
+  --verbose   Detailed help for every command
+  --?         Same as --verbose
   </pre>
   """
 
@@ -29,8 +30,10 @@ defmodule Wand.CLI.Commands.Help do
   def help({:invalid_flag, flag}) do
     """
     # Error
-    `#{flag}` is not a valid flag.
-    Type **wand help --verbose** for more information
+    `#{flag}` is not a valid flag for help.
+    Valid flags are:
+    --verbose   Detailed help for every command
+    --?         Same as --verbose
     """
     |> Display.print()
   end
