@@ -70,9 +70,12 @@ defmodule Wand.CLI.Display do
   @io Wand.CLI.IO.impl()
   def print(message) do
     {blocks, context} = Wand.CLI.Display.Renderer.parse(message)
-    Wand.CLI.Display.Renderer.render(blocks, context)
+
+    formatted = Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
     |> String.trim_trailing("\n")
-    |> @io.puts
+
+    # Always add on a blank newline at the top
+    @io.puts("\n" <> formatted)
   end
 end

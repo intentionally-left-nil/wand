@@ -86,6 +86,7 @@ defmodule DisplayTest do
   end
 
   defp stub_io(message) do
+    message = "\n" <> message
     expect(Wand.CLI.IOMock, :puts, fn ^message -> :ok end)
   end
 end
