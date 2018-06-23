@@ -43,4 +43,8 @@ defmodule ArgParserTest do
   test "wand --verbose gives detailed help" do
     assert ArgParser.parse(["--verbose"]) == {:help, :help, :verbose}
   end
+
+  test "wand --? gives detailed help" do
+    assert ArgParser.parse(["--?"]) == {:help, :help, :verbose}
+  end
 end

@@ -17,7 +17,7 @@ defmodule HelpTest do
     end
 
     test "with --? passed in" do
-      assert Help.validate(["help", "--?"]) == {:error, :banner}
+      assert Help.validate(["help", "--?"]) == {:error, :verbose}
     end
 
     test "Handle an invalid arg" do
