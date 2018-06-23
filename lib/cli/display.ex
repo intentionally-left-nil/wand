@@ -10,11 +10,11 @@ defmodule Wand.CLI.Display.Renderer do
 
   def br(), do: "\n"
   def codespan(text), do: "`#{text}`"
-  def em(text), do: ANSI.bright() <> text <> ANSI.normal()
-  def strong(text), do: em(text)
+  def em(text), do: ANSI.underline() <> text <> ANSI.no_underline()
+  def strong(text), do: ANSI.bright() <> text <> ANSI.normal()
 
   defp render_block(%Heading{content: content}, _context) do
-    [ANSI.underline(), content, ANSI.no_underline(), "\n", "\n"]
+    [ANSI.underline(), ANSI.bright(), content, ANSI.normal(), ANSI.no_underline(), "\n", "\n"]
   end
 
   defp render_block(%Para{lnb: lnb, lines: lines}, context) do

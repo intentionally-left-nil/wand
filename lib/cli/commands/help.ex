@@ -3,11 +3,12 @@ defmodule Wand.CLI.Commands.Help do
   @behaviour Wand.CLI.Command
   def help(:banner) do
     """
-    
-    Usage: wand [command] [flags]
 
-    Available commands:
 
+    # Usage
+    **wand** [command] [flags]
+
+    # Available commands
     add         Add dependencies to your project
     help        Get detailed help
     init        Add the global wand tasks needed to use wand
@@ -18,8 +19,7 @@ defmodule Wand.CLI.Commands.Help do
 
     You can type **wand help** [command] to see more information.
 
-    Options:
-
+    # Options
     --version   Get the version of wand installed on the system
     """
     |> Display.print()
