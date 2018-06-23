@@ -33,6 +33,11 @@ defmodule DisplayTest do
     |> Display.print
   end
 
+  test "bolded words" do
+    stub_io("This is #{ANSI.bright()}bolded#{ANSI.normal()} text")
+    Display.print("This is *bolded* text")
+  end
+
   defp stub_io(message) do
     expect(Wand.CLI.IOMock, :puts, fn ^message -> :ok end)
   end
