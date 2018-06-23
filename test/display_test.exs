@@ -11,6 +11,16 @@ defmodule DisplayTest do
     Display.print("Hello world")
   end
 
+  test "multiple lines are different paragraphs" do
+    stub_io("Hello\nworld")
+    Display.print("Hello\nworld")
+  end
+
+  test "render multiple empty lines" do
+    stub_io("Hello\n#{<<0x200B::utf8>>}\nworld")
+    Display.print("Hello\n\nworld")
+  end
+
   test "Adds underline to a title" do
     stub_io("#{ANSI.underline()}Hello#{ANSI.no_underline()}")
     Display.print("# Hello")
@@ -19,7 +29,7 @@ defmodule DisplayTest do
   test "combine text and an a title" do
     """
     #{ANSI.underline()}Lyrics#{ANSI.no_underline()}
-    
+
     This is America
     Don't catch you slippin' up
     """

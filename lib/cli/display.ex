@@ -37,7 +37,11 @@ defmodule Wand.CLI.Display do
   @io Wand.CLI.IO.impl()
   def print(message) do
     options = %Earmark.Options{renderer: Wand.CLI.Display.Renderer, smartypants: false}
-    {blocks, context} = Earmark.parse(message, options)
+    # Markdown is dumb and I can't get the normal <space><space>\n to trigger a blank line.
+    # Instead, replace \n\n with a zero-width-space character, which Earmark treats as non-space
+    {blocks, context} = String.replace(message, ~r/\n\n/, "\n#{<<0x200B::utf8>>}\n")
+    |>Earmark.parse(options)
+
     Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
     |> String.trim_trailing("\n")
