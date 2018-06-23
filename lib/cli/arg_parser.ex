@@ -14,7 +14,7 @@ defmodule Wand.CLI.ArgParser do
     end
   end
 
-  defp parse_main(_args, []), do: validate(:help, ["help"])
+  defp parse_main(args, []), do: validate(:help, ["help"] ++ args)
   @commands ["add", "a", "help", "init", "outdated", "remove", "r", "upgrade", "u", "version"]
   defp parse_main(args, [command | _rest]) when command in @commands do
     %{

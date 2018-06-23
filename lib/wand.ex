@@ -21,6 +21,8 @@ defmodule Wand do
   ## Options
   <pre>
   --version   Get the version of wand installed on the system
+  --verbose   Get detailed help
+  --?         Same as --verbose
   </pre>
   """
 
