@@ -71,11 +71,19 @@ defmodule Wand.CLI.Display do
   def print(message) do
     {blocks, context} = Wand.CLI.Display.Renderer.parse(message)
 
-    formatted = Wand.CLI.Display.Renderer.render(blocks, context)
+    Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
-    |> String.trim_trailing("\n")
+    |> pretty
+    |> @io.puts
+  end
 
-    # Always add on a blank newline at the top
-    @io.puts("\n" <> formatted)
+  defp pretty(message) do
+    # Remove leading and trailing whitespace,
+    # Then wrap with a single newline
+    message = message
+    |> String.replace(~r/(?:\n|\p{Z}|\x{200B})+$/u, "")
+    |> String.replace(~r/^(?:\n|\p{Z}|\x{200B})+/u, "")
+
+    "\n" <> message <> "\n"
   end
 end

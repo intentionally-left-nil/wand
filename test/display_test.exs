@@ -85,8 +85,13 @@ defmodule DisplayTest do
     Display.print("<pre>hello</pre>")
   end
 
+  test "trim trailing newlines" do
+    stub_io("hello")
+    Display.print("hello\n\n\n")
+  end
+
   defp stub_io(message) do
-    message = "\n" <> message
+    message = "\n" <> message <> "\n"
     expect(Wand.CLI.IOMock, :puts, fn ^message -> :ok end)
   end
 end
