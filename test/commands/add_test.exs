@@ -1,5 +1,6 @@
 defmodule AddTest do
   use ExUnit.Case, async: true
+  import Mox
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
 
@@ -130,12 +131,12 @@ defmodule AddTest do
              name: "test",
              details: %Path{
                path: "../test",
-               umbrella: true
+               in_umbrella: true
              }
            }
          ]}
 
-      assert Add.validate(["add", "test@file:../test", "--umbrella"]) == expected
+      assert Add.validate(["add", "test@file:../test", "--in-umbrella"]) == expected
     end
 
     test "Set the compile environment and disable-reading the app file" do
@@ -238,6 +239,18 @@ defmodule AddTest do
         )
 
       assert Add.validate(command) == expected
+    end
+  end
+
+  describe "help" do
+    setup :verify_on_exit!
+    setup :stub_io
+    test "banner" do
+      Add.help(:banner)
+    end
+    def stub_io(_) do
+      expect(Wand.CLI.IOMock, :puts, fn _message -> :ok end)
+      :ok
     end
   end
 end

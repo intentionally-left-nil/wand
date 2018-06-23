@@ -37,7 +37,7 @@ defmodule ArgParserTest do
   end
 
   test "help is left untouched" do
-    assert ArgParser.parse(["help", "add"]) == {:help, :add, nil}
+    assert ArgParser.parse(["help", "add"]) == {:help, :add, :banner}
   end
 
   test "wand --verbose gives detailed help" do

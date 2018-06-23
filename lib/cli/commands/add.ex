@@ -1,6 +1,43 @@
 defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
 
+  @moduledoc """
+  Add elixir packages to wand.json for the project
+
+  ## Usage
+  **wand** add [package] [package] ... [flags]
+
+  ## Examples
+  **wand** add ex_doc mox --test
+  **wand** add poison@https://github.com/devinus/poison.git
+  **wand** add poison@3.1 --exact
+
+  ## Options
+  The available flags depend on if wand is being used to add a single package, or multiple packages. Flags that can only be used in single-package-mode are denoted with (s).
+
+  --around            Stay within the minor version provided
+  --branch        (s) Treat the url anchor as a git branch
+  --compile           Run mix compile after adding (default: **true**)
+  --compile-env   (s) The environment for the dependency (default: **prod**)
+  --dev               Include the dependency in the dev environment
+  --download          Run mix deps.get after adding (default: **true**)
+  --env               Add the dependency to a specific environment
+  --exact             Set the version to exactly match the version provided
+  --hex-name      (s) The name of the package in hex to download
+  --optional          Mark the dependency as optional
+  --organization      Set the hex.pm organization to use
+  --prod              Include the dependency in the prod environment
+  --read-app-file (s) Read the app file of the dependency (default: **true**)
+  --ref           (s) Treat the url anchor as a git ref
+  --repo              The hex repo to use (default: **hexpm**)
+  --runtime           Start the application automatically (default: **true**)
+  --sparse        (s) Checkout a given directory inside git
+  --submodules    (s) Initialize submodules for the repo
+  --tag           (s) Treat the url anchor as a git tag
+  --test              Include the dependency in the test environment
+  --in-umbrella   (s) Sets a path dependency pointing to ../app
+  """
+
   defmodule Git do
     defstruct uri: nil,
               ref: nil,
@@ -19,7 +56,7 @@ defmodule Wand.CLI.Commands.Add do
 
   defmodule Path do
     defstruct path: nil,
-              umbrella: nil
+              in_umbrella: nil
   end
 
   defmodule Package do
@@ -36,8 +73,7 @@ defmodule Wand.CLI.Commands.Add do
               runtime: nil
   end
 
-  def help(_type) do
-  end
+  def help(:banner), do: Wand.CLI.Display.print(@moduledoc)
 
   def validate(args) do
     flags = allowed_flags(args)
@@ -93,7 +129,7 @@ defmodule Wand.CLI.Commands.Add do
   defp add_details(package, :file, "file:" <> file, switches) do
     details = %Path{
       path: file,
-      umbrella: Keyword.get(switches, :umbrella)
+      in_umbrella: Keyword.get(switches, :in_umbrella)
     }
 
     %Package{package | details: details}
@@ -186,7 +222,7 @@ defmodule Wand.CLI.Commands.Add do
     ]
 
     file_flags = [
-      umbrella: :boolean
+      in_umbrella: :boolean
     ]
 
     git_flags = [

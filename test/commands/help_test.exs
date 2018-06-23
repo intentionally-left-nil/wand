@@ -25,7 +25,7 @@ defmodule HelpTest do
     end
 
     test "help add" do
-      assert Help.validate(["help", "add"]) == {:help, :add, nil}
+      assert Help.validate(["help", "add"]) == {:help, :add, :banner}
     end
   end
 

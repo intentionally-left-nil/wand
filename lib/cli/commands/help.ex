@@ -61,7 +61,7 @@ defmodule Wand.CLI.Commands.Help do
   end
 
   defp parse(["help"], _switches), do: {:error, :verbose}
-  defp parse([name], _switches), do: {:help, String.to_atom(name), nil}
+  defp parse([name], _switches), do: {:help, String.to_atom(name), :banner}
   defp parse(_commands, switches) do
     cond do
       Keyword.get(switches, :verbose) -> {:error, :verbose}
