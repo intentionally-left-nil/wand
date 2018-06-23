@@ -63,6 +63,28 @@ defmodule DisplayTest do
     Display.print("This is _underlined_ text")
   end
 
+  test "strip out pre tags" do
+    """
+    #{@t}Available commands#{@tt}
+
+    add
+    """
+    |> String.trim_trailing("\n")
+    |> stub_io
+    """
+    ## Available commands
+    <pre>
+    add
+    </pre>
+    """
+    |> Display.print()
+  end
+
+  test "Handle HtmlOther for a single pre tag" do
+    stub_io("hello")
+    Display.print("<pre>hello</pre>")
+  end
+
   defp stub_io(message) do
     expect(Wand.CLI.IOMock, :puts, fn ^message -> :ok end)
   end
