@@ -28,6 +28,11 @@ defmodule ArgParserTest do
     assert ArgParser.parse(["u", "poison"]) == {:upgrade, {["poison"], %Options{}}}
   end
 
+  test "core" do
+    assert ArgParser.parse(["core", "install"]) ==
+      {:core, :install}
+  end
+
   test "ok responses get converted to key, response" do
     assert ArgParser.parse(["version"]) == {:version, []}
   end
