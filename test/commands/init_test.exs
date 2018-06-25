@@ -1,5 +1,6 @@
 defmodule InitTest do
   use ExUnit.Case, async: true
+  import Mox
   alias Wand.CLI.Commands.Init
 
   describe "validate" do
@@ -19,9 +20,30 @@ defmodule InitTest do
       assert Init.validate(["init", "--overwrite"]) == {:ok, {"./", [overwrite: true]}}
     end
 
-    test "passes in task_only and force" do
-      assert Init.validate(["init", "--overwrite", "--task-only"]) ==
-               {:ok, {"./", [overwrite: true, task_only: true]}}
+    test "passes in force" do
+      assert Init.validate(["init", "--overwrite", "--force"]) ==
+               {:ok, {"./", [overwrite: true, force: true]}}
+    end
+  end
+
+  describe "help" do
+    setup :verify_on_exit!
+    setup :stub_io
+    test "invalid flag" do
+      Init.help({:invalid_flag, "--wrong-flag"})
+    end
+
+    test "banner" do
+      Init.help(:banner)
+    end
+
+    test "verbose" do
+      Init.help(:verbose)
+    end
+
+    def stub_io(_) do
+      expect(Wand.CLI.IOMock, :puts, fn _message -> :ok end)
+      :ok
     end
   end
 end
