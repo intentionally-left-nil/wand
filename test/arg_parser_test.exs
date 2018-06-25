@@ -2,6 +2,7 @@ defmodule ArgParserTest do
   use ExUnit.Case, async: true
   alias Wand.CLI.ArgParser
   alias Wand.CLI.Commands.Add.Package
+  alias Wand.CLI.Commands.Upgrade.Options
 
   test "no arguments" do
     assert ArgParser.parse([]) == {:help, :help, :banner}
@@ -24,7 +25,7 @@ defmodule ArgParserTest do
   end
 
   test "upgrade shorthand" do
-    assert ArgParser.parse(["u", "poison"]) == {:upgrade, {["poison"], :major}}
+    assert ArgParser.parse(["u", "poison"]) == {:upgrade, {["poison"], %Options{}}}
   end
 
   test "ok responses get converted to key, response" do
