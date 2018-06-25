@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Init do
   @behaviour Wand.CLI.Command
   alias Wand.CLI.Display
+
   @moduledoc """
   Convert an elixir project to use wand for dependencies. This command also installs the wand.core tasks if not installed.
 

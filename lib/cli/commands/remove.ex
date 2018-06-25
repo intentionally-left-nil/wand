@@ -15,6 +15,7 @@ defmodule Wand.CLI.Commands.Remove do
     """
     |> Display.print()
   end
+
   def help(:banner), do: Display.print(@moduledoc)
   def help(:verbose), do: help(:banner)
 

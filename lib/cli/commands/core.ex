@@ -9,6 +9,7 @@ defmodule Wand.CLI.Commands.Core do
   """
 
   def help(:banner), do: Display.print(@moduledoc)
+
   def help(:verbose) do
     """
     Wand comes in two parts, the CLI and the wand.core tasks.
@@ -18,6 +19,7 @@ defmodule Wand.CLI.Commands.Core do
     """
     |> Display.print()
   end
+
   def help(:wrong_command) do
     """
     The command is invalid.

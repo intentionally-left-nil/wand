@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Outdated do
   @behaviour Wand.CLI.Command
   alias Wand.CLI.Display
+
   @moduledoc """
   List packages that are out of date.
   ## Usage
@@ -22,6 +23,7 @@ defmodule Wand.CLI.Commands.Outdated do
     """
     |> Wand.CLI.Display.print()
   end
+
   def help(_type), do: Display.print(@moduledoc)
 
   def validate([]), do: {:ok, []}

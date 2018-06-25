@@ -29,7 +29,6 @@ defmodule HelpTest do
     end
 
     test "help add --verbose" do
-
       assert Help.validate(["help", "add", "--verbose"]) == {:help, :add, :verbose}
     end
   end
@@ -37,6 +36,7 @@ defmodule HelpTest do
   describe "help" do
     setup :verify_on_exit!
     setup :stub_io
+
     test "invalid flag" do
       Help.help({:invalid_flag, "--wrong-flag"})
     end

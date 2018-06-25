@@ -12,6 +12,7 @@ defmodule OutdatedTest do
   describe "help" do
     setup :verify_on_exit!
     setup :stub_io
+
     test "invalid flag" do
       Outdated.help({:invalid_flag, "--wrong-flag"})
     end

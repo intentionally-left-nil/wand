@@ -29,8 +29,7 @@ defmodule ArgParserTest do
   end
 
   test "core" do
-    assert ArgParser.parse(["core", "install"]) ==
-      {:core, :install}
+    assert ArgParser.parse(["core", "install"]) == {:core, :install}
   end
 
   test "ok responses get converted to key, response" do

@@ -50,7 +50,7 @@ defmodule DisplayTest do
     This is America
     Don't catch you slippin' up
     """
-    |> Display.print
+    |> Display.print()
   end
 
   test "bolded words" do
@@ -71,6 +71,7 @@ defmodule DisplayTest do
     """
     |> String.trim_trailing("\n")
     |> stub_io
+
     """
     ## Available commands
     <pre>

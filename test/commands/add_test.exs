@@ -245,6 +245,7 @@ defmodule AddTest do
   describe "help" do
     setup :verify_on_exit!
     setup :stub_io
+
     test "banner" do
       Add.help(:banner)
     end

@@ -27,6 +27,7 @@ defmodule Wand.CLI.Commands.Help do
 
   def help(:banner), do: Display.print(Wand.banner())
   def help(:verbose), do: Display.print(@moduledoc)
+
   def help({:invalid_flag, flag}) do
     """
     # Error
@@ -50,8 +51,9 @@ defmodule Wand.CLI.Commands.Help do
   def validate(args) do
     flags = [
       verbose: :boolean,
-      "?": :boolean,
+      "?": :boolean
     ]
+
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case Wand.CLI.Command.parse_errors(errors) do
@@ -61,10 +63,10 @@ defmodule Wand.CLI.Commands.Help do
   end
 
   defp parse(["help"], _verbose), do: {:error, :verbose}
-  defp parse([name], _verbose=true), do: {:help, String.to_atom(name), :verbose}
-  defp parse([name], _verbose=false), do: {:help, String.to_atom(name), :banner}
-  defp parse(_commands, _verbose=true), do: {:error, :verbose}
-  defp parse(_commands, _verbose=false), do: {:error, :banner}
+  defp parse([name], _verbose = true), do: {:help, String.to_atom(name), :verbose}
+  defp parse([name], _verbose = false), do: {:help, String.to_atom(name), :banner}
+  defp parse(_commands, _verbose = true), do: {:error, :verbose}
+  defp parse(_commands, _verbose = false), do: {:error, :banner}
 
   defp verbose?(switches) do
     cond do

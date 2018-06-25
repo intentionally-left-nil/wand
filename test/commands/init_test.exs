@@ -29,6 +29,7 @@ defmodule InitTest do
   describe "help" do
     setup :verify_on_exit!
     setup :stub_io
+
     test "invalid flag" do
       Init.help({:invalid_flag, "--wrong-flag"})
     end

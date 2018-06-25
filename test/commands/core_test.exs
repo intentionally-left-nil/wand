@@ -5,18 +5,15 @@ defmodule CoreTest do
 
   describe "validate" do
     test "returns help if invalid commands are given" do
-      assert Core.validate(["core", "wrong"]) ==
-               {:error, :wrong_command}
+      assert Core.validate(["core", "wrong"]) == {:error, :wrong_command}
     end
 
     test "install" do
-      assert Core.validate(["core", "install"]) ==
-               {:ok, :install}
+      assert Core.validate(["core", "install"]) == {:ok, :install}
     end
 
     test "uninstall" do
-      assert Core.validate(["core", "uninstall"]) ==
-               {:ok, :uninstall}
+      assert Core.validate(["core", "uninstall"]) == {:ok, :uninstall}
     end
   end
 

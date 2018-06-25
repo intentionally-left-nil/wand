@@ -11,7 +11,8 @@ defmodule UpgradeTest do
     end
 
     test "a single package" do
-      assert Upgrade.validate(["upgrade", "poison"]) == {:ok, {["poison"], %Options{level: :major}}}
+      assert Upgrade.validate(["upgrade", "poison"]) ==
+               {:ok, {["poison"], %Options{level: :major}}}
     end
 
     test "Upgrade to the latest version" do
@@ -20,7 +21,8 @@ defmodule UpgradeTest do
     end
 
     test "a single package to the next minor version" do
-      assert Upgrade.validate(["upgrade", "poison", "--minor"]) == {:ok, {["poison"], %Options{level: :minor}}}
+      assert Upgrade.validate(["upgrade", "poison", "--minor"]) ==
+               {:ok, {["poison"], %Options{level: :minor}}}
     end
 
     test "If both major and minor are passed in, prefer major" do

@@ -21,12 +21,13 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   defmodule Options do
     defstruct level: :major,
-    download: true,
-    compile: true
+              download: true,
+              compile: true
   end
 
   def help(:banner), do: Display.print(@moduledoc)
   def help(:verbose), do: help(:banner)
+
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
@@ -42,7 +43,7 @@ defmodule Wand.CLI.Commands.Upgrade do
       major: :boolean,
       minor: :boolean,
       download: :boolean,
-      compile: :boolean,
+      compile: :boolean
     ]
 
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
@@ -58,11 +59,13 @@ defmodule Wand.CLI.Commands.Upgrade do
     download = Keyword.get(switches, :download, true)
     compile = download and Keyword.get(switches, :compile, true)
     level = get_level(switches)
+
     options = %Options{
       download: download,
       compile: compile,
       level: level
     }
+
     {packages, options}
   end
 
