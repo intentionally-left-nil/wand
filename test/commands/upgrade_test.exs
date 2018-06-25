@@ -47,4 +47,26 @@ defmodule UpgradeTest do
                {:ok, {["poison"], %Options{download: false, compile: false}}}
     end
   end
+
+  describe "help" do
+    setup :verify_on_exit!
+    setup :stub_io
+
+    test "invalid_flag" do
+      Upgrade.help({:invalid_flag, "--foobaz"})
+    end
+
+    test "banner" do
+      Upgrade.help(:banner)
+    end
+
+    test "verbose" do
+      Upgrade.help(:verbose)
+    end
+
+    def stub_io(_) do
+      expect(Wand.CLI.IOMock, :puts, fn _message -> :ok end)
+      :ok
+    end
+  end
 end

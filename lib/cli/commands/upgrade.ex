@@ -25,7 +25,15 @@ defmodule Wand.CLI.Commands.Upgrade do
     compile: true
   end
 
-  def help(_type) do
+  def help(:banner), do: Display.print(@moduledoc)
+  def help(:verbose), do: help(:banner)
+  def help({:invalid_flag, flag}) do
+    """
+    #{flag} is invalid.
+    Allowed flags are --compile, --download, --latest, --major, and --minor.
+    See wand help upgrade --verbose for more information
+    """
+    |> Display.print()
   end
 
   def validate(args) do
