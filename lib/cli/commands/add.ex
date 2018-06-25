@@ -164,6 +164,14 @@ defmodule Wand.CLI.Commands.Add do
     |> Wand.CLI.Display.print()
   end
 
+  def help({:invalid_flag, flag}) do
+    """
+    #{flag} is invalid.
+    Enter wand help add --verbose for more information
+    """
+    |> Wand.CLI.Display.print()
+  end
+
   def validate(args) do
     flags = allowed_flags(args)
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)

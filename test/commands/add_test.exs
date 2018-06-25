@@ -252,7 +252,11 @@ defmodule AddTest do
     test "verbose" do
       Add.help(:verbose)
     end
-    
+
+    test "invalid_flag" do
+      Add.help({:invalid_flag, "--foobaz"})
+    end
+
     def stub_io(_) do
       expect(Wand.CLI.IOMock, :puts, fn _message -> :ok end)
       :ok
