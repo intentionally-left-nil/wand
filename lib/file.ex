@@ -1,0 +1,8 @@
+defmodule Wand.File do
+  @callback read(path :: Path.t()) :: {:ok, binary()} | {:error, File.posix()}
+
+  def impl() do
+    Wand.FileMock
+    #Application.get_env(:wand, :file, File)
+  end
+end
