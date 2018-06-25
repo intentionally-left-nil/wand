@@ -1,8 +1,9 @@
 defmodule Wand.WandFile do
   @f Wand.File.impl()
   @requirement "~> 1.0"
+  @vsn "1.0"
 
-  defstruct version: "1.0",
+  defstruct version: @vsn,
   dependencies: []
 
   defmodule Dependency do
