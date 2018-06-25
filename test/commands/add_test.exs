@@ -248,6 +248,11 @@ defmodule AddTest do
     test "banner" do
       Add.help(:banner)
     end
+
+    test "verbose" do
+      Add.help(:verbose)
+    end
+    
     def stub_io(_) do
       expect(Wand.CLI.IOMock, :puts, fn _message -> :ok end)
       :ok

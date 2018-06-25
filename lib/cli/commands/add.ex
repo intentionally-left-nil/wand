@@ -2,19 +2,21 @@ defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
 
   @moduledoc """
-  Add elixir packages to wand.json for the project
+  Add elixir packages to wand.json
 
   ## Usage
   **wand** add [package] [package] ... [flags]
 
   ## Examples
+  <pre>
   **wand** add ex_doc mox --test
   **wand** add poison@https://github.com/devinus/poison.git
   **wand** add poison@3.1 --exact
+  </pre>
 
   ## Options
   The available flags depend on if wand is being used to add a single package, or multiple packages. Flags that can only be used in single-package-mode are denoted with (s).
-
+  <pre>
   --around            Stay within the minor version provided
   --branch        (s) Treat the url anchor as a git branch
   --compile           Run mix compile after adding (default: **true**)
@@ -36,6 +38,7 @@ defmodule Wand.CLI.Commands.Add do
   --tag           (s) Treat the url anchor as a git tag
   --test              Include the dependency in the test environment
   --in-umbrella   (s) Sets a path dependency pointing to ../app
+  </pre>
   """
 
   defmodule Git do
@@ -74,6 +77,92 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   def help(:banner), do: Wand.CLI.Display.print(@moduledoc)
+
+  def help(:verbose) do
+    """
+    Add elixir packages to wand.json
+
+    ## Usage
+    **wand** add [package] [package] ... [flags]
+    Wand can be used to add packages from three different places: hex, git, or the local filesystem. The syntax for [package] is described below:
+
+    ### Hex.pm
+    Package can be just the name, or name@version
+
+    Examples:
+    <pre>
+    wand add poison
+    wand add poison@3.1
+    </pre>
+    If a version is provided, the --around and --exact flags determine how the version is used.
+
+    ### Git
+    The format is name@location where location is one of the https or ssh syntaxes below
+    <pre>
+    package@https://gitub.com/<url>#key
+    package@git@github.com:<path>#key
+    </pre>
+
+    `key` is optional, and if provided can refer to a git branch, tag, or ref. By default, the key is treated as a ref. This behavior can be changed by passing the --branch flag to interpret the key as a branch (such as master), or the --tag flag to treat the key as a git tag. Additionally the `sparse` and `submodules` flags describe how to checkout the repository once downloaded.
+
+    Examples:
+    <pre>
+    wand add poison@https://github.com/devinus/poison.git
+    wand add poison@https://github.com/devinus/poison.git#test --branch
+    poison@https://github.com/devinus/poison.git#3.1.0 --tag
+    poison@git@github.com:devinus/poison
+    </pre>
+
+    ### Local Path
+    Local packages are described by the format name@file:[path]
+
+    OR, for an umbrella application, when you need to include a sibling dependency, pass the app name, along with the --in-umbrella flag.
+
+    Examples:
+    <pre>
+    wand add poison@file:/absolute/path/to/poison
+    wand add poison@file:../../relative/path/
+    wand add sibling_dependency --in-umbrella
+    </pre>
+
+    ## Options
+    The following flags are provided. They are boolean flags unless specified.
+
+    ### Hex flags
+    --hex-name=NAME means that the local name of the dependency is different from its name on hex
+    E.g. wand add mypoison --hex-name=poison
+    --organization=ORGANIZATION corresponds to the private org to pull the package(s) from.
+    --repo=REPO An alternative repository to use. Configure with mix hex.repo. Default: hexpm
+
+    ### Git flags
+    --branch Interpret the string after the `#` as a git branch (Default: ref)
+    --ref Interpret the string as a git ref
+    --tag Iterpret the string as a git tag
+    --sparse=FOLDER git checkout only a single folder, and use that
+    --submodules tells git to also initialize submodules
+
+    ### Environment flags
+    Setting these flags specifies which environments to install the dependency. If none are provided, all environments are included.
+
+    **--env=ENVIRONMENT** where ENVIRONMENT is the environment to add. This flag can be added multiple times. Example: --env=prod --env=test
+
+    --dev is shorthand for --env=dev
+    --test is shorthand for --env=test
+    --prod is shorthand for --env=prod
+
+    --compile-env=ENVIRONMENT doesn't affect which environments the dependency is loaded from. Instead, it says "when compiling the dependency, which environment to use?". Defaults to --compile-env=prod
+
+    --optional will include the project for THIS project, but not reuire it should the main project be a dependency of another project.
+
+    ### Dependency configuration
+    These flags deal with what happens with the dependency once configured
+    --runtime determines whether to start the dependency's application. Defaults to true
+    --read-app-file determines if the app file for the dependency is read. Defaults to true.
+    --download determines if mix deps.get is run after adding the package to wand.json. Defaults to true. If set to false, this implies --compile=false as well.
+    --compile determines if mix.compile is run after adding the package to wand.json.
+    """
+    |> Wand.CLI.Display.print()
+  end
 
   def validate(args) do
     flags = allowed_flags(args)
