@@ -8,6 +8,15 @@ defmodule Wand.CLI.Commands.Upgrade do
   ## Usage
   wand upgrade
   wand upgrade poison ex_doc --latest
+
+  ## Options
+  <pre>
+  --compile           Run mix compile after adding (default: **true**)
+  --download          Run mix deps.get after adding (default: **true**)
+  --latest            Upgrade to the latest version in hex
+  --major            Upgrade to the highest version within the current major version
+  --minor            Upgrade to the highest version within the current minor version
+  </pre>
   """
 
   defmodule Options do
@@ -24,7 +33,6 @@ defmodule Wand.CLI.Commands.Upgrade do
       latest: :boolean,
       major: :boolean,
       minor: :boolean,
-      patch: :boolean,
       download: :boolean,
       compile: :boolean,
     ]
@@ -55,10 +63,9 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   defp get_level(switches) do
     cond do
-      Keyword.get(switches, :latest) -> :major
+      Keyword.get(switches, :latest) -> :latest
       Keyword.get(switches, :major) -> :major
       Keyword.get(switches, :minor) -> :minor
-      Keyword.get(switches, :patch) -> :patch
       true -> :major
     end
   end

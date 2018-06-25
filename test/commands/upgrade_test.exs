@@ -14,17 +14,13 @@ defmodule UpgradeTest do
       assert Upgrade.validate(["upgrade", "poison"]) == {:ok, {["poison"], %Options{level: :major}}}
     end
 
-    test "--latest is the same as major" do
-      assert Upgrade.validate(["upgrade", "poison", "--patch", "--latest"]) ==
-               {:ok, {["poison"], %Options{level: :major}}}
+    test "Upgrade to the latest version" do
+      assert Upgrade.validate(["upgrade", "poison", "--latest"]) ==
+               {:ok, {["poison"], %Options{level: :latest}}}
     end
 
     test "a single package to the next minor version" do
       assert Upgrade.validate(["upgrade", "poison", "--minor"]) == {:ok, {["poison"], %Options{level: :minor}}}
-    end
-
-    test "a single package to the next patch version" do
-      assert Upgrade.validate(["upgrade", "poison", "--patch"]) == {:ok, {["poison"], %Options{level: :patch}}}
     end
 
     test "If both major and minor are passed in, prefer major" do
@@ -33,12 +29,12 @@ defmodule UpgradeTest do
     end
 
     test "upgrade multiple packages" do
-      assert Upgrade.validate(["upgrade", "poison", "ex_doc", "--patch"]) ==
-               {:ok, {["poison", "ex_doc"], %Options{level: :patch}}}
+      assert Upgrade.validate(["upgrade", "poison", "ex_doc", "--minor"]) ==
+               {:ok, {["poison", "ex_doc"], %Options{level: :minor}}}
     end
 
     test "upgrade all packages if none passed in" do
-      assert Upgrade.validate(["upgrade", "--patch"]) == {:ok, {:all, %Options{level: :patch}}}
+      assert Upgrade.validate(["upgrade", "--minor"]) == {:ok, {:all, %Options{level: :minor}}}
     end
 
     test "skip compiling" do
