@@ -55,18 +55,22 @@ defmodule Wand.CLI.Commands.Help do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case Wand.CLI.Command.parse_errors(errors) do
-      :ok -> parse(commands, switches)
+      :ok -> parse(commands, verbose?(switches))
       error -> error
     end
   end
 
-  defp parse(["help"], _switches), do: {:error, :verbose}
-  defp parse([name], _switches), do: {:help, String.to_atom(name), :banner}
-  defp parse(_commands, switches) do
+  defp parse(["help"], _verbose), do: {:error, :verbose}
+  defp parse([name], _verbose=true), do: {:help, String.to_atom(name), :verbose}
+  defp parse([name], _verbose=false), do: {:help, String.to_atom(name), :banner}
+  defp parse(_commands, _verbose=true), do: {:error, :verbose}
+  defp parse(_commands, _verbose=false), do: {:error, :banner}
+
+  defp verbose?(switches) do
     cond do
-      Keyword.get(switches, :verbose) -> {:error, :verbose}
-      Keyword.get(switches, :"?") -> {:error, :verbose}
-      true -> {:error, :banner}
+      Keyword.get(switches, :verbose) -> true
+      Keyword.get(switches, :"?") -> true
+      true -> false
     end
   end
 end
