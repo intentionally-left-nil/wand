@@ -1,6 +1,5 @@
 {
   "skip_files": [
-    "lib/cli/command.ex",
-    "lib/wand.ex"
+    "deps"
   ]
 }
