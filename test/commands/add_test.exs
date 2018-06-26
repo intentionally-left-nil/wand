@@ -76,6 +76,11 @@ defmodule AddTest do
                {:ok, [%Package{name: "ex_doc", environments: [:docs]}]}
     end
 
+    test "umbrella package" do
+      assert Add.validate(["add", "sibling", "--in-umbrella"]) ==
+               {:ok, [%Package{name: "sibling", details: %Path{in_umbrella: true}}]}
+    end
+
     test "add multiple custom environments and prod" do
       command = OptionParser.split("add ex_doc --env=dogs --env=cat --prod")
 

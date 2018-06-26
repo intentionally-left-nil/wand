@@ -243,6 +243,10 @@ defmodule Wand.CLI.Commands.Add do
     %Package{package | details: details}
   end
 
+  defp add_details(package, :umbrella, switches) do
+    %Package{package | details: %Path{in_umbrella: true}}
+  end
+
   defp add_predefined_environments(environments, switches) do
     [:dev, :test, :prod]
     |> Enum.reduce(environments, fn name, environments ->
@@ -286,60 +290,55 @@ defmodule Wand.CLI.Commands.Add do
     cond do
       Keyword.has_key?(switches, :git) -> :git
       Keyword.has_key?(switches, :path) -> :path
+      Keyword.has_key?(switches, :in_umbrella) -> :umbrella
       true -> :hex
     end
   end
 
   defp allowed_flags(args) do
-    hex_flags = [
-      hex_name: :string
-    ]
-
-    path_flags = [
-      path: :string,
-      in_umbrella: :boolean,
-    ]
-
-    git_flags = [
-      git: :string,
-      sparse: :string,
-      submodules: :boolean
-    ]
-
-    common_single_package_flags = [
-      compile_env: :string,
-      read_app_file: :boolean
-    ]
-
-    multi_package_flags = [
-      around: :boolean,
-      compile: :boolean,
-      dev: :boolean,
-      download: :boolean,
-      env: :keep,
-      exact: :boolean,
-      optional: :boolean,
-      organization: :string,
-      override: :boolean,
-      prod: :boolean,
-      repo: :string,
-      runtime: :boolean,
-      test: :boolean
-    ]
+    all_flags = %{
+      hex: [
+        hex_name: :string
+      ],
+      path: [
+        path: :string,
+        in_umbrella: :boolean,
+      ],
+      git: [
+        git: :string,
+        sparse: :string,
+        submodules: :boolean
+      ],
+      umbrella: [
+        in_umbrella: :boolean,
+      ],
+      single_package: [
+        compile_env: :string,
+        read_app_file: :boolean,
+      ],
+      multi_package: [
+        around: :boolean,
+        compile: :boolean,
+        dev: :boolean,
+        download: :boolean,
+        env: :keep,
+        exact: :boolean,
+        optional: :boolean,
+        organization: :string,
+        override: :boolean,
+        prod: :boolean,
+        repo: :string,
+        runtime: :boolean,
+        test: :boolean
+      ],
+    }
 
     {switches, [_ | commands], _errors} = OptionParser.parse(args)
 
-    if length(commands) == 1 do
-      flags =
-        case package_type(switches) do
-          :path -> path_flags
-          :git -> git_flags
-          :hex -> hex_flags
-        end
-
-      flags ++ common_single_package_flags ++ multi_package_flags
-    else
-      multi_package_flags
+    case length(commands) do
+      1 -> [:single_package, :multi_package, package_type(switches)]
+      _ -> [:multi_package]
     end
+    |> Enum.flat_map(&Map.fetch!(all_flags, &1))
   end
 end
