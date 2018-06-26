@@ -11,10 +11,10 @@ defmodule CliTest do
   end
 
   defp stub_exit(status) do
-    expect(CLI.SystemMock, :halt, fn ^status -> :ok end)
+    expect(Wand.SystemMock, :halt, fn ^status -> :ok end)
   end
 
   defp stub_io() do
-    expect(CLI.IOMock, :puts, fn _message -> :ok end)
+    expect(Wand.IOMock, :puts, fn _message -> :ok end)
   end
 end

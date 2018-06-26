@@ -265,7 +265,7 @@ defmodule AddTest do
     end
 
     def stub_io(_) do
-      expect(Wand.CLI.IOMock, :puts, fn _message -> :ok end)
+      expect(Wand.IOMock, :puts, fn _message -> :ok end)
       :ok
     end
   end
