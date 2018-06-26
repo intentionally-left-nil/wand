@@ -2,7 +2,7 @@ defmodule Wand.WandFile do
   alias Wand.WandFile
   @f Wand.File.impl()
   @requirement "~> 1.0"
-  @vsn "1.0"
+  @vsn "1.0.0"
 
   defstruct version: @vsn,
   dependencies: []
@@ -31,6 +31,12 @@ defmodule Wand.WandFile do
         {:ok, file}
       true -> {:error, {:already_exists, dependency.name}}
     end
+  end
+
+  def remove(%WandFile{}=file, name) do
+    update_in(file.dependencies, fn dependencies ->
+      Enum.reject(dependencies, &(&1.name == name))
+    end)
   end
 
   defp validate(data) do

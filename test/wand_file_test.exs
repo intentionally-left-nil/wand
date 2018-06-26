@@ -79,6 +79,15 @@ defmodule WandFileTest do
     end
   end
 
+  describe "remove" do
+    test "Removes an existing package" do
+      file = valid_deps_config()
+      poison = Enum.at(file.dependencies, 1)
+
+      assert WandFile.remove(file, "mox") == %WandFile{version: "1.0.1", dependencies: [poison]}
+    end
+  end
+
   defp stub_read_valid(path \\ "wand.json") do
     contents = valid_deps() |> Poison.encode!()
     stub_read(:ok, path, contents)
@@ -96,7 +105,7 @@ defmodule WandFileTest do
 
   defp valid_deps() do
     %{
-      version: "1.0.0",
+      version: "1.0.1",
       dependencies: %{
         mox: ["~> 0.3.2", %{only: "test"}],
         poison: "~> 3.1",
@@ -106,7 +115,7 @@ defmodule WandFileTest do
 
   defp valid_deps_config() do
     %WandFile{
-      version: "1.0.0",
+      version: "1.0.1",
       dependencies: [
         %WandFile.Dependency{
           name: "mox",
