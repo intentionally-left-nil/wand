@@ -1,5 +1,5 @@
 defmodule WandFileTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Mox
   alias Wand.WandFile
   alias Wand.WandFile.Dependency
@@ -71,12 +71,12 @@ defmodule WandFileTest do
   describe "add" do
     test ":already_exists if the package already exists" do
       file = valid_deps_config()
-      dependency = %Dependency{name: "poison", requirement: "~> 3.3"}
+      dependency = poison("~> 3.3")
       assert WandFile.add(file, dependency) == {:error, {:already_exists, "poison"}}
     end
     test "a new package" do
       file = %WandFile{}
-      dependency = %Dependency{name: "poison", requirement: "~> 3.1"}
+      dependency = poison()
       assert WandFile.add(file, dependency) == {:ok, %WandFile{dependencies: [dependency]}}
     end
   end
@@ -104,13 +104,13 @@ defmodule WandFileTest do
     end
 
     test "saves a simple dependency" do
-      dependency = %Dependency{name: "poison", requirement: "~> 3.3"}
+      dependency = poison()
       {:ok, file} = WandFile.add(%WandFile{}, dependency)
 
       expected = %{
         version: file.version,
         dependencies: %{
-          "poison" => "~> 3.3",
+          "poison" => "~> 3.1",
         }
       }
       |> Poison.encode!(pretty: true)
@@ -131,7 +131,14 @@ defmodule WandFileTest do
 
       stub_write(:ok, "wand.json", expected)
       WandFile.save(file)
+    end
 
+    test "dependencies with opts" do
+      file = %WandFile{dependencies: [mox()]}
+      expected = "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"a\": \"~> 3.1\",\n    \"b\": \"~> 3.2\",\n    \"c\": \"~> 3.3\",\n    \"d\": \"~> 3.4\",\n    \"f\": \"~> 3.5\"\n  }\n}"
+
+      stub_write(:ok, "wand.json", expected)
+      WandFile.save(file)
     end
   end
 
@@ -168,16 +175,21 @@ defmodule WandFileTest do
     %WandFile{
       version: "1.0.1",
       dependencies: [
-        %WandFile.Dependency{
-          name: "mox",
-          requirement: "~> 0.3.2",
-          opts: %{only: "test"}
-        },
-        %WandFile.Dependency{
-          name: "poison",
-          requirement: "~> 3.1",
-        }
+        mox(),
+        poison(),
       ]
+    }
+  end
+
+  defp poison(requirement \\ "~> 3.1") do
+    %Dependency{name: "poison", requirement: requirement}
+  end
+
+  defp mox() do
+    %WandFile.Dependency{
+      name: "mox",
+      requirement: "~> 0.3.2",
+      opts: %{only: "test"}
     }
   end
 end

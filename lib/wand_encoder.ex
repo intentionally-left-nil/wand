@@ -1,11 +1,10 @@
 defmodule Wand.WandEncoder do
   alias Wand.WandFile
   alias Wand.WandFile.Dependency
-  alias Poison.Encoder.BitString
+  alias Poison.Encoder
   defimpl Poison.Encoder, for: WandFile do
     @default_indent 2
     @default_offset 0
-    @empty %{}
 
     def encode(%WandFile{version: version, dependencies: dependencies}, options) do
       indent = indent(options)
@@ -38,13 +37,18 @@ defmodule Wand.WandEncoder do
       |> wrap_map(offset, indent)
     end
 
-    def encode(%Dependency{requirement: requirement, opts: @empty}, options) do
-      BitString.encode(requirement, options)
+    def encode(%Dependency{requirement: requirement, opts: opts}, options) when opts == %{} do
+      Encoder.BitString.encode(requirement, options)
+    end
+
+    def encode(%Dependency{requirement: requirement, opts: opts}, options) do
+      [requirement, opts]
+      |> Encoder.List.encode(options)
     end
 
     def encode(key, options) when is_binary(key) do
       to_string(key)
-      |> BitString.encode(options)
+      |> Encoder.BitString.encode(options)
     end
 
     defp wrap_map(body, offset, indent) do
