@@ -1,4 +1,4 @@
-defmodule Wand.CLI.System do
+defmodule Wand.Interfaces.System do
   @callback halt(status :: integer()) :: no_return()
 
   def impl() do

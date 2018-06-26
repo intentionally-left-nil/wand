@@ -73,7 +73,7 @@ defmodule Wand.CLI.Display.Renderer do
 end
 
 defmodule Wand.CLI.Display do
-  @io Wand.CLI.IO.impl()
+  @io Wand.Interfaces.IO.impl()
   def print(message) do
     {blocks, context} = Wand.CLI.Display.Renderer.parse(message)
 
