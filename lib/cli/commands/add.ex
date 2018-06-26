@@ -10,7 +10,7 @@ defmodule Wand.CLI.Commands.Add do
   ## Examples
   <pre>
   **wand** add ex_doc mox --test
-  **wand** add poison@https://github.com/devinus/poison.git
+  **wand** add poison --git=https://github.com/devinus/poison.git
   **wand** add poison@3.1 --exact
   </pre>
 
@@ -18,24 +18,23 @@ defmodule Wand.CLI.Commands.Add do
   The available flags depend on if wand is being used to add a single package, or multiple packages. Flags that can only be used in single-package-mode are denoted with (s).
   <pre>
   --around            Stay within the minor version provided
-  --branch        (s) Treat the url anchor as a git branch
   --compile           Run mix compile after adding (default: **true**)
   --compile-env   (s) The environment for the dependency (default: **prod**)
   --dev               Include the dependency in the dev environment
   --download          Run mix deps.get after adding (default: **true**)
   --env               Add the dependency to a specific environment
   --exact             Set the version to exactly match the version provided
+  --git           (s) The Git URI to download the package from
   --hex-name      (s) The name of the package in hex to download
   --optional          Mark the dependency as optional
   --organization      Set the hex.pm organization to use
+  --path          (s) The local directory to install the package from
   --prod              Include the dependency in the prod environment
   --read-app-file (s) Read the app file of the dependency (default: **true**)
-  --ref           (s) Treat the url anchor as a git ref
   --repo              The hex repo to use (default: **hexpm**)
   --runtime           Start the application automatically (default: **true**)
   --sparse        (s) Checkout a given directory inside git
   --submodules    (s) Initialize submodules for the repo
-  --tag           (s) Treat the url anchor as a git tag
   --test              Include the dependency in the test environment
   --in-umbrella   (s) Sets a path dependency pointing to ../app
   </pre>
@@ -53,8 +52,7 @@ defmodule Wand.CLI.Commands.Add do
   defmodule Hex do
     defstruct hex_name: nil,
               organization: nil,
-              repo: nil,
-              version: :latest
+              repo: nil
   end
 
   defmodule Path do
@@ -73,6 +71,7 @@ defmodule Wand.CLI.Commands.Add do
               optional: nil,
               override: nil,
               read_app_file: nil,
+              requirement: :latest,
               runtime: nil
   end
 
@@ -84,44 +83,36 @@ defmodule Wand.CLI.Commands.Add do
 
     ## Usage
     **wand** add [package] [package] ... [flags]
-    Wand can be used to add packages from three different places: hex, git, or the local filesystem. The syntax for [package] is described below:
+    Wand can be used to add packages from three different places: hex, git, or the local filesystem. [package] can either be the name, or name@version.
+
+    If a version is provided, the --around and --exact flags determine how the version is used.
 
     ### Hex.pm
-    Package can be just the name, or name@version
-
     Examples:
     <pre>
     wand add poison
     wand add poison@3.1
     </pre>
-    If a version is provided, the --around and --exact flags determine how the version is used.
 
     ### Git
-    The format is name@location where location is one of the https or ssh syntaxes below
-    <pre>
-    package@https://gitub.com/<url>#key
-    package@git@github.com:<path>#key
-    </pre>
-
-    `key` is optional, and if provided can refer to a git branch, tag, or ref. By default, the key is treated as a ref. This behavior can be changed by passing the --branch flag to interpret the key as a branch (such as master), or the --tag flag to treat the key as a git tag. Additionally the `sparse` and `submodules` flags describe how to checkout the repository once downloaded.
-
+    Include the --git flag to pass a URI. The URI can be one of two base formats, and can end with an optional hash of the branch, tag, or ref to use
     Examples:
     <pre>
-    wand add poison@https://github.com/devinus/poison.git
-    wand add poison@https://github.com/devinus/poison.git#test --branch
-    poison@https://github.com/devinus/poison.git#3.1.0 --tag
-    poison@git@github.com:devinus/poison
+    wand add poison --git="https://github.com/devinus/poison.git"
+    wand add poison --git="git@github.com:devinus/poison"
+    wand add poison@3.1 --git="https://github.com/devinus/poison.git#test"
+    wand add poison --git="https://github.com/devinus/poison.git#3.1.0"
     </pre>
 
     ### Local Path
-    Local packages are described by the format name@file:[path]
+    Local packages are described by passing in the --path flag corresponding to the path location
 
     OR, for an umbrella application, when you need to include a sibling dependency, pass the app name, along with the --in-umbrella flag.
 
     Examples:
     <pre>
-    wand add poison@file:/absolute/path/to/poison
-    wand add poison@file:../../relative/path/
+    wand add poison --path="/absolute/path/to/poison"
+    wand add poison --path="../../relative/path/"
     wand add sibling_dependency --in-umbrella
     </pre>
 
@@ -135,9 +126,6 @@ defmodule Wand.CLI.Commands.Add do
     --repo=REPO An alternative repository to use. Configure with mix hex.repo. Default: hexpm
 
     ### Git flags
-    --branch Interpret the string after the `#` as a git branch (Default: ref)
-    --ref Interpret the string as a git ref
-    --tag Iterpret the string as a git tag
     --sparse=FOLDER git checkout only a single folder, and use that
     --submodules tells git to also initialize submodules
 
@@ -189,11 +177,11 @@ defmodule Wand.CLI.Commands.Add do
 
     packages =
       Enum.map(names, fn name ->
-        {name, version} = split_version(name)
-        type = version_type(version)
+        {name, requirement} = split_name(name)
+        type = package_type(switches)
 
-        %Package{base_package | name: name}
-        |> add_details(type, version, switches)
+        %Package{base_package | name: name, requirement: requirement}
+        |> add_details(type, switches)
       end)
 
     {:ok, packages}
@@ -216,52 +204,38 @@ defmodule Wand.CLI.Commands.Add do
     }
   end
 
-  defp split_version(package) do
+  defp split_name(package) do
     case String.split(package, "@", parts: 2) do
-      [package, version] -> {package, version}
+      [package, name] -> {package, name}
       [package] -> {package, :latest}
     end
   end
 
-  defp add_details(package, :file, "file:" <> file, switches) do
+  defp add_details(package, :path, switches) do
     details = %Path{
-      path: file,
+      path: Keyword.fetch!(switches, :path),
       in_umbrella: Keyword.get(switches, :in_umbrella)
     }
 
     %Package{package | details: details}
   end
 
-  defp add_details(package, :git, git_uri, switches) do
-    details =
-      case String.split(git_uri, "#", parts: 2) do
-        [git_uri] ->
-          %Git{uri: git_uri}
-
-        [git_uri, ref] ->
-          key =
-            [:branch, :ref, :tag]
-            |> Enum.find(:ref, &Keyword.get(switches, &1))
-
-          data =
-            %{uri: git_uri}
-            |> Map.put(key, ref)
-
-          struct(Git, data)
-      end
-
+  defp add_details(package, :git, switches) do
+    {uri, ref} = case String.split(Keyword.fetch!(switches, :git), "#", parts: 2) do
+      [uri] -> {uri, nil}
+      [uri, ref] -> {uri, ref}
+    end
     details = %Git{
-      details
-      | sparse: Keyword.get(switches, :sparse),
-        submodules: Keyword.get(switches, :submodules)
+      uri: uri,
+      sparse: Keyword.get(switches, :sparse),
+      submodules: Keyword.get(switches, :submodules),
+      ref: ref
     }
-
     %Package{package | details: details}
   end
 
-  defp add_details(package, :hex, version, switches) do
+  defp add_details(package, :hex, switches) do
     details = %Hex{
-      version: version,
       organization: Keyword.get(switches, :organization),
       repo: Keyword.get(switches, :repo)
     }
@@ -308,24 +282,26 @@ defmodule Wand.CLI.Commands.Add do
     end
   end
 
-  defp version_type("file:" <> _), do: :file
-  defp version_type("https://" <> _), do: :git
-  defp version_type("git@" <> _), do: :git
-  defp version_type(_), do: :hex
+  defp package_type(switches) do
+    cond do
+      Keyword.has_key?(switches, :git) -> :git
+      Keyword.has_key?(switches, :path) -> :path
+      true -> :hex
+    end
+  end
 
   defp allowed_flags(args) do
     hex_flags = [
       hex_name: :string
     ]
 
-    file_flags = [
-      in_umbrella: :boolean
+    path_flags = [
+      path: :string,
+      in_umbrella: :boolean,
     ]
 
     git_flags = [
-      branch: :boolean,
-      ref: :boolean,
-      tag: :boolean,
+      git: :string,
       sparse: :string,
       submodules: :boolean
     ]
@@ -351,18 +327,12 @@ defmodule Wand.CLI.Commands.Add do
       test: :boolean
     ]
 
-    {_switches, [_ | commands], _errors} = OptionParser.parse(args)
+    {switches, [_ | commands], _errors} = OptionParser.parse(args)
 
     if length(commands) == 1 do
-      type =
-        hd(commands)
-        |> split_version
-        |> elem(1)
-        |> version_type
-
       flags =
-        case type do
-          :file -> file_flags
+        case package_type(switches) do
+          :path -> path_flags
           :git -> git_flags
           :hex -> hex_flags
         end
