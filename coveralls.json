@@ -1,5 +1,8 @@
 {
   "skip_files": [
-    "deps"
+    "deps",
+    "lib/cli/io.ex",
+    "lib/cli/system.ex",
+    "lib/file.ex"
   ]
 }
