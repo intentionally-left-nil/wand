@@ -1,4 +1,5 @@
 defmodule Wand.WandFile do
+  alias Wand.WandFile
   @f Wand.File.impl()
   @requirement "~> 1.0"
   @vsn "1.0"
@@ -20,6 +21,15 @@ defmodule Wand.WandFile do
       {:ok, wand_file}
     else
       error -> error
+    end
+  end
+
+  def add(%WandFile{}=file, %Dependency{}=dependency) do
+    case exists?(file, dependency.name) do
+      false ->
+        file = update_in(file.dependencies, &([dependency | &1]))
+        {:ok, file}
+      true -> {:error, {:already_exists, dependency.name}}
     end
   end
 
@@ -71,9 +81,14 @@ defmodule Wand.WandFile do
   defp extract_version(_data), do: {:error, :missing_version}
 
   defp create_dependency(name, requirement, opts) do
+    name = to_string(name)
     case Version.parse_requirement(requirement) do
       :error -> {:error, {:invalid_dependency, name}}
       _ -> %Dependency{name: name, requirement: requirement, opts: opts}
     end
+  end
+
+  defp exists?(%WandFile{dependencies: dependencies}, name) do
+    Enum.find(dependencies, &(&1.name == name)) != nil
   end
 end

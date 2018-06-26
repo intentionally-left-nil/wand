@@ -2,6 +2,7 @@ defmodule WandFileTest do
   use ExUnit.Case
   import Mox
   alias Wand.WandFile
+  alias Wand.WandFile.Dependency
 
   describe "load" do
     test "loads the default wand.json file" do
@@ -61,7 +62,20 @@ defmodule WandFileTest do
         }
       })
       stub_read(:ok, "wand.json", json)
-      assert WandFile.load() == {:error, {:invalid_dependency, :mox}}
+      assert WandFile.load() == {:error, {:invalid_dependency, "mox"}}
+    end
+  end
+
+  describe "add" do
+    test ":already_exists if the package already exists" do
+      file = valid_deps_config()
+      dependency = %Dependency{name: "poison", requirement: "~> 3.3"}
+      assert WandFile.add(file, dependency) == {:error, {:already_exists, "poison"}}
+    end
+    test "a new package" do
+      file = %WandFile{}
+      dependency = %Dependency{name: "poison", requirement: "~> 3.1"}
+      assert WandFile.add(file, dependency) == {:ok, %WandFile{dependencies: [dependency]}}
     end
   end
 
@@ -95,12 +109,12 @@ defmodule WandFileTest do
       version: "1.0.0",
       dependencies: [
         %WandFile.Dependency{
-          name: :mox,
+          name: "mox",
           requirement: "~> 0.3.2",
           opts: %{only: "test"}
         },
         %WandFile.Dependency{
-          name: :poison,
+          name: "poison",
           requirement: "~> 3.1",
         }
       ]
