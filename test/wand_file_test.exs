@@ -4,6 +4,8 @@ defmodule WandFileTest do
   alias Wand.WandFile
   alias Wand.WandFile.Dependency
 
+  setup :verify_on_exit!
+
   describe "load" do
     test "loads the default wand.json file" do
       stub_read_valid()
@@ -88,6 +90,51 @@ defmodule WandFileTest do
     end
   end
 
+  describe "save" do
+
+    test "saves an empty config" do
+      file = %WandFile{}
+      expected = %{
+        version: file.version,
+        dependencies: %{},
+      }
+      |> Poison.encode!(pretty: true)
+      stub_write(:ok, "wand.json", expected)
+      WandFile.save(file)
+    end
+
+    test "saves a simple dependency" do
+      dependency = %Dependency{name: "poison", requirement: "~> 3.3"}
+      {:ok, file} = WandFile.add(%WandFile{}, dependency)
+
+      expected = %{
+        version: file.version,
+        dependencies: %{
+          "poison" => "~> 3.3",
+        }
+      }
+      |> Poison.encode!(pretty: true)
+      stub_write(:ok, "wand.json", expected)
+      WandFile.save(file)
+    end
+
+    test "dependencies are sorted by their name" do
+      dependencies = [
+        %Dependency{name: "d", requirement: "~> 3.4"},
+        %Dependency{name: "b", requirement: "~> 3.2"},
+        %Dependency{name: "a", requirement: "~> 3.1"},
+        %Dependency{name: "f", requirement: "~> 3.5"},
+        %Dependency{name: "c", requirement: "~> 3.3"},
+      ]
+      file = %WandFile{dependencies: dependencies}
+      expected = "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"a\": \"~> 3.1\",\n    \"b\": \"~> 3.2\",\n    \"c\": \"~> 3.3\",\n    \"d\": \"~> 3.4\",\n    \"f\": \"~> 3.5\"\n  }\n}"
+
+      stub_write(:ok, "wand.json", expected)
+      WandFile.save(file)
+
+    end
+  end
+
   defp stub_read_valid(path \\ "wand.json") do
     contents = valid_deps() |> Poison.encode!()
     stub_read(:ok, path, contents)
@@ -101,6 +148,10 @@ defmodule WandFileTest do
 
   defp stub_read(:error, path, error) do
     expect(Wand.FileMock, :read, fn ^path -> {:error, error} end)
+  end
+
+  defp stub_write(:ok, path, contents) do
+    expect(Wand.FileMock, :write, fn(^path, ^contents) -> :ok end)
   end
 
   defp valid_deps() do

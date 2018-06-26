@@ -1,5 +1,6 @@
 defmodule Wand.WandFile do
   alias Wand.WandFile
+  alias Wand.WandEncoder
   @f Wand.File.impl()
   @requirement "~> 1.0"
   @vsn "1.0.0"
@@ -10,6 +11,15 @@ defmodule Wand.WandFile do
   defmodule Dependency do
     @enforce_keys [:name]
     defstruct name: nil, requirement: nil, opts: %{}
+  end
+
+  def add(%WandFile{}=file, %Dependency{}=dependency) do
+    case exists?(file, dependency.name) do
+      false ->
+        file = update_in(file.dependencies, &([dependency | &1]))
+        {:ok, file}
+      true -> {:error, {:already_exists, dependency.name}}
+    end
   end
 
   def load(path \\ "wand.json") do
@@ -24,19 +34,15 @@ defmodule Wand.WandFile do
     end
   end
 
-  def add(%WandFile{}=file, %Dependency{}=dependency) do
-    case exists?(file, dependency.name) do
-      false ->
-        file = update_in(file.dependencies, &([dependency | &1]))
-        {:ok, file}
-      true -> {:error, {:already_exists, dependency.name}}
-    end
-  end
-
   def remove(%WandFile{}=file, name) do
     update_in(file.dependencies, fn dependencies ->
       Enum.reject(dependencies, &(&1.name == name))
     end)
+  end
+
+  def save(%WandFile{}=file, path \\ "wand.json") do
+    contents = Poison.encode!(file, pretty: true)
+    @f.write(path, contents)
   end
 
   defp validate(data) do
