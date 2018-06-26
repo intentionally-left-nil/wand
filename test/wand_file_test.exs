@@ -135,7 +135,7 @@ defmodule WandFileTest do
 
     test "dependencies with opts" do
       file = %WandFile{dependencies: [mox()]}
-      expected = "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"a\": \"~> 3.1\",\n    \"b\": \"~> 3.2\",\n    \"c\": \"~> 3.3\",\n    \"d\": \"~> 3.4\",\n    \"f\": \"~> 3.5\"\n  }\n}"
+      expected = "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"mox\": [\n      \"~> 0.3.2\",\n      {\n        \"only\": \"test\"\n      }\n    ]\n  }\n}"
 
       stub_write(:ok, "wand.json", expected)
       WandFile.save(file)
