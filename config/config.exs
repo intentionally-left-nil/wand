@@ -2,6 +2,7 @@ use Mix.Config
 
 if Mix.env() == :test do
   config :wand,
-    system: Wand.CLI.SystemMock,
-    io: Wand.CLI.IOMock
+    file: Wand.FileMock,
+    io: Wand.CLI.IOMock,
+    system: Wand.CLI.SystemMock
 end

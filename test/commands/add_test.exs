@@ -20,7 +20,7 @@ defmodule AddTest do
     end
 
     test "returns help if a flag for the wrong file type is given" do
-      command = OptionParser.split("add ex_doc@file:/test --hex-name=foo")
+      command = OptionParser.split("add ex_doc --path=/test --hex-name=foo")
       assert Add.validate(command) == {:error, {:invalid_flag, "--hex-name"}}
     end
 
@@ -58,7 +58,7 @@ defmodule AddTest do
 
     test "a package with a specific version" do
       assert Add.validate(["add", "poison@3.1"]) ==
-               {:ok, [%Package{name: "poison", details: %Hex{version: "3.1"}}]}
+               {:ok, [%Package{name: "poison", requirement: "3.1"}]}
     end
 
     test "a package only for the test environment" do
@@ -74,6 +74,11 @@ defmodule AddTest do
     test "a package for a custom env" do
       assert Add.validate(["add", "ex_doc", "--env=docs"]) ==
                {:ok, [%Package{name: "ex_doc", environments: [:docs]}]}
+    end
+
+    test "umbrella package" do
+      assert Add.validate(["add", "sibling", "--in-umbrella"]) ==
+               {:ok, [%Package{name: "sibling", details: %Path{in_umbrella: true}}]}
     end
 
     test "add multiple custom environments and prod" do
@@ -110,7 +115,7 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "test@file:../test"]) == expected
+      assert Add.validate(["add", "test", "--path=../test"]) == expected
     end
 
     test "an exact match" do
@@ -136,7 +141,7 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "test@file:../test", "--in-umbrella"]) == expected
+      assert Add.validate(["add", "test", "--path=../test", "--in-umbrella"]) == expected
     end
 
     test "Set the compile environment and disable-reading the app file" do
@@ -167,7 +172,23 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "poison@https://github.com/devinus/poison.git"]) == expected
+      assert Add.validate(["add", "poison", "--git=https://github.com/devinus/poison.git"]) == expected
+    end
+
+    test "a http git package with a version" do
+      expected =
+        {:ok,
+         [
+           %Package{
+             name: "poison",
+             requirement: "3.1",
+             details: %Git{
+               uri: "https://github.com/devinus/poison.git"
+             }
+           }
+         ]}
+
+      assert Add.validate(["add", "poison@3.1", "--git=https://github.com/devinus/poison.git"]) == expected
     end
 
     test "a ssh github package" do
@@ -176,13 +197,14 @@ defmodule AddTest do
          [
            %Package{
              name: "poison",
+             requirement: "3.1",
              details: %Git{
                uri: "git@github.com:devinus/poison"
              }
            }
          ]}
 
-      assert Add.validate(["add", "poison@git@github.com:devinus/poison"]) == expected
+      assert Add.validate(["add", "poison@3.1", "--git=git@github.com:devinus/poison"]) == expected
     end
 
     test "a ssh github package with a ref" do
@@ -193,32 +215,16 @@ defmodule AddTest do
              name: "poison",
              details: %Git{
                uri: "git@github.com:devinus/poison",
-               ref: "123"
+               ref: "master"
              }
            }
          ]}
 
-      assert Add.validate(["add", "poison@git@github.com:devinus/poison#123"]) == expected
-    end
-
-    test "a ssh github package with a branch" do
-      expected =
-        {:ok,
-         [
-           %Package{
-             name: "poison",
-             details: %Git{
-               uri: "git@github.com:devinus/poison",
-               branch: "master"
-             }
-           }
-         ]}
-
-      assert Add.validate(["add", "poison@git@github.com:devinus/poison#master", "--branch"]) ==
+      assert Add.validate(["add", "poison", "--git=git@github.com:devinus/poison#master"]) ==
                expected
     end
 
-    test "ssh github package with a tag, sparse, and submodules" do
+    test "ssh github package with a ref, sparse, and submodules" do
       expected =
         {:ok,
          [
@@ -226,7 +232,7 @@ defmodule AddTest do
              name: "poison",
              details: %Git{
                uri: "git@github.com:devinus/poison",
-               tag: "123",
+               ref: "123",
                sparse: "my_folder",
                submodules: true
              }
@@ -235,7 +241,7 @@ defmodule AddTest do
 
       command =
         OptionParser.split(
-          "add poison@git@github.com:devinus/poison#123 --tag --sparse=my_folder --submodules"
+          "add poison --git=git@github.com:devinus/poison#123 --sparse=my_folder --submodules"
         )
 
       assert Add.validate(command) == expected
