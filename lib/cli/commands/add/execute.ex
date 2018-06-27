@@ -132,4 +132,16 @@ defmodule Wand.CLI.Commands.Add.Execute do
     |> Display.error()
     error(:package_not_found)
   end
+
+  defp handle_error(:dependency, {:no_connection, _name}) do
+    """
+    # Error
+    Error getting package version from the remote repository.
+
+    Talking to the remote repository (hex.pm unless overridden) failed.
+    Please check your network connection and try again.
+    """
+    |> Display.error()
+    error(:hex_api_error)
+  end
 end

@@ -11,7 +11,7 @@ defmodule AddExecuteTest do
   setup :verify_on_exit!
   setup :set_mox_global
 
-  describe "errors" do
+  describe "read file errors" do
     setup do
       Helpers.IO.stub_stderr()
       :ok
@@ -56,11 +56,23 @@ defmodule AddExecuteTest do
       Helpers.WandFile.stub_file_bad_dependency()
         assert Add.execute([%Package{name: "poison"}]) == error(:invalid_wand_file)
     end
+  end
+
+  describe "hex api errors" do
+    setup do
+      Helpers.WandFile.stub_empty()
+      Helpers.IO.stub_stderr()
+      :ok
+    end
 
     test ":package_not_found when the package is not in hex" do
-      Helpers.WandFile.stub_empty()
       Helpers.Hex.stub_not_found()
       assert Add.execute([%Package{name: "poison"}]) == error(:package_not_found)
+    end
+
+    test ":hex_api_error if there is no internet" do
+      Helpers.Hex.stub_no_connection()
+      assert Add.execute([%Package{name: "poison"}]) == error(:hex_api_error)
     end
   end
 

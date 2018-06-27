@@ -1,6 +1,6 @@
 defmodule Wand.Test.Helpers.Hex do
   import Mox
-  alias HTTPoison.Response
+  alias HTTPoison.{Error,Response}
 
   def stub_poison() do
     releases = [
@@ -16,7 +16,7 @@ defmodule Wand.Test.Helpers.Hex do
       body: body,
       status_code: 200,
     }
-    |> stub_ok()
+    |> stub_http()
   end
 
   def stub_not_found() do
@@ -24,11 +24,16 @@ defmodule Wand.Test.Helpers.Hex do
       body: "",
       status_code: 404,
     }
-    |> stub_ok()
+    |> stub_http()
   end
 
-  defp stub_ok(response) do
+  def stub_no_connection() do
+    %Error{id: nil, reason: :nxdomain}
+    |> stub_http(:error)
+  end
+
+  defp stub_http(response, type \\ :ok) do
     uri = URI.parse("https://hex.pm/api/packages/poison")
-    expect(Wand.HttpMock, :get, fn(^uri, _headers) -> {:ok, response} end)
+    expect(Wand.HttpMock, :get, fn(^uri, _headers) -> {type, response} end)
   end
 end
