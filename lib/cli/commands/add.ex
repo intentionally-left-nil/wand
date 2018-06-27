@@ -80,5 +80,5 @@ defmodule Wand.CLI.Commands.Add do
 
   def validate(args), do: Wand.CLI.Commands.Add.Validate.validate(args)
 
-  def execute(%Package{}=package), do: Wand.CLI.Commands.Add.Execute.execute(package)
+  def execute(packages), do: Wand.CLI.Commands.Add.Execute.execute(packages)
 end
