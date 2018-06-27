@@ -73,14 +73,27 @@ defmodule Wand.CLI.Display.Renderer do
 end
 
 defmodule Wand.CLI.Display do
+  alias IO.ANSI
   @io Wand.Interfaces.IO.impl()
   def print(message) do
-    {blocks, context} = Wand.CLI.Display.Renderer.parse(message)
+    convert(message)
+    |> @io.puts
+  end
 
+  def error(message) do
+    ANSI.red() <> convert(message) <> ANSI.default_color()
+    |> stderr()
+  end
+
+  defp convert(message) do
+    {blocks, context} = Wand.CLI.Display.Renderer.parse(message)
     Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
     |> pretty
-    |> @io.puts
+  end
+
+  defp stderr(message) do
+    @io.puts(:stderr, message)
   end
 
   defp pretty(message) do
