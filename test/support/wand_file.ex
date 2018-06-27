@@ -11,4 +11,8 @@ defmodule Wand.Test.Helpers.WandFile do
     contents = file |> Poison.encode!()
     expect(Wand.FileMock, :write, fn _path, ^contents -> :ok end)
   end
+
+  def stub_no_file() do
+    expect(Wand.FileMock, :read, fn _path -> {:error, :enoent} end)
+  end
 end
