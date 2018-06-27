@@ -4,5 +4,6 @@ defmodule Wand.CLI.Errors do
     invalid_wand_file: 65,
   }
 
-  def error(key), do: {:error, Map.fetch!(@errors, key)}
+  def code(key), do: Map.fetch!(@errors, key)
+  def error(key), do: {:error, code(key)}
 end
