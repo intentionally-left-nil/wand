@@ -19,12 +19,12 @@ defmodule WandFileTest do
 
     test "returns an error if not found" do
       stub_not_found()
-      assert WandFile.load() == {:error, :enoent}
+      assert WandFile.load() == {:error, {:file_read_error, :enoent}}
     end
 
     test "returns an error if not valid JSON" do
       stub_read(:ok, "wand.json", "[ NOT VALID JSON")
-      assert WandFile.load() == {:error, {:invalid, "N", 2}}
+      assert WandFile.load() == {:error, :json_decode_error}
     end
 
     test ":missing_version if the version is missing" do

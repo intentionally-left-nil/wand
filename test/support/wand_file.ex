@@ -15,4 +15,34 @@ defmodule Wand.Test.Helpers.WandFile do
   def stub_no_file() do
     expect(Wand.FileMock, :read, fn _path -> {:error, :enoent} end)
   end
+
+  def stub_invalid_file() do
+    expect(Wand.FileMock, :read, fn _path -> {:ok, "[ NOT VALID JSON"} end)
+  end
+
+  def stub_file_wrong_dependencies() do
+    contents = %{
+      version: "1.0.0",
+      dependencies: "not requirements",
+    }
+    |> Poison.encode!()
+    expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
+  end
+
+  def stub_file_wrong_version(version) do
+    contents = %{
+      version: version,
+      requirements: [],
+    }
+    |> Poison.encode!()
+    expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
+  end
+
+  def stub_file_missing_version() do
+    contents = %{
+      requirements: []
+    }
+    |> Poison.encode!()
+    expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
+  end
 end

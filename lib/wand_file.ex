@@ -1,6 +1,5 @@
 defmodule Wand.WandFile do
   alias Wand.WandFile
-  alias Wand.WandEncoder
   @f Wand.Interfaces.File.impl()
   @requirement "~> 1.0"
   @vsn "1.0.0"
@@ -24,8 +23,8 @@ defmodule Wand.WandFile do
 
   def load(path \\ "wand.json") do
     with \
-      {:ok, contents} <- @f.read(path),
-      {:ok, data} <- Poison.decode(contents, keys: :atoms),
+      {:ok, contents} <- read(path),
+      {:ok, data} <- parse(contents),
       {:ok, wand_file} <- validate(data)
     do
       {:ok, wand_file}
@@ -102,5 +101,19 @@ defmodule Wand.WandFile do
 
   defp exists?(%WandFile{dependencies: dependencies}, name) do
     Enum.find(dependencies, &(&1.name == name)) != nil
+  end
+
+  defp parse(contents) do
+    case Poison.decode(contents, keys: :atoms) do
+      {:ok, data} -> {:ok, data}
+      {:error, _reason} -> {:error, :json_decode_error}
+    end
+  end
+
+  defp read(path) do
+    case @f.read(path) do
+      {:ok, contents} -> {:ok, contents}
+      {:error, reason} -> {:error, {:file_read_error, reason}}
+    end
   end
 end

@@ -16,7 +16,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
        end)
       |> WandFile.save()
     else
-      error -> error
+      {:error, step, reason} -> handle_error(step, reason)
     end
   end
 
@@ -33,7 +33,23 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp load_file() do
     case WandFile.load() do
       {:ok, file} -> {:ok, file}
-      {:error, _reason} -> error(:missing_wand_file)
+      {:error, reason} -> {:error, :wand_file_read, reason}
     end
+  end
+
+  defp handle_error(:wand_file_read, :json_decode_error) do
+    error(:invalid_wand_file)
+  end
+
+  defp handle_error(:wand_file_read, reason) when reason in [:invalid_version, :missing_version, :version_mismatch] do
+    error(:invalid_wand_file)
+  end
+
+  defp handle_error(:wand_file_read, {:file_read_error, _reason}) do
+    error(:missing_wand_file)
+  end
+
+  defp handle_error(:wand_file_read, :invalid_dependencies) do
+    error(:invalid_wand_file)
   end
 end
