@@ -96,4 +96,15 @@ defmodule Wand.CLI.Commands.Add.Execute do
     |> Display.error()
     error(:invalid_wand_file)
   end
+
+  defp handle_error(:wand_file_read, {:invalid_dependency, name}) do
+    """
+    # Error
+    A dependency in wand.json is formatted incorrectly.
+
+    The dependency #{name} in wand.json is incorrect. Please fix it and try again.
+    """
+    |> Display.error()
+    error(:invalid_wand_file)
+  end
 end

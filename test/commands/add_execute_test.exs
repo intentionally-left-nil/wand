@@ -51,6 +51,11 @@ defmodule AddExecuteTest do
       Helpers.WandFile.stub_file_wrong_dependencies()
       assert Add.execute([%Package{name: "poison"}]) == error(:invalid_wand_file)
     end
+
+    test ":invalid_wand_file when a dependency is invalid" do
+      Helpers.WandFile.stub_file_bad_dependency()
+        assert Add.execute([%Package{name: "poison"}]) == error(:invalid_wand_file)
+    end
   end
 
   test "adds a single package" do
