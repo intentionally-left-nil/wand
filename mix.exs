@@ -49,6 +49,7 @@ defmodule Wand.MixProject do
   defp deps do
     [
       {:earmark, "~> 1.2"},
+      {:httpoison, "~> 1.2"},
       {:poison, "~> 3.1"},
       {:excoveralls, "~> 0.9.1", only: :test},
       {:mox, "~> 0.3.2", only: :test},

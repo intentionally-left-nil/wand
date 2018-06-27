@@ -1,8 +1,6 @@
 {
   "skip_files": [
     "deps",
-    "lib/cli/io.ex",
-    "lib/cli/system.ex",
-    "lib/file.ex"
+    "lib/interfaces"
   ]
 }

@@ -1,4 +1,4 @@
-defmodule Wand.CLI.IO do
+defmodule Wand.Interfaces.IO do
   @callback puts(message :: String.t()) :: :ok
 
   def impl() do

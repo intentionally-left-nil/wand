@@ -1,7 +1,7 @@
 defmodule Wand.WandFile do
   alias Wand.WandFile
   alias Wand.WandEncoder
-  @f Wand.File.impl()
+  @f Wand.Interfaces.File.impl()
   @requirement "~> 1.0"
   @vsn "1.0.0"
 

@@ -1,5 +1,5 @@
 defmodule Wand.CLI do
-  @system Wand.CLI.System.impl()
+  @system Wand.Interfaces.System.impl()
   def main(args) do
     Wand.CLI.ArgParser.parse(args)
     |> route
