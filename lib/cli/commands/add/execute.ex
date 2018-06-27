@@ -7,11 +7,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
   def execute(packages) do
     with \
-      {:ok, file} <- load_file()
+      {:ok, file} <- load_file(),
+      {:ok, dependencies} <- get_dependencies(packages)
     do
-      packages
-      |> Enum.map(&Task.async(fn -> get_dependency(&1) end))
-      |> Enum.map(&Task.await/1)
+      dependencies
       |> Enum.reduce(file, fn (dependency, file) ->
          WandFile.add(file, dependency) |> elem(1)
        end)
@@ -21,10 +20,21 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end
   end
 
+  defp get_dependencies(packages) do
+    dependencies = packages
+    |> Enum.map(&Task.async(fn -> get_dependency(&1) end))
+    |> Enum.map(&Task.await/1)
+
+    case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
+      nil -> {:ok, Enum.unzip(dependencies) |> elem(1)}
+      error -> {:error, error}
+    end
+  end
+
   defp get_dependency(%Package{name: name, requirement: :latest}=package) do
     {:ok, [version | _]} = Wand.Hex.releases(name)
     requirement = get_requirement(version, package.mode)
-    %Dependency{name: name, requirement: requirement}
+    {:ok, %Dependency{name: name, requirement: requirement}}
   end
 
   defp get_requirement(version, :normal) do
