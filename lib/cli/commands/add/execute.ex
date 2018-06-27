@@ -27,14 +27,17 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
     case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
       nil -> {:ok, Enum.unzip(dependencies) |> elem(1)}
-      error -> {:error, error}
+      {:error, error} -> {:error, :dependency, error}
     end
   end
 
   defp get_dependency(%Package{name: name, requirement: :latest}=package) do
-    {:ok, [version | _]} = Wand.Hex.releases(name)
-    requirement = get_requirement(version, package.mode)
-    {:ok, %Dependency{name: name, requirement: requirement}}
+    case Wand.Hex.releases(name) do
+      {:ok, [version | _]} ->
+        requirement = get_requirement(version, package.mode)
+        {:ok, %Dependency{name: name, requirement: requirement}}
+      {:error, error} -> {:error, {error, name}}
+    end
   end
 
   defp get_requirement(version, :normal) do
@@ -116,5 +119,17 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
     error(:invalid_wand_file)
+  end
+
+  defp handle_error(:dependency, {:not_found, name}) do
+    """
+    # Error
+    Package does not exist in remote repository
+
+    The remote server (hex.pm unless overridden), does not contain #{name}
+    Please check the spelling and try again.
+    """
+    |> Display.error()
+    error(:package_not_found)
   end
 end

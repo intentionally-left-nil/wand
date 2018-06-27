@@ -65,7 +65,6 @@ defmodule HexTest do
   end
 
   defp stub_http(:error) do
-    # expect(Wand.HttpMock, :get, fn(url, headers) -> HTTPoison.get(url, headers) end)
     response = %Error{id: nil, reason: :nxdomain}
     expect(Wand.HttpMock, :get, fn(_url, _headers) -> {:error, response} end)
   end

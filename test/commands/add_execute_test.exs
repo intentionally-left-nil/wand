@@ -56,6 +56,12 @@ defmodule AddExecuteTest do
       Helpers.WandFile.stub_file_bad_dependency()
         assert Add.execute([%Package{name: "poison"}]) == error(:invalid_wand_file)
     end
+
+    test ":package_not_found when the package is not in hex" do
+      Helpers.WandFile.stub_empty()
+      Helpers.Hex.stub_not_found()
+      assert Add.execute([%Package{name: "poison"}]) == error(:package_not_found)
+    end
   end
 
   test "adds a single package" do
