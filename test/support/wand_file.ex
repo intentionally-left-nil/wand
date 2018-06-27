@@ -12,8 +12,8 @@ defmodule Wand.Test.Helpers.WandFile do
     expect(Wand.FileMock, :write, fn _path, ^contents -> :ok end)
   end
 
-  def stub_no_file() do
-    expect(Wand.FileMock, :read, fn _path -> {:error, :enoent} end)
+  def stub_no_file(reason \\ :enoent) do
+    expect(Wand.FileMock, :read, fn _path -> {:error, reason} end)
   end
 
   def stub_invalid_file() do
