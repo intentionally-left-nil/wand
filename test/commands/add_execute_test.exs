@@ -74,6 +74,11 @@ defmodule AddExecuteTest do
       Helpers.Hex.stub_no_connection()
       assert Add.execute([%Package{name: "poison"}]) == error(:hex_api_error)
     end
+
+    test ":hex_api_error if hex returns :bad_response" do
+      Helpers.Hex.stub_bad_response()
+      assert Add.execute([%Package{name: "poison"}]) == error(:hex_api_error)
+    end
   end
 
   test "adds a single package" do

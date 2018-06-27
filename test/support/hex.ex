@@ -32,6 +32,14 @@ defmodule Wand.Test.Helpers.Hex do
     |> stub_http(:error)
   end
 
+  def stub_bad_response() do
+    %Response{
+      body: "[NOT JSON",
+      status_code: 200,
+    }
+    |> stub_http()
+  end
+
   defp stub_http(response, type \\ :ok) do
     uri = URI.parse("https://hex.pm/api/packages/poison")
     expect(Wand.HttpMock, :get, fn(^uri, _headers) -> {type, response} end)

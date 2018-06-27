@@ -133,7 +133,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:package_not_found)
   end
 
-  defp handle_error(:dependency, {:no_connection, _name}) do
+  defp handle_error(:dependency, {reason, _name}) when reason in [:no_connection, :bad_response] do
     """
     # Error
     Error getting package version from the remote repository.
