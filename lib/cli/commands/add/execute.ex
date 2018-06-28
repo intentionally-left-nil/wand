@@ -108,6 +108,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end)
   end
 
+  defp download_dependencies() do
+
+  end
+
   defp handle_error(:dependency, {:not_found, name}) do
     """
     # Error
