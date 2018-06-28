@@ -127,31 +127,18 @@ defmodule AddExecuteTest do
 
     test "adds a single package" do
       Helpers.Hex.stub_poison()
-
-      %WandFile{
-        dependencies: [%Dependency{name: "poison", requirement: ">= 3.1.0 and < 4.0.0"}]
-      }
-      |> Helpers.WandFile.stub_save()
-
+      stub_file(requirement: ">= 3.1.0 and < 4.0.0")
       assert Add.execute([@poison]) == :ok
     end
 
     test "add a package with a version" do
-      %WandFile{
-        dependencies: [%Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}]
-      }
-      |> Helpers.WandFile.stub_save()
-
+      stub_file()
       package = get_package()
       assert Add.execute([package]) == :ok
     end
 
     test "add a package with the exact version" do
-      %WandFile{
-        dependencies: [%Dependency{name: "poison", requirement: "== 3.1.2"}]
-      }
-      |> Helpers.WandFile.stub_save()
-
+      stub_file(requirement: "== 3.1.2")
       package = get_package(requirement: "== 3.1.2")
       assert Add.execute([package]) == :ok
     end
@@ -166,6 +153,20 @@ defmodule AddExecuteTest do
       |> Keyword.merge(opts)
 
       struct(Package, fields)
+    end
+
+    defp get_file(opts) do
+      fields = %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
+      |> Map.to_list()
+      |> Keyword.merge(opts)
+
+      dependency = struct(Dependency, fields)
+      %WandFile{dependencies: [dependency]}
+    end
+
+    defp stub_file(opts \\ []) do
+      get_file(opts)
+      |> Helpers.WandFile.stub_save()
     end
   end
 end
