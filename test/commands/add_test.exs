@@ -19,6 +19,11 @@ defmodule AddTest do
       assert Add.validate(command) == {:error, {:invalid_flag, "--sparse"}}
     end
 
+    test "returns help if the version is invalid" do
+      assert Add.validate(["add", "poison@NOT_A_VERSION"]) ==
+               {:error, {:invalid_version, "poison@NOT_A_VERSION"}}
+    end
+
     test "returns help if a flag for the wrong file type is given" do
       command = OptionParser.split("add ex_doc --path=/test --hex-name=foo")
       assert Add.validate(command) == {:error, {:invalid_flag, "--hex-name"}}

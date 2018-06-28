@@ -29,10 +29,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end
   end
 
-  defp get_dependency(%Package{name: name, requirement: {:latest, mode}}=package) do
+  defp get_dependency(%Package{name: name, requirement: {:latest, mode}}) do
     case Wand.Hex.releases(name) do
       {:ok, [version | _]} ->
-        requirement = Wand.Mode.get_requirement(mode, version)
+        requirement = Wand.Mode.get_requirement!(mode, version)
         {:ok, %Dependency{name: name, requirement: requirement}}
       {:error, error} -> {:error, {error, name}}
     end

@@ -61,7 +61,7 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defmodule Package do
-    @default_requirement Wand.Mode.get_requirement(:caret, :latest)
+    @default_requirement Wand.Mode.get_requirement!(:caret, :latest)
     defstruct compile: true,
               compile_env: nil,
               details: %Hex{},

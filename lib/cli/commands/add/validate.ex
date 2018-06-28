@@ -5,22 +5,23 @@ defmodule Wand.CLI.Commands.Add.Validate do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case Wand.CLI.Command.parse_errors(errors) do
-      :ok -> get_packages(commands, switches)
+      :ok ->
+        requirements = get_requirements(commands, switches)
+        get_packages(commands, switches, requirements)
       error -> error
     end
   end
 
-  defp get_packages([], _switches), do: {:error, :missing_package}
+  defp get_packages([], _switches, _requirements), do: {:error, :missing_package}
 
-  defp get_packages(names, switches) do
+  defp get_packages(_names, _switches, {:error, _}=error), do: error
+  defp get_packages(names, switches, {:ok, requirements}) do
     base_package = get_base_package(switches)
-
     packages =
-      Enum.map(names, fn name ->
-        {name, version} = split_name(name)
+      Enum.zip(names, requirements)
+      |> Enum.map(fn {name, requirement} ->
+        {name, _} = split_name(name)
         type = package_type(switches)
-        requirement = get_mode(switches)
-        |> Wand.Mode.get_requirement(version)
 
         %Package{
           base_package |
@@ -128,6 +129,25 @@ defmodule Wand.CLI.Commands.Add.Validate do
       exact -> :exact
       tilde -> :tilde
       true -> :caret
+    end
+  end
+
+  defp get_requirements(names, switches) do
+    requirements = Enum.map(names, fn name ->
+      version = split_name(name)
+      |> elem(1)
+      {name, Wand.Mode.get_requirement(get_mode(switches), version)}
+    end)
+
+    case Enum.find(requirements, &(&1 |> elem(1) |> elem(0) == :error)) do
+      nil ->
+        requirements =
+          Enum.unzip(requirements)
+          |> elem(1)
+          |> Enum.unzip()
+          |> elem(1)
+        {:ok, requirements}
+      {name, {:error, reason}} -> {:error, {reason, name}}
     end
   end
 
