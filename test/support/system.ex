@@ -20,4 +20,13 @@ defmodule Wand.Test.Helpers.System do
     message = "** (SyntaxError) mix.exs:9"
     expect(Wand.SystemMock, :cmd, fn "mix", ["compile"], _opts -> {message, 1} end)
   end
+
+  def stub_cleanup_deps() do
+    expect(Wand.SystemMock, :cmd, fn "mix", ["deps.unlock", "--unused"], _opts -> {"", 0} end)
+  end
+
+  def stub_failed_cleanup_deps() do
+    message = "** (CompileError) mix.lock:2"
+    expect(Wand.SystemMock, :cmd, fn "mix", ["deps.unlock", "--unused"], _opts -> {message, 1} end)
+  end
 end

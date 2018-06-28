@@ -26,4 +26,15 @@ defmodule MixTest do
     assert Wand.CLI.Mix.compile() == {:error, {1,
              "** (SyntaxError) mix.exs:9"}}
   end
+
+  test "cleanup_deps" do
+    Helpers.System.stub_cleanup_deps()
+    assert Wand.CLI.Mix.cleanup_deps() == :ok
+  end
+
+  test "cleanup_deps fails" do
+    Helpers.System.stub_failed_cleanup_deps()
+    assert Wand.CLI.Mix.cleanup_deps() == {:error, {1,
+             "** (CompileError) mix.lock:2"}}
+  end
 end
