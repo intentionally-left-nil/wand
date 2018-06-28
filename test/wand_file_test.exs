@@ -169,7 +169,7 @@ defmodule WandFileTest do
   end
 
   defp stub_read_valid(path \\ "wand.json") do
-    contents = valid_deps() |> Poison.encode!()
+    contents = valid_deps() |> Poison.encode!(pretty: true)
     stub_read(:ok, path, contents)
   end
 

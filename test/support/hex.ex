@@ -28,7 +28,7 @@ defmodule Wand.Test.Helpers.Hex do
       ]
       |> Enum.map(&%{version: &1})
 
-    body = %{releases: releases} |> Poison.encode!()
+    body = %{releases: releases} |> Poison.encode!(pretty: true)
 
     %Response{
       body: body,

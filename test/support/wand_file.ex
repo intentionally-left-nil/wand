@@ -4,17 +4,17 @@ defmodule Wand.Test.Helpers.WandFile do
 
   def stub_load(file \\ %WandFile{}) do
     file
-    |> Poison.encode!()
+    |> Poison.encode!(pretty: true)
     |> stub_read()
   end
 
   def stub_save(file) do
-    contents = file |> Poison.encode!()
+    contents = file |> Poison.encode!(pretty: true)
     expect(Wand.FileMock, :write, fn _path, ^contents -> :ok end)
   end
 
   def stub_cannot_save(file, reason \\ :enoent) do
-    contents = file |> Poison.encode!()
+    contents = file |> Poison.encode!(pretty: true)
     expect(Wand.FileMock, :write, fn _path, ^contents -> {:error, reason} end)
   end
 
@@ -32,7 +32,7 @@ defmodule Wand.Test.Helpers.WandFile do
         version: "1.0.0",
         dependencies: "not requirements"
       }
-      |> Poison.encode!()
+      |> Poison.encode!(pretty: true)
 
     stub_read(contents)
   end
@@ -45,7 +45,7 @@ defmodule Wand.Test.Helpers.WandFile do
           mox: "== == 1.0.0"
         }
       }
-      |> Poison.encode!()
+      |> Poison.encode!(pretty: true)
 
     expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
   end
@@ -56,7 +56,7 @@ defmodule Wand.Test.Helpers.WandFile do
         version: version,
         requirements: []
       }
-      |> Poison.encode!()
+      |> Poison.encode!(pretty: true)
 
     stub_read(contents)
   end
@@ -66,7 +66,7 @@ defmodule Wand.Test.Helpers.WandFile do
       %{
         requirements: []
       }
-      |> Poison.encode!()
+      |> Poison.encode!(pretty: true)
 
     stub_read(contents)
   end
