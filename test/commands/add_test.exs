@@ -19,6 +19,11 @@ defmodule AddTest do
       assert Add.validate(command) == {:error, {:invalid_flag, "--sparse"}}
     end
 
+    test "returns help if a string flag is empty" do
+      assert Add.validate(["add", "poison", "--repo=", "--test"]) ==
+               {:error, {:invalid_flag, "--repo"}}
+    end
+
     test "returns help if the version is invalid" do
       assert Add.validate(["add", "poison@NOT_A_VERSION"]) ==
                {:error, {:invalid_version, "poison@NOT_A_VERSION"}}
@@ -43,7 +48,7 @@ defmodule AddTest do
                {:ok, [%Package{name: "poison", download: false, compile: false}]}
     end
 
-    test "with an organization and a repo" do
+    test "with an organization, repo, and custom name" do
       expected = {
         :ok,
         [
@@ -51,14 +56,19 @@ defmodule AddTest do
             name: "poison",
             details: %Hex{
               organization: "mycompany",
-              repo: "nothexpm"
+              repo: "nothexpm",
+              hex: "mypoison"
             }
           }
         ]
       }
 
-      assert Add.validate(["add", "poison", "--repo=nothexpm", "--organization=mycompany"]) ==
-               expected
+      command =
+        OptionParser.split(
+          "add poison --repo=nothexpm --organization=mycompany --hex-name=mypoison"
+        )
+
+      assert Add.validate(command) == expected
     end
 
     test "a package with a specific version" do
@@ -68,17 +78,17 @@ defmodule AddTest do
 
     test "a package only for the test environment" do
       assert Add.validate(["add", "poison", "--test"]) ==
-               {:ok, [%Package{name: "poison", environments: [:test]}]}
+               {:ok, [%Package{name: "poison", only: [:test]}]}
     end
 
     test "a package for dev and test" do
       assert Add.validate(["add", "poison", "--test", "--dev"]) ==
-               {:ok, [%Package{name: "poison", environments: [:test, :dev]}]}
+               {:ok, [%Package{name: "poison", only: [:test, :dev]}]}
     end
 
     test "a package for a custom env" do
       assert Add.validate(["add", "ex_doc", "--env=docs"]) ==
-               {:ok, [%Package{name: "ex_doc", environments: [:docs]}]}
+               {:ok, [%Package{name: "ex_doc", only: [:docs]}]}
     end
 
     test "umbrella package" do
@@ -90,7 +100,7 @@ defmodule AddTest do
       command = OptionParser.split("add ex_doc --env=dogs --env=cat --prod")
 
       assert Add.validate(command) ==
-               {:ok, [%Package{name: "ex_doc", environments: [:prod, :dogs, :cat]}]}
+               {:ok, [%Package{name: "ex_doc", only: [:prod, :dogs, :cat]}]}
     end
 
     test "set the runtime flag to false" do
@@ -172,7 +182,7 @@ defmodule AddTest do
            %Package{
              name: "poison",
              details: %Git{
-               uri: "https://github.com/devinus/poison.git"
+               git: "https://github.com/devinus/poison.git"
              }
            }
          ]}
@@ -189,7 +199,7 @@ defmodule AddTest do
              name: "poison",
              requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
-               uri: "https://github.com/devinus/poison.git"
+               git: "https://github.com/devinus/poison.git"
              }
            }
          ]}
@@ -206,7 +216,7 @@ defmodule AddTest do
              name: "poison",
              requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
-               uri: "git@github.com:devinus/poison"
+               git: "git@github.com:devinus/poison"
              }
            }
          ]}
@@ -222,7 +232,7 @@ defmodule AddTest do
            %Package{
              name: "poison",
              details: %Git{
-               uri: "git@github.com:devinus/poison",
+               git: "git@github.com:devinus/poison",
                ref: "master"
              }
            }
@@ -239,7 +249,7 @@ defmodule AddTest do
            %Package{
              name: "poison",
              details: %Git{
-               uri: "git@github.com:devinus/poison",
+               git: "git@github.com:devinus/poison",
                ref: "123",
                sparse: "my_folder",
                submodules: true

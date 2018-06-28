@@ -41,38 +41,36 @@ defmodule Wand.CLI.Commands.Add do
   """
 
   defmodule Git do
-    defstruct uri: nil,
+    defstruct git: nil,
               ref: nil,
-              branch: nil,
-              tag: nil,
               sparse: nil,
-              submodules: nil
+              submodules: false
   end
 
   defmodule Hex do
-    defstruct hex_name: nil,
+    defstruct hex: nil,
               organization: nil,
-              repo: nil
+              repo: :hexpm
   end
 
   defmodule Path do
     defstruct path: nil,
-              in_umbrella: nil
+              in_umbrella: false
   end
 
   defmodule Package do
     @default_requirement Wand.Mode.get_requirement!(:caret, :latest)
     defstruct compile: true,
-              compile_env: nil,
+              compile_env: :prod,
               details: %Hex{},
               download: true,
-              environments: [:all],
+              only: nil,
               name: nil,
-              optional: nil,
-              override: nil,
-              read_app_file: nil,
+              optional: false,
+              override: false,
+              read_app_file: true,
               requirement: @default_requirement,
-              runtime: nil
+              runtime: true
   end
 
   def moduledoc(), do: @moduledoc

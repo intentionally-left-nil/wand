@@ -28,11 +28,18 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end
   end
 
-  defp get_dependency(%Package{name: name, requirement: {:latest, mode}}) do
+  defp get_dependency(%Package{name: name, requirement: {:latest, mode}} = package) do
     case Wand.Hex.releases(name) do
       {:ok, [version | _]} ->
         requirement = Wand.Mode.get_requirement!(mode, version)
-        {:ok, %Dependency{name: name, requirement: requirement}}
+        opts = get_opts(package)
+
+        {:ok,
+         %Dependency{
+           name: name,
+           opts: opts,
+           requirement: requirement
+         }}
 
       {:error, error} ->
         {:error, {error, name}}
@@ -40,7 +47,12 @@ defmodule Wand.CLI.Commands.Add.Execute do
   end
 
   defp get_dependency(%Package{} = package) do
-    {:ok, %Dependency{name: package.name, requirement: package.requirement}}
+    {:ok,
+     %Dependency{
+       name: package.name,
+       opts: get_opts(package),
+       requirement: package.requirement
+     }}
   end
 
   defp add_dependencies(file, dependencies) do
@@ -49,6 +61,42 @@ defmodule Wand.CLI.Commands.Add.Execute do
         {:ok, file} -> {:cont, {:ok, file}}
         {:error, reason} -> {:halt, {:error, :add_dependency, reason}}
       end
+    end)
+  end
+
+  defp get_opts(%Package{details: details} = package) do
+    get_base_opts(package)
+    |> Keyword.merge(get_detail_opts(details))
+    |> Enum.into(%{})
+  end
+
+  defp get_base_opts(%Package{} = package) do
+    [
+      :compile_env,
+      :only,
+      :optional,
+      :override,
+      :read_app_file,
+      :runtime
+    ]
+    |> get_changed(package, %Package{})
+  end
+
+  def get_detail_opts(details) do
+    default =
+      Map.fetch!(details, :__struct__)
+      |> struct()
+
+    Map.keys(details)
+    |> get_changed(details, default)
+  end
+
+  defp get_changed(keys, config, default) do
+    defaults = Enum.map(keys, &Map.fetch!(config, &1))
+
+    Enum.zip(keys, defaults)
+    |> Enum.filter(fn {key, value} ->
+      value != Map.fetch!(default, key)
     end)
   end
 
