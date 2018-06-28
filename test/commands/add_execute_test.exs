@@ -155,6 +155,25 @@ defmodule AddExecuteTest do
       assert Add.execute([package]) == :ok
     end
 
+    test "add the latest version only to test and dev" do
+      stub_file(requirement: ">= 3.1.0 and < 4.0.0", opts: %{only: [:test, :dev]} )
+      Helpers.Hex.stub_poison()
+      package = get_package(only: [:test, :dev], requirement: {:latest, :caret})
+      assert Add.execute([package]) == :ok
+    end
+
+    test "add the optional, override, and runtime flag if set" do
+      stub_file(opts: %{optional: true, override: true, runtime: false, read_app_file: false})
+      package = get_package(optional: true, override: true, runtime: false, read_app_file: false)
+      assert Add.execute([package]) == :ok
+    end
+
+    test "no opts for remaining opts if default" do
+      stub_file()
+      package = get_package(optional: false, override: false, runtime: true, read_app_file: true)
+      assert Add.execute([package]) == :ok
+    end
+
     defp get_package(opts \\ []) do
       fields = %Package{}
       |> Map.to_list()
