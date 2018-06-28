@@ -110,7 +110,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end)
   end
 
-  defp download([%Package{download: download} |_]) when not download, do: :ok
+  defp download([%Package{download: download} | _]) when not download, do: :ok
 
   defp download(_) do
     case Wand.CLI.Mix.update_deps() do
@@ -119,7 +119,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end
   end
 
-  defp compile([%Package{compile: compile} |_]) when not compile, do: :ok
+  defp compile([%Package{compile: compile} | _]) when not compile, do: :ok
 
   defp compile(_) do
     case Wand.CLI.Mix.compile() do
@@ -177,6 +177,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     however mix deps.get failed.
     """
     |> Display.error()
+
     error(:install_deps_error)
   end
 
@@ -189,6 +190,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     however mix compile failed.
     """
     |> Display.error()
+
     error(:install_deps_error)
   end
 end

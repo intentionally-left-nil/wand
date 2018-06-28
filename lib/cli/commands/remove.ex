@@ -3,7 +3,7 @@ defmodule Wand.CLI.Commands.Remove do
   alias Wand.WandFile
   alias Wand.CLI.WandFileWithHelp
   import Wand.CLI.Errors, only: [error: 1]
-  
+
   @behaviour Wand.CLI.Command
   @moduledoc """
   Remove elixir packages from wand.json
@@ -45,7 +45,8 @@ defmodule Wand.CLI.Commands.Remove do
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
 
-      {:error, step, reason} -> handle_error(step, reason)
+      {:error, step, reason} ->
+        handle_error(step, reason)
     end
   end
 
@@ -69,6 +70,7 @@ defmodule Wand.CLI.Commands.Remove do
     however, updating the mix.lock file failed
     """
     |> Display.error()
+
     error(:install_deps_error)
   end
 end

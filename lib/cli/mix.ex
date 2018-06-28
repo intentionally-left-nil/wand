@@ -15,10 +15,13 @@ defmodule Wand.CLI.Mix do
 
   defp mix(command, opts \\ []) do
     args = OptionParser.split(command)
-    opts = case Keyword.get(opts, :print_output) do
-      true -> [stderr_to_stdout: true, into: IO.stream(:stdio, :line)]
-      _ -> [stderr_to_stdout: true]
-    end
+
+    opts =
+      case Keyword.get(opts, :print_output) do
+        true -> [stderr_to_stdout: true, into: IO.stream(:stdio, :line)]
+        _ -> [stderr_to_stdout: true]
+      end
+
     {message, code} = @system.cmd("mix", args, opts)
 
     case code do

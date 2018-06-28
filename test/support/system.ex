@@ -7,7 +7,9 @@ defmodule Wand.Test.Helpers.System do
   end
 
   def stub_failed_update_deps() do
-    message = "Could not find a Mix.Project, please ensure you are running Mix in a directory with a mix.exs file"
+    message =
+      "Could not find a Mix.Project, please ensure you are running Mix in a directory with a mix.exs file"
+
     expect(Wand.SystemMock, :cmd, fn "mix", ["deps.get"], _opts -> {message, 1} end)
   end
 
@@ -27,6 +29,7 @@ defmodule Wand.Test.Helpers.System do
 
   def stub_failed_cleanup_deps() do
     message = "** (CompileError) mix.lock:2"
+
     expect(Wand.SystemMock, :cmd, fn "mix", ["deps.unlock", "--unused"], _opts -> {message, 1} end)
   end
 end
