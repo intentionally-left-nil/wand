@@ -20,7 +20,8 @@ defmodule AddTest do
     end
 
     test "returns help if a string flag is empty" do
-      assert Add.validate(["add", "poison", "--repo=", "--test"]) == {:error, {:invalid_flag, "--repo"}}
+      assert Add.validate(["add", "poison", "--repo=", "--test"]) ==
+               {:error, {:invalid_flag, "--repo"}}
     end
 
     test "returns help if the version is invalid" do
@@ -62,7 +63,11 @@ defmodule AddTest do
         ]
       }
 
-      command = OptionParser.split("add poison --repo=nothexpm --organization=mycompany --hex-name=mypoison")
+      command =
+        OptionParser.split(
+          "add poison --repo=nothexpm --organization=mycompany --hex-name=mypoison"
+        )
+
       assert Add.validate(command) == expected
     end
 

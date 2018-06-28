@@ -231,12 +231,16 @@ defmodule Wand.CLI.Commands.Add.Validate do
   defp strict_parse(args, flags) do
     {switches, commands, errors} = OptionParser.parse(args, strict: flags)
 
-    {valid_switches, empty} = Enum.split_with(switches, fn
-      {_name, ""} -> false
-      _ -> true
-    end)
-    errors = Enum.map(empty, fn {key, value} -> {"--#{key}", value} end)
-    |> Enum.concat(errors)
+    {valid_switches, empty} =
+      Enum.split_with(switches, fn
+        {_name, ""} -> false
+        _ -> true
+      end)
+
+    errors =
+      Enum.map(empty, fn {key, value} -> {"--#{key}", value} end)
+      |> Enum.concat(errors)
+
     {valid_switches, commands, errors}
   end
 end

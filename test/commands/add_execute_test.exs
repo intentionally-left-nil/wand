@@ -3,7 +3,7 @@ defmodule AddExecuteTest do
   import Mox
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Commands.Add
-  alias Wand.CLI.Commands.Add.{Git,Hex,Package, Path}
+  alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
   alias Wand.Test.Helpers
   alias Wand.WandFile
   alias Wand.WandFile.Dependency
@@ -156,7 +156,7 @@ defmodule AddExecuteTest do
     end
 
     test "add the latest version only to test and dev" do
-      stub_file(requirement: ">= 3.1.0 and < 4.0.0", opts: %{only: [:test, :dev]} )
+      stub_file(requirement: ">= 3.1.0 and < 4.0.0", opts: %{only: [:test, :dev]})
       Helpers.Hex.stub_poison()
       package = get_package(only: [:test, :dev], requirement: {:latest, :caret})
       assert Add.execute([package]) == :ok
@@ -175,20 +175,50 @@ defmodule AddExecuteTest do
     end
 
     test "add a git package with all the fixings" do
-      stub_file(opts: %{git: "https://github.com/devinus/poison.git", ref: "master", sparse: true, submodules: "myfolder"})
-      package = get_package(details: %Git{git: "https://github.com/devinus/poison.git", ref: "master", sparse: true, submodules: "myfolder"})
+      stub_file(
+        opts: %{
+          git: "https://github.com/devinus/poison.git",
+          ref: "master",
+          sparse: true,
+          submodules: "myfolder"
+        }
+      )
+
+      package =
+        get_package(
+          details: %Git{
+            git: "https://github.com/devinus/poison.git",
+            ref: "master",
+            sparse: true,
+            submodules: "myfolder"
+          }
+        )
+
       assert Add.execute([package]) == :ok
     end
 
     test "do not add extra git flags" do
-      stub_file(opts: %{git: "https://github.com/devinus/poison.git", })
-      package = get_package(details: %Git{git: "https://github.com/devinus/poison.git", ref: nil, sparse: nil, submodules: false})
+      stub_file(opts: %{git: "https://github.com/devinus/poison.git"})
+
+      package =
+        get_package(
+          details: %Git{
+            git: "https://github.com/devinus/poison.git",
+            ref: nil,
+            sparse: nil,
+            submodules: false
+          }
+        )
+
       assert Add.execute([package]) == :ok
     end
 
     test "add a path with an umbrella" do
       stub_file(opts: %{path: "/path/to/app", in_umbrella: true, optional: true})
-      package = get_package(details: %Path{path: "/path/to/app", in_umbrella: true}, optional: true)
+
+      package =
+        get_package(details: %Path{path: "/path/to/app", in_umbrella: true}, optional: true)
+
       assert Add.execute([package]) == :ok
     end
 
@@ -200,26 +230,31 @@ defmodule AddExecuteTest do
 
     test "add a hex package with all the fixings" do
       stub_file(opts: %{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
-      package = get_package(details: %Hex{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
+
+      package =
+        get_package(details: %Hex{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
+
       assert Add.execute([package]) == :ok
     end
 
     defp get_package(opts \\ []) do
-      fields = %Package{}
-      |> Map.to_list()
-      |> Keyword.merge([
-        name: "poison",
-        requirement: ">= 3.1.3 and < 4.0.0"
-      ])
-      |> Keyword.merge(opts)
+      fields =
+        %Package{}
+        |> Map.to_list()
+        |> Keyword.merge(
+          name: "poison",
+          requirement: ">= 3.1.3 and < 4.0.0"
+        )
+        |> Keyword.merge(opts)
 
       struct(Package, fields)
     end
 
     defp get_file(opts) do
-      fields = %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
-      |> Map.to_list()
-      |> Keyword.merge(opts)
+      fields =
+        %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
+        |> Map.to_list()
+        |> Keyword.merge(opts)
 
       dependency = struct(Dependency, fields)
       %WandFile{dependencies: [dependency]}
