@@ -50,7 +50,7 @@ defmodule Wand.CLI.Commands.Add do
   defmodule Hex do
     defstruct hex_name: nil,
               organization: nil,
-              repo: "hexpm"
+              repo: :hexpm
   end
 
   defmodule Path do
@@ -61,7 +61,7 @@ defmodule Wand.CLI.Commands.Add do
   defmodule Package do
     @default_requirement Wand.Mode.get_requirement!(:caret, :latest)
     defstruct compile: true,
-              compile_env: "prod",
+              compile_env: :prod,
               details: %Hex{},
               download: true,
               only: nil,

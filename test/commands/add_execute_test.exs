@@ -149,6 +149,12 @@ defmodule AddExecuteTest do
       assert Add.execute([package]) == :ok
     end
 
+    test "does not add compile_env if it's set to prod" do
+      stub_file()
+      package = get_package(compile_env: :prod)
+      assert Add.execute([package]) == :ok
+    end
+
     defp get_package(opts \\ []) do
       fields = %Package{}
       |> Map.to_list()
