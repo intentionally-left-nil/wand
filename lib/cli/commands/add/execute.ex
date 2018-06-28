@@ -15,9 +15,12 @@ defmodule Wand.CLI.Commands.Add.Execute do
     else
       {:error, :wand_file_load, reason} ->
         WandFileWithHelp.handle_error(:wand_file_load, reason)
+
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
-      {:error, step, reason} -> handle_error(step, reason)
+
+      {:error, step, reason} ->
+        handle_error(step, reason)
     end
   end
 

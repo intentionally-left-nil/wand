@@ -68,17 +68,19 @@ defmodule RemoveTest do
       file = %WandFile{
         dependencies: [
           Helpers.WandFile.poison(),
-          Helpers.WandFile.mox(),
+          Helpers.WandFile.mox()
         ]
       }
+
       Helpers.WandFile.stub_load(file)
 
       %WandFile{
         dependencies: [
-          Helpers.WandFile.mox(),
+          Helpers.WandFile.mox()
         ]
       }
       |> Helpers.WandFile.stub_save()
+
       assert Remove.execute(["poison"]) == :ok
     end
 
@@ -86,9 +88,10 @@ defmodule RemoveTest do
       file = %WandFile{
         dependencies: [
           Helpers.WandFile.poison(),
-          Helpers.WandFile.mox(),
+          Helpers.WandFile.mox()
         ]
       }
+
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(%WandFile{})
       assert Remove.execute(["mox", "poison", "not_present"]) == :ok

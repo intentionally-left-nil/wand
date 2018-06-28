@@ -197,6 +197,7 @@ defmodule AddExecuteTest do
       assert Add.execute([package]) == :ok
     end
   end
+
   defp get_package(opts \\ []) do
     fields =
       %Package{}

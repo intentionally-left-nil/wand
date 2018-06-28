@@ -89,6 +89,7 @@ defmodule WandFileWithHelpTest do
       Helpers.IO.stub_stderr()
       :ok
     end
+
     test ":file_write_error when trying to save the file" do
       file = %WandFile{}
       Helpers.WandFile.stub_cannot_save(file)

@@ -2,6 +2,7 @@ defmodule Wand.CLI.WandFileWithHelp do
   alias Wand.WandFile
   alias Wand.CLI.Display
   import Wand.CLI.Errors, only: [error: 1]
+
   def load() do
     case WandFile.load() do
       {:ok, file} -> {:ok, file}
@@ -28,7 +29,7 @@ defmodule Wand.CLI.WandFileWithHelp do
   end
 
   def handle_error(:wand_file_load, reason)
-       when reason in [:invalid_version, :missing_version, :version_mismatch] do
+      when reason in [:invalid_version, :missing_version, :version_mismatch] do
     """
     # Error
     The version field in wand.json is incorrect.
