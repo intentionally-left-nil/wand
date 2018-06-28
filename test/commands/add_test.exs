@@ -269,6 +269,10 @@ defmodule AddTest do
       Add.help({:invalid_flag, "--foobaz"})
     end
 
+    test "invalid_version" do
+      Add.help({:invalid_version, "poison@-3.1.0"})
+    end
+
     def stub_io(_) do
       expect(Wand.IOMock, :puts, fn _message -> :ok end)
       :ok
