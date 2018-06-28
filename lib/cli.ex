@@ -5,6 +5,13 @@ defmodule Wand.CLI do
     |> route
   end
 
+  defp route({key, data}) do
+    case Wand.CLI.Command.route(key, :execute, [data]) do
+      :ok -> :ok
+      {:error, code} -> @system.halt(code)
+    end
+  end
+
   defp route({:help, key, data}) do
     Wand.CLI.Command.route(key, :help, [data])
     @system.halt(1)

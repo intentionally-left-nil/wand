@@ -19,12 +19,12 @@ defmodule WandFileTest do
 
     test "returns an error if not found" do
       stub_not_found()
-      assert WandFile.load() == {:error, :enoent}
+      assert WandFile.load() == {:error, {:file_read_error, :enoent}}
     end
 
     test "returns an error if not valid JSON" do
       stub_read(:ok, "wand.json", "[ NOT VALID JSON")
-      assert WandFile.load() == {:error, {:invalid, "N", 2}}
+      assert WandFile.load() == {:error, :json_decode_error}
     end
 
     test ":missing_version if the version is missing" do
@@ -92,6 +92,16 @@ defmodule WandFileTest do
 
   describe "save" do
 
+    test ":enoent if saving fails" do
+      file = %WandFile{}
+      contents = %{
+        version: file.version,
+        dependencies: %{},
+      }
+      |> Poison.encode!(pretty: true)
+      stub_write(:error, "wand.json", contents)
+      assert WandFile.save(file) == {:error, :enoent}
+    end
     test "saves an empty config" do
       file = %WandFile{}
       expected = %{
@@ -100,7 +110,7 @@ defmodule WandFileTest do
       }
       |> Poison.encode!(pretty: true)
       stub_write(:ok, "wand.json", expected)
-      WandFile.save(file)
+      assert WandFile.save(file) == :ok
     end
 
     test "saves a simple dependency" do
@@ -159,6 +169,10 @@ defmodule WandFileTest do
 
   defp stub_write(:ok, path, contents) do
     expect(Wand.FileMock, :write, fn(^path, ^contents) -> :ok end)
+  end
+
+  defp stub_write(:error, path, contents) do
+    expect(Wand.FileMock, :write, fn(^path, ^contents) -> {:error, :enoent} end)
   end
 
   defp valid_deps() do

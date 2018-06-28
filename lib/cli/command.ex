@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Command do
-  @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
+  @callback execute(data :: any()) :: :ok | {:error, integer()}
   @callback help(type :: any()) :: any()
+  @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
 
   def route(key, name, args) do
     get_module(key)

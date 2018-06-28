@@ -12,6 +12,9 @@ defmodule DisplayTest do
   @u ANSI.underline()
   @uu ANSI.no_underline()
 
+  @r ANSI.red()
+  @rr ANSI.default_color()
+
   @t @u <> @b
   @tt @bb <> @uu
 
@@ -91,8 +94,18 @@ defmodule DisplayTest do
     Display.print("hello\n\n\n")
   end
 
+  test "error message" do
+    stub_stderr("hello")
+    Display.error("hello")
+  end
+
   defp stub_io(message) do
     message = "\n" <> message <> "\n"
     expect(Wand.IOMock, :puts, fn ^message -> :ok end)
+  end
+
+  defp stub_stderr(message) do
+    message = @r <> "\n" <> message <> "\n" <> @rr
+    expect(Wand.IOMock, :puts, fn(:stderr, ^message) -> :ok end)
   end
 end

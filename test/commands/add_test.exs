@@ -3,7 +3,7 @@ defmodule AddTest do
   import Mox
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
-
+  
   describe "validate" do
     test "returns help if no args are given" do
       assert Add.validate(["add"]) == {:error, :missing_package}
