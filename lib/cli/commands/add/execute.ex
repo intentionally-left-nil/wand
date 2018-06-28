@@ -38,10 +38,12 @@ defmodule Wand.CLI.Commands.Add.Execute do
   end
 
   defp add_dependencies(file, dependencies) do
-    file = Enum.reduce(dependencies, file, fn (dependency, file) ->
-       WandFile.add(file, dependency) |> elem(1)
-     end)
-     {:ok, file}
+    Enum.reduce_while(dependencies, {:ok, file}, fn(dependency, {:ok, file}) ->
+      case WandFile.add(file, dependency) do
+        {:ok, file} -> {:cont, {:ok, file}}
+        {:error, reason} -> {:halt, {:error, :add_dependency, reason}}
+      end
+    end)
   end
 
   defp get_requirement(version, :normal) do
@@ -147,5 +149,17 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
     error(:hex_api_error)
+  end
+
+  defp handle_error(:add_dependency, {:already_exists, name}) do
+    """
+    # Error
+    Package already exists in wand.json
+
+    Attempted to add #{name} to wand.json, but that name already exists.
+    Did you mean to type wand upgrade #{name} instead?
+    """
+    |> Display.error()
+    error(:package_already_exists)
   end
 end

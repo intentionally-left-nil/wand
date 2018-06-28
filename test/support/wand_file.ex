@@ -2,9 +2,10 @@ defmodule Wand.Test.Helpers.WandFile do
   import Mox
   alias Wand.WandFile
 
-  def stub_empty() do
-    contents = %WandFile{} |> Poison.encode!()
-    stub_read(contents)
+  def stub_load(file \\ %WandFile{}) do
+    file
+    |> Poison.encode!()
+    |> stub_read()
   end
 
   def stub_save(file) do
