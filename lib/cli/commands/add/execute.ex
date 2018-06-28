@@ -6,12 +6,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
   import Wand.CLI.Errors, only: [error: 1]
 
   def execute(packages) do
-    with \
-      {:ok, file} <- load_file(),
-      {:ok, dependencies} <- get_dependencies(packages),
-      {:ok, file} <- add_dependencies(file, dependencies),
-      :ok <- save_file(file)
-    do
+    with {:ok, file} <- load_file(),
+         {:ok, dependencies} <- get_dependencies(packages),
+         {:ok, file} <- add_dependencies(file, dependencies),
+         :ok <- save_file(file) do
       :ok
     else
       {:error, step, reason} -> handle_error(step, reason)
@@ -19,9 +17,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
   end
 
   defp get_dependencies(packages) do
-    dependencies = packages
-    |> Enum.map(&Task.async(fn -> get_dependency(&1) end))
-    |> Enum.map(&Task.await/1)
+    dependencies =
+      packages
+      |> Enum.map(&Task.async(fn -> get_dependency(&1) end))
+      |> Enum.map(&Task.await/1)
 
     case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
       nil -> {:ok, Enum.unzip(dependencies) |> elem(1)}
@@ -34,16 +33,18 @@ defmodule Wand.CLI.Commands.Add.Execute do
       {:ok, [version | _]} ->
         requirement = Wand.Mode.get_requirement!(mode, version)
         {:ok, %Dependency{name: name, requirement: requirement}}
-      {:error, error} -> {:error, {error, name}}
+
+      {:error, error} ->
+        {:error, {error, name}}
     end
   end
 
-  defp get_dependency(%Package{}=package) do
+  defp get_dependency(%Package{} = package) do
     {:ok, %Dependency{name: package.name, requirement: package.requirement}}
   end
 
   defp add_dependencies(file, dependencies) do
-    Enum.reduce_while(dependencies, {:ok, file}, fn(dependency, {:ok, file}) ->
+    Enum.reduce_while(dependencies, {:ok, file}, fn dependency, {:ok, file} ->
       case WandFile.add(file, dependency) do
         {:ok, file} -> {:cont, {:ok, file}}
         {:error, reason} -> {:halt, {:error, :add_dependency, reason}}
@@ -72,10 +73,12 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Please make sure you don't have any dangling commas or other invalid json.
     """
     |> Display.error()
+
     error(:invalid_wand_file)
   end
 
-  defp handle_error(:wand_file_read, reason) when reason in [:invalid_version, :missing_version, :version_mismatch] do
+  defp handle_error(:wand_file_read, reason)
+       when reason in [:invalid_version, :missing_version, :version_mismatch] do
     """
     # Error
     The version field in wand.json is incorrect.
@@ -85,6 +88,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Detailed error: #{reason}
     """
     |> Display.error()
+
     error(:invalid_wand_file)
   end
 
@@ -97,6 +101,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Detailed error: #{:file.format_error(:eaccess)}
     """
     |> Display.error()
+
     error(:missing_wand_file)
   end
 
@@ -110,6 +115,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Detailed error: #{:file.format_error(reason)}
     """
     |> Display.error()
+
     error(:missing_wand_file)
   end
 
@@ -121,6 +127,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Either the key is missing, or it is not a map. Please edit the file, and then re-run wand add.
     """
     |> Display.error()
+
     error(:invalid_wand_file)
   end
 
@@ -132,6 +139,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     The dependency #{name} in wand.json is incorrect. Please fix it and try again.
     """
     |> Display.error()
+
     error(:invalid_wand_file)
   end
 
@@ -144,10 +152,12 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Please check the spelling and try again.
     """
     |> Display.error()
+
     error(:package_not_found)
   end
 
-  defp handle_error(:dependency, {reason, _name}) when reason in [:no_connection, :bad_response] do
+  defp handle_error(:dependency, {reason, _name})
+       when reason in [:no_connection, :bad_response] do
     """
     # Error
     Error getting package version from the remote repository.
@@ -156,6 +166,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Please check your network connection and try again.
     """
     |> Display.error()
+
     error(:hex_api_error)
   end
 
@@ -168,6 +179,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Did you mean to type wand upgrade #{name} instead?
     """
     |> Display.error()
+
     error(:package_already_exists)
   end
 
@@ -181,6 +193,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Detailed error: #{:file.format_error(reason)}
     """
     |> Display.error()
+
     error(:file_write_error)
   end
 end

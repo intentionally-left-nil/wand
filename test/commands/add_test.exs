@@ -177,7 +177,8 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "poison", "--git=https://github.com/devinus/poison.git"]) == expected
+      assert Add.validate(["add", "poison", "--git=https://github.com/devinus/poison.git"]) ==
+               expected
     end
 
     test "a http git package with a version" do
@@ -193,7 +194,8 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "poison@3.1", "--git=https://github.com/devinus/poison.git"]) == expected
+      assert Add.validate(["add", "poison@3.1", "--git=https://github.com/devinus/poison.git"]) ==
+               expected
     end
 
     test "a ssh github package" do
@@ -209,7 +211,8 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "poison@3.1", "--git=git@github.com:devinus/poison"]) == expected
+      assert Add.validate(["add", "poison@3.1", "--git=git@github.com:devinus/poison"]) ==
+               expected
     end
 
     test "a ssh github package with a ref" do

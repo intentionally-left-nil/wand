@@ -106,6 +106,6 @@ defmodule DisplayTest do
 
   defp stub_stderr(message) do
     message = @r <> "\n" <> message <> "\n" <> @rr
-    expect(Wand.IOMock, :puts, fn(:stderr, ^message) -> :ok end)
+    expect(Wand.IOMock, :puts, fn :stderr, ^message -> :ok end)
   end
 end
