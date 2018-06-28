@@ -170,4 +170,17 @@ defmodule Wand.CLI.Commands.Add.Execute do
     |> Display.error()
     error(:package_already_exists)
   end
+
+  defp handle_error(:wand_file_write, reason) do
+    """
+    # Error
+    Could not write to wand.json
+
+    Make sure you have permission to write to wand.json, otherwise see the detailed error for more information:
+
+    Detailed error: #{:file.format_error(reason)}
+    """
+    |> Display.error()
+    error(:file_write_error)
+  end
 end

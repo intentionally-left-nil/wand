@@ -103,6 +103,17 @@ defmodule AddExecuteTest do
       assert Add.execute([@poison, @poison]) == error(:package_already_exists)
   end
 
+  test ":file_write_error when trying to save the file" do
+    Helpers.IO.stub_stderr()
+    Helpers.Hex.stub_poison()
+    Helpers.WandFile.stub_load()
+    %WandFile{
+      dependencies: [%Dependency{name: "poison", requirement: "~> 3.1.0"}]
+    }
+    |> Helpers.WandFile.stub_cannot_save()
+    assert Add.execute([@poison]) == error(:file_write_error)
+  end
+
   test "adds a single package" do
     Helpers.Hex.stub_poison()
     Helpers.WandFile.stub_load()
