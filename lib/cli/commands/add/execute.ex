@@ -9,9 +9,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
     with \
       {:ok, file} <- load_file(),
       {:ok, dependencies} <- get_dependencies(packages),
-      {:ok, file} <- add_dependencies(file, dependencies)
+      {:ok, file} <- add_dependencies(file, dependencies),
+      :ok <- save_file(file)
     do
-      WandFile.save(file)
+      :ok
     else
       {:error, step, reason} -> handle_error(step, reason)
     end
@@ -54,6 +55,13 @@ defmodule Wand.CLI.Commands.Add.Execute do
     case WandFile.load() do
       {:ok, file} -> {:ok, file}
       {:error, reason} -> {:error, :wand_file_read, reason}
+    end
+  end
+
+  defp save_file(file) do
+    case WandFile.save(file) do
+      :ok -> :ok
+      {:error, reason} -> {:error, :wand_file_write, reason}
     end
   end
 
