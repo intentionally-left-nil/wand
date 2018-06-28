@@ -1,6 +1,11 @@
 defmodule Wand.CLI.Commands.Init do
   @behaviour Wand.CLI.Command
   alias Wand.CLI.Display
+  alias Wand.WandFile
+  alias Wand.CLI.WandFileWithHelp
+  import Wand.CLI.Errors, only: [error: 1]
+
+  @f Wand.Interfaces.File.impl()
 
   @moduledoc """
   Convert an elixir project to use wand for dependencies.
@@ -63,7 +68,42 @@ defmodule Wand.CLI.Commands.Init do
     end
   end
 
+  def execute({path, switches}) do
+    with \
+    :ok <- can_write?(path, switches),
+    :ok <- WandFileWithHelp.save(%WandFile{}, path)
+    do
+      :ok
+    else
+      {:error, :wand_file_save, reason} ->
+        WandFileWithHelp.handle_error(:wand_file_save, reason)
+      {:error, step, reason} -> handle_error(step, reason)
+    end
+  end
+
   defp get_path([], switches), do: {:ok, {"./", switches}}
   defp get_path([path], switches), do: {:ok, {path, switches}}
   defp get_path(_, _), do: {:error, :wrong_command}
+
+  defp can_write?(path, switches) do
+    cond do
+      Keyword.get(switches, :overwrite) -> :ok
+      @f.exists?(path) -> {:error, :file_exists, path}
+      true -> :ok
+    end
+  end
+
+  defp handle_error(:file_exists, path) do
+    """
+    # Error
+    File already exists
+
+    The file #{path} already exists.
+
+    If you want to override it, use the --overwrite flag
+    """
+    |> Display.error()
+
+    error(:file_already_exists)
+  end
 end
