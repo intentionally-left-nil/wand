@@ -38,6 +38,11 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end
   end
 
+  defp get_dependency(%Package{}=package) do
+    requirement = get_requirement(package.requirement, package.mode)
+    {:ok, %Dependency{name: package.name, requirement: requirement}}
+  end
+
   defp add_dependencies(file, dependencies) do
     Enum.reduce_while(dependencies, {:ok, file}, fn(dependency, {:ok, file}) ->
       case WandFile.add(file, dependency) do
@@ -49,6 +54,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
   defp get_requirement(version, :normal) do
     "~> " <> version
+  end
+
+  defp get_requirement(version, :exact) do
+    "== " <> version
   end
 
   defp load_file() do
