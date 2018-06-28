@@ -57,7 +57,7 @@ defmodule Wand.CLI.Commands.Init do
 
   def validate(args) do
     flags = [
-      overwrite: :boolean,
+      overwrite: :boolean
     ]
 
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
@@ -69,25 +69,26 @@ defmodule Wand.CLI.Commands.Init do
   end
 
   def execute({path, switches}) do
-    with \
-    :ok <- can_write?(path, switches),
-    :ok <- WandFileWithHelp.save(%WandFile{}, path)
-    do
+    with :ok <- can_write?(path, switches),
+         :ok <- WandFileWithHelp.save(%WandFile{}, path) do
       :ok
     else
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
-      {:error, step, reason} -> handle_error(step, reason)
+
+      {:error, step, reason} ->
+        handle_error(step, reason)
     end
   end
 
   defp get_path([], switches), do: {:ok, {"wand.json", switches}}
 
   defp get_path([path], switches) do
-    path = case Path.basename(path) do
-      "wand.json" -> path
-      _ -> Path.join(path, "wand.json")
-    end
+    path =
+      case Path.basename(path) do
+        "wand.json" -> path
+        _ -> Path.join(path, "wand.json")
+      end
 
     {:ok, {path, switches}}
   end

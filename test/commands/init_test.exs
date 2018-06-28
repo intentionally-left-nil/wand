@@ -20,7 +20,7 @@ defmodule InitTest do
     end
 
     test "uses a custom path that ends in wand.json" do
-        assert Init.validate(["init", "../foo/wand.json"]) == {:ok, {"../foo/wand.json", []}}
+      assert Init.validate(["init", "../foo/wand.json"]) == {:ok, {"../foo/wand.json", []}}
     end
 
     test "passes in overwrite" do
@@ -28,8 +28,7 @@ defmodule InitTest do
     end
 
     test "passes in force" do
-      assert Init.validate(["init", "--overwrite"]) ==
-               {:ok, {"wand.json", [overwrite: true]}}
+      assert Init.validate(["init", "--overwrite"]) == {:ok, {"wand.json", [overwrite: true]}}
     end
   end
 
