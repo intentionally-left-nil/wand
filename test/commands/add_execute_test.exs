@@ -12,6 +12,25 @@ defmodule AddExecuteTest do
   setup :set_mox_global
 
   @poison %Package{name: "poison"}
+
+  describe "load/save errors" do
+    test "Error loading the wand file" do
+      Helpers.WandFile.stub_no_file()
+      Helpers.IO.stub_stderr()
+      assert Add.execute([@poison]) == error(:missing_wand_file)
+    end
+
+    test "Error saving the wand file" do
+      Helpers.WandFile.stub_load()
+
+      get_file()
+      |> Helpers.WandFile.stub_cannot_save()
+
+      Helpers.IO.stub_stderr()
+      assert Add.execute([get_package()]) == error(:file_write_error)
+    end
+  end
+
   describe "hex api errors" do
     setup do
       Helpers.WandFile.stub_load()
@@ -177,33 +196,32 @@ defmodule AddExecuteTest do
 
       assert Add.execute([package]) == :ok
     end
+  end
+  defp get_package(opts \\ []) do
+    fields =
+      %Package{}
+      |> Map.to_list()
+      |> Keyword.merge(
+        name: "poison",
+        requirement: ">= 3.1.3 and < 4.0.0"
+      )
+      |> Keyword.merge(opts)
 
-    defp get_package(opts \\ []) do
-      fields =
-        %Package{}
-        |> Map.to_list()
-        |> Keyword.merge(
-          name: "poison",
-          requirement: ">= 3.1.3 and < 4.0.0"
-        )
-        |> Keyword.merge(opts)
+    struct(Package, fields)
+  end
 
-      struct(Package, fields)
-    end
+  defp get_file(opts \\ []) do
+    fields =
+      %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
+      |> Map.to_list()
+      |> Keyword.merge(opts)
 
-    defp get_file(opts) do
-      fields =
-        %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
-        |> Map.to_list()
-        |> Keyword.merge(opts)
+    dependency = struct(Dependency, fields)
+    %WandFile{dependencies: [dependency]}
+  end
 
-      dependency = struct(Dependency, fields)
-      %WandFile{dependencies: [dependency]}
-    end
-
-    defp stub_file(opts \\ []) do
-      get_file(opts)
-      |> Helpers.WandFile.stub_save()
-    end
+  defp stub_file(opts \\ []) do
+    get_file(opts)
+    |> Helpers.WandFile.stub_save()
   end
 end
