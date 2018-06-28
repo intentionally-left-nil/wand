@@ -172,7 +172,7 @@ defmodule AddTest do
            %Package{
              name: "poison",
              details: %Git{
-               uri: "https://github.com/devinus/poison.git"
+               git: "https://github.com/devinus/poison.git"
              }
            }
          ]}
@@ -189,7 +189,7 @@ defmodule AddTest do
              name: "poison",
              requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
-               uri: "https://github.com/devinus/poison.git"
+               git: "https://github.com/devinus/poison.git"
              }
            }
          ]}
@@ -206,7 +206,7 @@ defmodule AddTest do
              name: "poison",
              requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
-               uri: "git@github.com:devinus/poison"
+               git: "git@github.com:devinus/poison"
              }
            }
          ]}
@@ -222,7 +222,7 @@ defmodule AddTest do
            %Package{
              name: "poison",
              details: %Git{
-               uri: "git@github.com:devinus/poison",
+               git: "git@github.com:devinus/poison",
                ref: "master"
              }
            }
@@ -239,7 +239,7 @@ defmodule AddTest do
            %Package{
              name: "poison",
              details: %Git{
-               uri: "git@github.com:devinus/poison",
+               git: "git@github.com:devinus/poison",
                ref: "123",
                sparse: "my_folder",
                submodules: true

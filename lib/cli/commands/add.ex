@@ -41,7 +41,7 @@ defmodule Wand.CLI.Commands.Add do
   """
 
   defmodule Git do
-    defstruct uri: nil,
+    defstruct git: nil,
               ref: nil,
               sparse: nil,
               submodules: false

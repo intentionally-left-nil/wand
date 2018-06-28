@@ -79,7 +79,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
       end
 
     details = %Git{
-      uri: uri,
+      git: uri,
       sparse: get_flag(switches, :sparse, %Git{}),
       submodules: get_flag(switches, :submodules, %Git{}),
       ref: ref
