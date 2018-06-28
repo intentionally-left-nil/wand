@@ -88,7 +88,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:invalid_wand_file)
   end
 
-  defp handle_error(:wand_file_read, {:file_read_error, :eacces}) do
+  defp handle_error(:wand_file_read, {:file_read_error, :eaccess}) do
     """
     # Error
     Permission error reading wand.json.
