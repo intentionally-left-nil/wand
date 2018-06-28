@@ -1,26 +1,38 @@
 defmodule Wand.CLI.Commands.Add.Validate do
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
+
   def validate(args) do
     flags = allowed_flags(args)
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
     case Wand.CLI.Command.parse_errors(errors) do
-      :ok -> get_packages(commands, switches)
-      error -> error
+      :ok ->
+        requirements = get_requirements(commands, switches)
+        get_packages(commands, switches, requirements)
+
+      error ->
+        error
     end
   end
 
-  defp get_packages([], _switches), do: {:error, :missing_package}
+  defp get_packages([], _switches, _requirements), do: {:error, :missing_package}
 
-  defp get_packages(names, switches) do
+  defp get_packages(_names, _switches, {:error, _} = error), do: error
+
+  defp get_packages(names, switches, {:ok, requirements}) do
     base_package = get_base_package(switches)
 
     packages =
-      Enum.map(names, fn name ->
-        {name, requirement} = split_name(name)
+      Enum.zip(names, requirements)
+      |> Enum.map(fn {name, requirement} ->
+        {name, _} = split_name(name)
         type = package_type(switches)
 
-        %Package{base_package | name: name, requirement: requirement}
+        %Package{
+          base_package
+          | name: name,
+            requirement: requirement
+        }
         |> add_details(type, switches)
       end)
 
@@ -36,7 +48,6 @@ defmodule Wand.CLI.Commands.Add.Validate do
       compile_env: Keyword.get(switches, :compile_env),
       download: download,
       environments: get_environments(switches),
-      mode: get_mode(switches),
       optional: Keyword.get(switches, :optional),
       override: Keyword.get(switches, :override),
       read_app_file: Keyword.get(switches, :read_app_file),
@@ -46,7 +57,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp split_name(package) do
     case String.split(package, "@", parts: 2) do
-      [package, name] -> {package, name}
+      [package, version] -> {package, version}
       [package] -> {package, :latest}
     end
   end
@@ -61,16 +72,19 @@ defmodule Wand.CLI.Commands.Add.Validate do
   end
 
   defp add_details(package, :git, switches) do
-    {uri, ref} = case String.split(Keyword.fetch!(switches, :git), "#", parts: 2) do
-      [uri] -> {uri, nil}
-      [uri, ref] -> {uri, ref}
-    end
+    {uri, ref} =
+      case String.split(Keyword.fetch!(switches, :git), "#", parts: 2) do
+        [uri] -> {uri, nil}
+        [uri, ref] -> {uri, ref}
+      end
+
     details = %Git{
       uri: uri,
       sparse: Keyword.get(switches, :sparse),
       submodules: Keyword.get(switches, :submodules),
       ref: ref
     }
+
     %Package{package | details: details}
   end
 
@@ -117,12 +131,37 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp get_mode(switches) do
     exact = Keyword.get(switches, :exact)
-    around = Keyword.get(switches, :around)
+    tilde = Keyword.get(switches, :tilde)
 
     cond do
       exact -> :exact
-      around -> :around
-      true -> :normal
+      tilde -> :tilde
+      true -> :caret
+    end
+  end
+
+  defp get_requirements(names, switches) do
+    requirements =
+      Enum.map(names, fn name ->
+        version =
+          split_name(name)
+          |> elem(1)
+
+        {name, Wand.Mode.get_requirement(get_mode(switches), version)}
+      end)
+
+    case Enum.find(requirements, &(&1 |> elem(1) |> elem(0) == :error)) do
+      nil ->
+        requirements =
+          Enum.unzip(requirements)
+          |> elem(1)
+          |> Enum.unzip()
+          |> elem(1)
+
+        {:ok, requirements}
+
+      {name, {:error, reason}} ->
+        {:error, {reason, name}}
     end
   end
 
@@ -142,7 +181,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
       ],
       path: [
         path: :string,
-        in_umbrella: :boolean,
+        in_umbrella: :boolean
       ],
       git: [
         git: :string,
@@ -150,14 +189,13 @@ defmodule Wand.CLI.Commands.Add.Validate do
         submodules: :boolean
       ],
       umbrella: [
-        in_umbrella: :boolean,
+        in_umbrella: :boolean
       ],
       single_package: [
         compile_env: :string,
-        read_app_file: :boolean,
+        read_app_file: :boolean
       ],
       multi_package: [
-        around: :boolean,
         compile: :boolean,
         dev: :boolean,
         download: :boolean,
@@ -169,8 +207,9 @@ defmodule Wand.CLI.Commands.Add.Validate do
         prod: :boolean,
         repo: :string,
         runtime: :boolean,
-        test: :boolean
-      ],
+        test: :boolean,
+        tilde: :boolean
+      ]
     }
 
     {switches, [_ | commands], _errors} = OptionParser.parse(args)

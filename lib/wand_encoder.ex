@@ -2,6 +2,7 @@ defmodule Wand.WandEncoder do
   alias Wand.WandFile
   alias Wand.WandFile.Dependency
   alias Poison.Encoder
+
   defimpl Poison.Encoder, for: WandFile do
     @default_indent 2
     @default_offset 0
@@ -13,7 +14,7 @@ defmodule Wand.WandEncoder do
 
       [
         {"version", version},
-        {"dependencies", dependencies},
+        {"dependencies", dependencies}
       ]
       |> Enum.map(fn {key, value} ->
         {encode(key, options), encode(value, options)}
@@ -23,15 +24,17 @@ defmodule Wand.WandEncoder do
     end
 
     def encode([], _options), do: "{}"
+
     def encode(dependencies, options) when is_list(dependencies) do
       indent = indent(options)
       offset = offset(options) + indent
       options = offset(options, offset)
 
-      dependencies = Enum.sort_by(dependencies, &(&1.name))
-      |> Enum.map(fn dependency ->
-        {encode(dependency.name, options), encode(dependency, options)}
-      end)
+      dependencies =
+        Enum.sort_by(dependencies, & &1.name)
+        |> Enum.map(fn dependency ->
+          {encode(dependency.name, options), encode(dependency, options)}
+        end)
 
       create_map_body(dependencies, offset)
       |> wrap_map(offset, indent)

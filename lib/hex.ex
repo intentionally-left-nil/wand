@@ -19,17 +19,20 @@ defmodule Wand.Hex do
   defp parse_response({:ok, %Response{status_code: 404}}) do
     {:error, :not_found}
   end
+
   defp parse_response({:ok, %Response{}}), do: {:error, :bad_response}
   defp parse_response({:error, %Error{}}), do: {:error, :no_connection}
 
   defp parse_json({:ok, %{"releases" => releases}}) do
-    releases = Enum.map(releases, &Map.get(&1, "version"))
-    |> Enum.reject(&(&1 == nil or Version.parse(&1) == :error))
+    releases =
+      Enum.map(releases, &Map.get(&1, "version"))
+      |> Enum.reject(&(&1 == nil or Version.parse(&1) == :error))
 
     case releases do
       [] -> {:error, :not_found}
       releases -> {:ok, releases}
     end
   end
+
   defp parse_json(_), do: {:error, :bad_response}
 end

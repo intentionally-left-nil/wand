@@ -81,12 +81,13 @@ defmodule Wand.CLI.Display do
   end
 
   def error(message) do
-    ANSI.red() <> convert(message) <> ANSI.default_color()
+    (ANSI.red() <> convert(message) <> ANSI.default_color())
     |> stderr()
   end
 
   defp convert(message) do
     {blocks, context} = Wand.CLI.Display.Renderer.parse(message)
+
     Wand.CLI.Display.Renderer.render(blocks, context)
     |> elem(1)
     |> pretty

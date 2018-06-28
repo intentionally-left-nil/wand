@@ -27,39 +27,47 @@ defmodule Wand.Test.Helpers.WandFile do
   end
 
   def stub_file_wrong_dependencies() do
-    contents = %{
-      version: "1.0.0",
-      dependencies: "not requirements",
-    }
-    |> Poison.encode!()
+    contents =
+      %{
+        version: "1.0.0",
+        dependencies: "not requirements"
+      }
+      |> Poison.encode!()
+
     stub_read(contents)
   end
 
   def stub_file_bad_dependency() do
-    contents = %{
-      version: "1.0.0",
-      dependencies: %{
-        mox: "== == 1.0.0"
+    contents =
+      %{
+        version: "1.0.0",
+        dependencies: %{
+          mox: "== == 1.0.0"
+        }
       }
-    }
-    |> Poison.encode!()
+      |> Poison.encode!()
+
     expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
   end
 
   def stub_file_wrong_version(version) do
-    contents = %{
-      version: version,
-      requirements: [],
-    }
-    |> Poison.encode!()
+    contents =
+      %{
+        version: version,
+        requirements: []
+      }
+      |> Poison.encode!()
+
     stub_read(contents)
   end
 
   def stub_file_missing_version() do
-    contents = %{
-      requirements: []
-    }
-    |> Poison.encode!()
+    contents =
+      %{
+        requirements: []
+      }
+      |> Poison.encode!()
+
     stub_read(contents)
   end
 

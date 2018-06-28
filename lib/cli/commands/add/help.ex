@@ -86,4 +86,20 @@ defmodule Wand.CLI.Commands.Add.Help do
     |> Wand.CLI.Display.print()
   end
 
+  def help({:invalid_version, package}) do
+    """
+    #{package} contains an invalid version
+    A version must conform to the SemVar schema.
+
+    Some valid example versions are:
+    <pre>
+    3.1.0
+    0.0.1
+    2.0.0-dev
+    </pre>
+
+    Note that versions are not requirements and don't contain >=, ~> etc.
+    """
+    |> Wand.CLI.Display.print()
+  end
 end

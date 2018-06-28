@@ -57,12 +57,14 @@ defmodule WandFileTest do
     end
 
     test ":invalid dependency when a dependency is invalid" do
-      json = Poison.encode!(%{
-        version: "1.0.0",
-        dependencies: %{
-          mox: "== == 1.0.0"
-        }
-      })
+      json =
+        Poison.encode!(%{
+          version: "1.0.0",
+          dependencies: %{
+            mox: "== == 1.0.0"
+          }
+        })
+
       stub_read(:ok, "wand.json", json)
       assert WandFile.load() == {:error, {:invalid_dependency, "mox"}}
     end
@@ -74,6 +76,7 @@ defmodule WandFileTest do
       dependency = poison("~> 3.3")
       assert WandFile.add(file, dependency) == {:error, {:already_exists, "poison"}}
     end
+
     test "a new package" do
       file = %WandFile{}
       dependency = poison()
@@ -91,24 +94,30 @@ defmodule WandFileTest do
   end
 
   describe "save" do
-
     test ":enoent if saving fails" do
       file = %WandFile{}
-      contents = %{
-        version: file.version,
-        dependencies: %{},
-      }
-      |> Poison.encode!(pretty: true)
+
+      contents =
+        %{
+          version: file.version,
+          dependencies: %{}
+        }
+        |> Poison.encode!(pretty: true)
+
       stub_write(:error, "wand.json", contents)
       assert WandFile.save(file) == {:error, :enoent}
     end
+
     test "saves an empty config" do
       file = %WandFile{}
-      expected = %{
-        version: file.version,
-        dependencies: %{},
-      }
-      |> Poison.encode!(pretty: true)
+
+      expected =
+        %{
+          version: file.version,
+          dependencies: %{}
+        }
+        |> Poison.encode!(pretty: true)
+
       stub_write(:ok, "wand.json", expected)
       assert WandFile.save(file) == :ok
     end
@@ -117,13 +126,15 @@ defmodule WandFileTest do
       dependency = poison()
       {:ok, file} = WandFile.add(%WandFile{}, dependency)
 
-      expected = %{
-        version: file.version,
-        dependencies: %{
-          "poison" => "~> 3.1",
+      expected =
+        %{
+          version: file.version,
+          dependencies: %{
+            "poison" => "~> 3.1"
+          }
         }
-      }
-      |> Poison.encode!(pretty: true)
+        |> Poison.encode!(pretty: true)
+
       stub_write(:ok, "wand.json", expected)
       WandFile.save(file)
     end
@@ -134,10 +145,13 @@ defmodule WandFileTest do
         %Dependency{name: "b", requirement: "~> 3.2"},
         %Dependency{name: "a", requirement: "~> 3.1"},
         %Dependency{name: "f", requirement: "~> 3.5"},
-        %Dependency{name: "c", requirement: "~> 3.3"},
+        %Dependency{name: "c", requirement: "~> 3.3"}
       ]
+
       file = %WandFile{dependencies: dependencies}
-      expected = "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"a\": \"~> 3.1\",\n    \"b\": \"~> 3.2\",\n    \"c\": \"~> 3.3\",\n    \"d\": \"~> 3.4\",\n    \"f\": \"~> 3.5\"\n  }\n}"
+
+      expected =
+        "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"a\": \"~> 3.1\",\n    \"b\": \"~> 3.2\",\n    \"c\": \"~> 3.3\",\n    \"d\": \"~> 3.4\",\n    \"f\": \"~> 3.5\"\n  }\n}"
 
       stub_write(:ok, "wand.json", expected)
       WandFile.save(file)
@@ -145,7 +159,9 @@ defmodule WandFileTest do
 
     test "dependencies with opts" do
       file = %WandFile{dependencies: [mox()]}
-      expected = "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"mox\": [\n      \"~> 0.3.2\",\n      {\n        \"only\": \"test\"\n      }\n    ]\n  }\n}"
+
+      expected =
+        "{\n  \"version\": \"1.0.0\",\n  \"dependencies\": {\n    \"mox\": [\n      \"~> 0.3.2\",\n      {\n        \"only\": \"test\"\n      }\n    ]\n  }\n}"
 
       stub_write(:ok, "wand.json", expected)
       WandFile.save(file)
@@ -168,11 +184,11 @@ defmodule WandFileTest do
   end
 
   defp stub_write(:ok, path, contents) do
-    expect(Wand.FileMock, :write, fn(^path, ^contents) -> :ok end)
+    expect(Wand.FileMock, :write, fn ^path, ^contents -> :ok end)
   end
 
   defp stub_write(:error, path, contents) do
-    expect(Wand.FileMock, :write, fn(^path, ^contents) -> {:error, :enoent} end)
+    expect(Wand.FileMock, :write, fn ^path, ^contents -> {:error, :enoent} end)
   end
 
   defp valid_deps() do
@@ -180,7 +196,7 @@ defmodule WandFileTest do
       version: "1.0.1",
       dependencies: %{
         mox: ["~> 0.3.2", %{only: "test"}],
-        poison: "~> 3.1",
+        poison: "~> 3.1"
       }
     }
   end
@@ -190,7 +206,7 @@ defmodule WandFileTest do
       version: "1.0.1",
       dependencies: [
         mox(),
-        poison(),
+        poison()
       ]
     }
   end

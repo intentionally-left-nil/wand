@@ -38,9 +38,32 @@ defmodule HexTest do
 
   test "returns the releases" do
     stub_http(:ok, 200, valid_body())
-    expected = {:ok, ["3.1.0", "3.0.0", "2.2.0", "2.1.0", "2.0.1", "2.0.0", "1.5.2",
-             "1.5.1", "1.5.0", "1.4.0", "1.3.1", "1.3.0", "1.2.1", "1.2.0",
-             "1.1.1", "1.1.0", "1.0.3", "1.0.2", "1.0.1", "1.0.0"]}
+
+    expected =
+      {:ok,
+       [
+         "3.1.0",
+         "3.0.0",
+         "2.2.0",
+         "2.1.0",
+         "2.0.1",
+         "2.0.0",
+         "1.5.2",
+         "1.5.1",
+         "1.5.0",
+         "1.4.0",
+         "1.3.1",
+         "1.3.0",
+         "1.2.1",
+         "1.2.0",
+         "1.1.1",
+         "1.1.0",
+         "1.0.3",
+         "1.0.2",
+         "1.0.1",
+         "1.0.0"
+       ]}
+
     assert Hex.releases("poison") == expected
   end
 
@@ -49,24 +72,28 @@ defmodule HexTest do
       releases: [
         %{version: "1.1.0"},
         %{missing_version: "1.1.0"},
-        %{version: "ABC"},
+        %{version: "ABC"}
       ]
     })
+
     assert Hex.releases("poison") == {:ok, ["1.1.0"]}
   end
 
-  defp stub_http(:ok, status, %{}=contents), do: stub_http(:ok, status, Poison.encode!(contents))
+  defp stub_http(:ok, status, %{} = contents),
+    do: stub_http(:ok, status, Poison.encode!(contents))
+
   defp stub_http(:ok, status, contents) do
     response = %Response{
       status_code: status,
-      body: contents,
+      body: contents
     }
+
     expect(Wand.HttpMock, :get, fn _url, _headers -> {:ok, response} end)
   end
 
   defp stub_http(:error) do
     response = %Error{id: nil, reason: :nxdomain}
-    expect(Wand.HttpMock, :get, fn(_url, _headers) -> {:error, response} end)
+    expect(Wand.HttpMock, :get, fn _url, _headers -> {:error, response} end)
   end
 
   defp valid_body() do

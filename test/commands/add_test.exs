@@ -3,7 +3,7 @@ defmodule AddTest do
   import Mox
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
-  
+
   describe "validate" do
     test "returns help if no args are given" do
       assert Add.validate(["add"]) == {:error, :missing_package}
@@ -17,6 +17,11 @@ defmodule AddTest do
     test "returns help if single-package flags are used to install multiple packages" do
       command = OptionParser.split("add poison ex_doc --sparse=foo")
       assert Add.validate(command) == {:error, {:invalid_flag, "--sparse"}}
+    end
+
+    test "returns help if the version is invalid" do
+      assert Add.validate(["add", "poison@NOT_A_VERSION"]) ==
+               {:error, {:invalid_version, "poison@NOT_A_VERSION"}}
     end
 
     test "returns help if a flag for the wrong file type is given" do
@@ -58,7 +63,7 @@ defmodule AddTest do
 
     test "a package with a specific version" do
       assert Add.validate(["add", "poison@3.1"]) ==
-               {:ok, [%Package{name: "poison", requirement: "3.1"}]}
+               {:ok, [%Package{name: "poison", requirement: ">= 3.1.0 and < 4.0.0"}]}
     end
 
     test "a package only for the test environment" do
@@ -120,12 +125,12 @@ defmodule AddTest do
 
     test "an exact match" do
       assert Add.validate(["add", "ex_doc", "--exact"]) ==
-               {:ok, [%Package{name: "ex_doc", mode: :exact}]}
+               {:ok, [%Package{name: "ex_doc", requirement: {:latest, :exact}}]}
     end
 
     test "Install the closest minor version" do
-      assert Add.validate(["add", "ex_doc", "--around"]) ==
-               {:ok, [%Package{name: "ex_doc", mode: :around}]}
+      assert Add.validate(["add", "ex_doc", "--tilde"]) ==
+               {:ok, [%Package{name: "ex_doc", requirement: {:latest, :tilde}}]}
     end
 
     test "a local umbrella package" do
@@ -172,7 +177,8 @@ defmodule AddTest do
            }
          ]}
 
-      assert Add.validate(["add", "poison", "--git=https://github.com/devinus/poison.git"]) == expected
+      assert Add.validate(["add", "poison", "--git=https://github.com/devinus/poison.git"]) ==
+               expected
     end
 
     test "a http git package with a version" do
@@ -181,14 +187,15 @@ defmodule AddTest do
          [
            %Package{
              name: "poison",
-             requirement: "3.1",
+             requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
                uri: "https://github.com/devinus/poison.git"
              }
            }
          ]}
 
-      assert Add.validate(["add", "poison@3.1", "--git=https://github.com/devinus/poison.git"]) == expected
+      assert Add.validate(["add", "poison@3.1", "--git=https://github.com/devinus/poison.git"]) ==
+               expected
     end
 
     test "a ssh github package" do
@@ -197,14 +204,15 @@ defmodule AddTest do
          [
            %Package{
              name: "poison",
-             requirement: "3.1",
+             requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
                uri: "git@github.com:devinus/poison"
              }
            }
          ]}
 
-      assert Add.validate(["add", "poison@3.1", "--git=git@github.com:devinus/poison"]) == expected
+      assert Add.validate(["add", "poison@3.1", "--git=git@github.com:devinus/poison"]) ==
+               expected
     end
 
     test "a ssh github package with a ref" do
@@ -262,6 +270,10 @@ defmodule AddTest do
 
     test "invalid_flag" do
       Add.help({:invalid_flag, "--foobaz"})
+    end
+
+    test "invalid_version" do
+      Add.help({:invalid_version, "poison@-3.1.0"})
     end
 
     def stub_io(_) do

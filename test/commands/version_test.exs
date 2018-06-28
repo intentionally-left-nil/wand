@@ -1,4 +1,4 @@
-defmodule VersionTest do
+defmodule CLI.VersionTest do
   use ExUnit.Case, async: true
   import Mox
   alias Wand.CLI.Commands.Version

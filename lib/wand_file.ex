@@ -5,67 +5,67 @@ defmodule Wand.WandFile do
   @vsn "1.0.0"
 
   defstruct version: @vsn,
-  dependencies: []
+            dependencies: []
 
   defmodule Dependency do
     @enforce_keys [:name]
     defstruct name: nil, requirement: nil, opts: %{}
   end
 
-  def add(%WandFile{}=file, %Dependency{}=dependency) do
+  def add(%WandFile{} = file, %Dependency{} = dependency) do
     case exists?(file, dependency.name) do
       false ->
-        file = update_in(file.dependencies, &([dependency | &1]))
+        file = update_in(file.dependencies, &[dependency | &1])
         {:ok, file}
-      true -> {:error, {:already_exists, dependency.name}}
+
+      true ->
+        {:error, {:already_exists, dependency.name}}
     end
   end
 
   def load(path \\ "wand.json") do
-    with \
-      {:ok, contents} <- read(path),
-      {:ok, data} <- parse(contents),
-      {:ok, wand_file} <- validate(data)
-    do
+    with {:ok, contents} <- read(path),
+         {:ok, data} <- parse(contents),
+         {:ok, wand_file} <- validate(data) do
       {:ok, wand_file}
     else
       error -> error
     end
   end
 
-  def remove(%WandFile{}=file, name) do
+  def remove(%WandFile{} = file, name) do
     update_in(file.dependencies, fn dependencies ->
       Enum.reject(dependencies, &(&1.name == name))
     end)
   end
 
-  def save(%WandFile{}=file, path \\ "wand.json") do
+  def save(%WandFile{} = file, path \\ "wand.json") do
     contents = Poison.encode!(file, pretty: true)
     @f.write(path, contents)
   end
 
   defp validate(data) do
-    with \
-      {:ok, version} <- validate_version(extract_version(data)),
-      {:ok, dependencies} <- validate_dependencies(Map.get(data, :dependencies, %{}))
-    do
+    with {:ok, version} <- validate_version(extract_version(data)),
+         {:ok, dependencies} <- validate_dependencies(Map.get(data, :dependencies, %{})) do
       {:ok, %Wand.WandFile{version: to_string(version), dependencies: dependencies}}
     else
       error -> error
     end
   end
 
-  defp validate_dependencies(dependencies) when not is_map(dependencies), do: {:error, :invalid_dependencies}
+  defp validate_dependencies(dependencies) when not is_map(dependencies),
+    do: {:error, :invalid_dependencies}
 
   defp validate_dependencies(dependencies) do
-    {dependencies, errors} = Enum.map(dependencies, fn
-      {name, [requirement, opts]} -> create_dependency(name, requirement, opts)
-      {name, requirement} -> create_dependency(name, requirement, %{})
-    end)
-    |> Enum.split_with(fn
-      %Dependency{} -> true
-      _ -> false
-    end)
+    {dependencies, errors} =
+      Enum.map(dependencies, fn
+        {name, [requirement, opts]} -> create_dependency(name, requirement, opts)
+        {name, requirement} -> create_dependency(name, requirement, %{})
+      end)
+      |> Enum.split_with(fn
+        %Dependency{} -> true
+        _ -> false
+      end)
 
     case errors do
       [] -> {:ok, dependencies}
@@ -74,6 +74,7 @@ defmodule Wand.WandFile do
   end
 
   defp validate_version({:error, _} = error), do: error
+
   defp validate_version({:ok, version}) do
     if Version.match?(version, @requirement) do
       {:ok, version}
@@ -88,11 +89,13 @@ defmodule Wand.WandFile do
       {:ok, version} -> {:ok, version}
     end
   end
+
   defp extract_version(%{version: _}), do: {:error, :invalid_version}
   defp extract_version(_data), do: {:error, :missing_version}
 
   defp create_dependency(name, requirement, opts) do
     name = to_string(name)
+
     case Version.parse_requirement(requirement) do
       :error -> {:error, {:invalid_dependency, name}}
       _ -> %Dependency{name: name, requirement: requirement, opts: opts}
