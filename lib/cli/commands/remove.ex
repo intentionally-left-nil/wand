@@ -2,6 +2,8 @@ defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
   alias Wand.WandFile
   alias Wand.CLI.WandFileWithHelp
+  import Wand.CLI.Errors, only: [error: 1]
+  
   @behaviour Wand.CLI.Command
   @moduledoc """
   Remove elixir packages from wand.json
@@ -33,7 +35,8 @@ defmodule Wand.CLI.Commands.Remove do
   def execute(names) do
     with {:ok, file} <- WandFileWithHelp.load(),
          file <- remove_names(file, names),
-         :ok <- WandFileWithHelp.save(file) do
+         :ok <- WandFileWithHelp.save(file),
+         :ok <- cleanup() do
       :ok
     else
       {:error, :wand_file_load, reason} ->
@@ -41,10 +44,31 @@ defmodule Wand.CLI.Commands.Remove do
 
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
+
+      {:error, step, reason} -> handle_error(step, reason)
     end
   end
 
   defp remove_names(file, names) do
     Enum.reduce(names, file, &WandFile.remove(&2, &1))
+  end
+
+  defp cleanup() do
+    case Wand.CLI.Mix.cleanup_deps() do
+      :ok -> :ok
+      {:error, reason} -> {:error, :cleanup_failed, reason}
+    end
+  end
+
+  defp handle_error(:cleanup_failed, _reason) do
+    """
+    # Partial Success
+    Unable to run mix deps.unlock --unused
+
+    The wand.json file was successfully updated,
+    however, updating the mix.lock file failed
+    """
+    |> Display.error()
+    error(:install_deps_error)
   end
 end

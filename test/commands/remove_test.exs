@@ -42,7 +42,7 @@ defmodule RemoveTest do
     end
   end
 
-  describe "execute" do
+  describe "execute errors" do
     test "Error reading the WandFile" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
@@ -55,6 +55,22 @@ defmodule RemoveTest do
       Helpers.WandFile.stub_cannot_save(file)
       Helpers.IO.stub_stderr()
       assert Remove.execute(["poison"]) == error(:file_write_error)
+    end
+
+    test ":install_deps_error if cleaning the deps fails" do
+      file = %WandFile{}
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_save(file)
+      Helpers.System.stub_failed_cleanup_deps()
+      Helpers.IO.stub_stderr()
+      assert Remove.execute(["poison"]) == error(:install_deps_error)
+    end
+  end
+
+  describe "execute successfully" do
+    setup do
+      Helpers.System.stub_cleanup_deps()
+      :ok
     end
 
     test "Does nothing if the dependency is not being used" do
