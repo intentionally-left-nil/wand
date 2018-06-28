@@ -13,50 +13,21 @@ defmodule AddExecuteTest do
 
   @poison %Package{name: "poison"}
 
-  describe "read file errors" do
-    setup do
-      Helpers.IO.stub_stderr()
-      :ok
-    end
-
-    test ":missing_wand_file when the file cannot be loaded" do
+  describe "load/save errors" do
+    test "Error loading the wand file" do
       Helpers.WandFile.stub_no_file()
+      Helpers.IO.stub_stderr()
       assert Add.execute([@poison]) == error(:missing_wand_file)
     end
 
-    test ":missing_wand_file when there are no permissions" do
-      Helpers.WandFile.stub_no_file(:eaccess)
-      assert Add.execute([@poison]) == error(:missing_wand_file)
-    end
+    test "Error saving the wand file" do
+      Helpers.WandFile.stub_load()
 
-    test ":invalid_wand_file when the JSON is invalid" do
-      Helpers.WandFile.stub_invalid_file()
-      assert Add.execute([@poison]) == error(:invalid_wand_file)
-    end
+      get_file()
+      |> Helpers.WandFile.stub_cannot_save()
 
-    test ":invalid_wand_file when the version is missing" do
-      Helpers.WandFile.stub_file_missing_version()
-      assert Add.execute([@poison]) == error(:invalid_wand_file)
-    end
-
-    test ":invalid_wand_file when the version is incorrect" do
-      Helpers.WandFile.stub_file_wrong_version("not_a_version")
-      assert Add.execute([@poison]) == error(:invalid_wand_file)
-    end
-
-    test ":invalid_wand_file when the version is too high" do
-      Helpers.WandFile.stub_file_wrong_version("10.0.0")
-      assert Add.execute([@poison]) == error(:invalid_wand_file)
-    end
-
-    test ":invalid_wand_file when dependencies are missing" do
-      Helpers.WandFile.stub_file_wrong_dependencies()
-      assert Add.execute([@poison]) == error(:invalid_wand_file)
-    end
-
-    test ":invalid_wand_file when a dependency is invalid" do
-      Helpers.WandFile.stub_file_bad_dependency()
-      assert Add.execute([@poison]) == error(:invalid_wand_file)
+      Helpers.IO.stub_stderr()
+      assert Add.execute([get_package()]) == error(:file_write_error)
     end
   end
 
@@ -105,17 +76,6 @@ defmodule AddExecuteTest do
       Helpers.WandFile.stub_load()
       Helpers.Hex.stub_poison()
       assert Add.execute([@poison, @poison]) == error(:package_already_exists)
-    end
-
-    test ":file_write_error when trying to save the file" do
-      Helpers.WandFile.stub_load()
-
-      %WandFile{
-        dependencies: [%Dependency{name: "poison", requirement: ">= 3.1.0 and < 4.0.0"}]
-      }
-      |> Helpers.WandFile.stub_cannot_save()
-
-      assert Add.execute([@poison]) == error(:file_write_error)
     end
   end
 
@@ -236,33 +196,33 @@ defmodule AddExecuteTest do
 
       assert Add.execute([package]) == :ok
     end
+  end
 
-    defp get_package(opts \\ []) do
-      fields =
-        %Package{}
-        |> Map.to_list()
-        |> Keyword.merge(
-          name: "poison",
-          requirement: ">= 3.1.3 and < 4.0.0"
-        )
-        |> Keyword.merge(opts)
+  defp get_package(opts \\ []) do
+    fields =
+      %Package{}
+      |> Map.to_list()
+      |> Keyword.merge(
+        name: "poison",
+        requirement: ">= 3.1.3 and < 4.0.0"
+      )
+      |> Keyword.merge(opts)
 
-      struct(Package, fields)
-    end
+    struct(Package, fields)
+  end
 
-    defp get_file(opts) do
-      fields =
-        %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
-        |> Map.to_list()
-        |> Keyword.merge(opts)
+  defp get_file(opts \\ []) do
+    fields =
+      %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
+      |> Map.to_list()
+      |> Keyword.merge(opts)
 
-      dependency = struct(Dependency, fields)
-      %WandFile{dependencies: [dependency]}
-    end
+    dependency = struct(Dependency, fields)
+    %WandFile{dependencies: [dependency]}
+  end
 
-    defp stub_file(opts \\ []) do
-      get_file(opts)
-      |> Helpers.WandFile.stub_save()
-    end
+  defp stub_file(opts \\ []) do
+    get_file(opts)
+    |> Helpers.WandFile.stub_save()
   end
 end

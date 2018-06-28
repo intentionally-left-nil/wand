@@ -1,5 +1,7 @@
 defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
+  alias Wand.WandFile
+  alias Wand.CLI.WandFileWithHelp
   @behaviour Wand.CLI.Command
   @moduledoc """
   Remove elixir packages from wand.json
@@ -26,5 +28,23 @@ defmodule Wand.CLI.Commands.Remove do
       [] -> {:error, :missing_package}
       names -> {:ok, names}
     end
+  end
+
+  def execute(names) do
+    with {:ok, file} <- WandFileWithHelp.load(),
+         file <- remove_names(file, names),
+         :ok <- WandFileWithHelp.save(file) do
+      :ok
+    else
+      {:error, :wand_file_load, reason} ->
+        WandFileWithHelp.handle_error(:wand_file_load, reason)
+
+      {:error, :wand_file_save, reason} ->
+        WandFileWithHelp.handle_error(:wand_file_save, reason)
+    end
+  end
+
+  defp remove_names(file, names) do
+    Enum.reduce(names, file, &WandFile.remove(&2, &1))
   end
 end
