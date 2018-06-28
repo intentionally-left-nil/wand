@@ -79,9 +79,34 @@ defmodule AddExecuteTest do
     end
   end
 
+  describe "download" do
+    test ":install_deps_error when downloading fails" do
+      Helpers.WandFile.stub_load()
+      stub_file()
+      Helpers.System.stub_failed_update_deps()
+      Helpers.IO.stub_stderr()
+      package = get_package(compile_env: :prod)
+      assert Add.execute([package]) == error(:install_deps_error)
+    end
+  end
+
+  describe "compile" do
+    test ":install_deps_error when compiling fails" do
+      Helpers.WandFile.stub_load()
+      stub_file()
+      Helpers.System.stub_update_deps()
+      Helpers.System.stub_failed_compile()
+      Helpers.IO.stub_stderr()
+      package = get_package(compile_env: :prod)
+      assert Add.execute([package]) == error(:install_deps_error)
+    end
+  end
+
   describe "Successfully" do
     setup do
       Helpers.WandFile.stub_load()
+      Helpers.System.stub_update_deps()
+      Helpers.System.stub_compile()
       :ok
     end
 

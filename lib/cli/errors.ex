@@ -5,7 +5,8 @@ defmodule Wand.CLI.Errors do
     package_not_found: 66,
     package_already_exists: 67,
     hex_api_error: 68,
-    file_write_error: 69
+    file_write_error: 69,
+    install_deps_error: 70
   }
 
   def code(key), do: Map.fetch!(@errors, key)
