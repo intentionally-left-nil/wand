@@ -52,6 +52,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end)
   end
 
+  defp get_opts(%Package{} = package) do
+    default = %Package{}
+  end
+
   defp load_file() do
     case WandFile.load() do
       {:ok, file} -> {:ok, file}

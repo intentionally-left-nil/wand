@@ -40,18 +40,18 @@ defmodule Wand.CLI.Commands.Add.Validate do
   end
 
   defp get_base_package(switches) do
-    download = Keyword.get(switches, :download, true)
-    compile = download and Keyword.get(switches, :compile, true)
+    download = get_flag(switches, :download)
+    compile = download and get_flag(switches, :compile)
 
     %Package{
       compile: compile,
-      compile_env: Keyword.get(switches, :compile_env),
+      compile_env: get_flag(switches, :compile_env),
       download: download,
       environments: get_environments(switches),
-      optional: Keyword.get(switches, :optional),
-      override: Keyword.get(switches, :override),
-      read_app_file: Keyword.get(switches, :read_app_file),
-      runtime: Keyword.get(switches, :runtime)
+      optional: get_flag(switches, :optional),
+      override: get_flag(switches, :override),
+      read_app_file: get_flag(switches, :read_app_file),
+      runtime: get_flag(switches, :runtime)
     }
   end
 
@@ -65,7 +65,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
   defp add_details(package, :path, switches) do
     details = %Path{
       path: Keyword.fetch!(switches, :path),
-      in_umbrella: Keyword.get(switches, :in_umbrella)
+      in_umbrella: get_flag(switches, :in_umbrella, %Path{})
     }
 
     %Package{package | details: details}
@@ -80,8 +80,8 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
     details = %Git{
       uri: uri,
-      sparse: Keyword.get(switches, :sparse),
-      submodules: Keyword.get(switches, :submodules),
+      sparse: get_flag(switches, :sparse, %Git{}),
+      submodules: get_flag(switches, :submodules, %Git{}),
       ref: ref
     }
 
@@ -90,8 +90,8 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp add_details(package, :hex, switches) do
     details = %Hex{
-      organization: Keyword.get(switches, :organization),
-      repo: Keyword.get(switches, :repo)
+      organization: get_flag(switches, :organization, %Hex{}),
+      repo: get_flag(switches, :repo, %Hex{})
     }
 
     %Package{package | details: details}
@@ -130,8 +130,8 @@ defmodule Wand.CLI.Commands.Add.Validate do
   end
 
   defp get_mode(switches) do
-    exact = Keyword.get(switches, :exact)
-    tilde = Keyword.get(switches, :tilde)
+    exact = Keyword.get(switches, :exact, false)
+    tilde = Keyword.get(switches, :tilde, false)
 
     cond do
       exact -> :exact
@@ -172,6 +172,10 @@ defmodule Wand.CLI.Commands.Add.Validate do
       Keyword.has_key?(switches, :in_umbrella) -> :umbrella
       true -> :hex
     end
+  end
+
+  defp get_flag(switches, key, struct \\ %Package{}) do
+    Keyword.get(switches, key, Map.fetch!(struct, key))
   end
 
   defp allowed_flags(args) do

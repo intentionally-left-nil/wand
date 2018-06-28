@@ -143,6 +143,12 @@ defmodule AddExecuteTest do
       assert Add.execute([package]) == :ok
     end
 
+    test "add a package with the compile_env flag" do
+      stub_file(opts: %{compile_env: :test})
+      package = get_package(compile_env: :test)
+      assert Add.execute([package]) == :ok
+    end
+
     defp get_package(opts \\ []) do
       fields = %Package{}
       |> Map.to_list()
