@@ -21,8 +21,8 @@ defmodule InitTest do
     end
 
     test "passes in force" do
-      assert Init.validate(["init", "--overwrite", "--force"]) ==
-               {:ok, {"./", [overwrite: true, force: true]}}
+      assert Init.validate(["init", "--overwrite"]) ==
+               {:ok, {"./", [overwrite: true]}}
     end
   end
 

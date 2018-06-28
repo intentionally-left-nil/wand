@@ -3,7 +3,7 @@ defmodule Wand.CLI.Commands.Init do
   alias Wand.CLI.Display
 
   @moduledoc """
-  Convert an elixir project to use wand for dependencies. This command also installs the wand.core tasks if not installed.
+  Convert an elixir project to use wand for dependencies.
 
   ## Usage
   **wand** init [path] [flags]
@@ -19,7 +19,6 @@ defmodule Wand.CLI.Commands.Init do
   By default, wand init will refuse to overwrite an existing wand.json file. It will also refuse to install the wand.core task without confirmation. This is controllable via flags.
   <pre>
   --overwrite           Ignore the presence of an existing wand.json file, and create a new one
-  --force               Always replace the existing wand.json file, and always install the core task, if needed.
   </pre>
   """
 
@@ -31,13 +30,12 @@ defmodule Wand.CLI.Commands.Init do
 
     Additionally, it will attempt to modify the mix.exs file to use the wand.core task to load the modules. If that fails, you need to manually edit your mix.exs file.
 
-    The task attempts to be non-destructive. It will not create a new wand.json file if one exists, unless the overwrite flag is present. It will not download the wand.core archive without prompting.
+    The task attempts to be non-destructive. It will not create a new wand.json file if one exists, unless the overwrite flag is present.
 
     ## Options
-    By default, wand init will refuse to overwrite an existing wand.json file. It will also refuse to install the wand.core task without confirmation. This is controllable via flags.
+    By default, wand init will refuse to overwrite an existing wand.json file. This is controllable via flags.
     <pre>
     --overwrite           Ignore the presence of an existing wand.json file, and create a new one
-    --force               Always replace the existing wand.json file, and always install the core task, if needed.
     </pre>
     """
     |> Display.print()
@@ -55,7 +53,6 @@ defmodule Wand.CLI.Commands.Init do
   def validate(args) do
     flags = [
       overwrite: :boolean,
-      force: :boolean
     ]
 
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
