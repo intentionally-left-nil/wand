@@ -43,7 +43,7 @@ defmodule AddTest do
                {:ok, [%Package{name: "poison", download: false, compile: false}]}
     end
 
-    test "with an organization and a repo" do
+    test "with an organization, repo, and custom name" do
       expected = {
         :ok,
         [
@@ -51,14 +51,15 @@ defmodule AddTest do
             name: "poison",
             details: %Hex{
               organization: "mycompany",
-              repo: "nothexpm"
+              repo: "nothexpm",
+              hex_name: "mypoison"
             }
           }
         ]
       }
 
-      assert Add.validate(["add", "poison", "--repo=nothexpm", "--organization=mycompany"]) ==
-               expected
+      command = OptionParser.split("add poison --repo=nothexpm --organization=mycompany --hex-name=mypoison")
+      assert Add.validate(command) == expected
     end
 
     test "a package with a specific version" do

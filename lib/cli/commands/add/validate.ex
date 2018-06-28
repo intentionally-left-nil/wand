@@ -90,6 +90,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp add_details(package, :hex, switches) do
     details = %Hex{
+      hex_name: get_flag(switches, :hex_name, %Hex{}),
       organization: get_flag(switches, :organization, %Hex{}),
       repo: get_flag(switches, :repo, %Hex{})
     }
