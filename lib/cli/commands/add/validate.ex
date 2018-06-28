@@ -3,7 +3,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   def validate(args) do
     flags = allowed_flags(args)
-    {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
+    {switches, [_ | commands], errors} = strict_parse(args, flags)
 
     case Wand.CLI.Command.parse_errors(errors) do
       :ok ->
@@ -226,5 +226,17 @@ defmodule Wand.CLI.Commands.Add.Validate do
       _ -> [:multi_package]
     end
     |> Enum.flat_map(&Map.fetch!(all_flags, &1))
+  end
+
+  defp strict_parse(args, flags) do
+    {switches, commands, errors} = OptionParser.parse(args, strict: flags)
+
+    {valid_switches, empty} = Enum.split_with(switches, fn
+      {_name, ""} -> false
+      _ -> true
+    end)
+    errors = Enum.map(empty, fn {key, value} -> {"--#{key}", value} end)
+    |> Enum.concat(errors)
+    {valid_switches, commands, errors}
   end
 end

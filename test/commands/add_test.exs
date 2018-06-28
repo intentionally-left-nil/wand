@@ -19,6 +19,10 @@ defmodule AddTest do
       assert Add.validate(command) == {:error, {:invalid_flag, "--sparse"}}
     end
 
+    test "returns help if a string flag is empty" do
+      assert Add.validate(["add", "poison", "--repo=", "--test"]) == {:error, {:invalid_flag, "--repo"}}
+    end
+
     test "returns help if the version is invalid" do
       assert Add.validate(["add", "poison@NOT_A_VERSION"]) ==
                {:error, {:invalid_version, "poison@NOT_A_VERSION"}}
