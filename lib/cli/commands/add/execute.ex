@@ -103,18 +103,18 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp load_file() do
     case WandFile.load() do
       {:ok, file} -> {:ok, file}
-      {:error, reason} -> {:error, :wand_file_read, reason}
+      {:error, reason} -> {:error, :wand_file_load, reason}
     end
   end
 
   defp save_file(file) do
     case WandFile.save(file) do
       :ok -> :ok
-      {:error, reason} -> {:error, :wand_file_write, reason}
+      {:error, reason} -> {:error, :wand_file_save, reason}
     end
   end
 
-  defp handle_error(:wand_file_read, :json_decode_error) do
+  defp handle_error(:wand_file_load, :json_decode_error) do
     """
     # Error
     wand.json is not a valid JSON file.
@@ -125,7 +125,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:invalid_wand_file)
   end
 
-  defp handle_error(:wand_file_read, reason)
+  defp handle_error(:wand_file_load, reason)
        when reason in [:invalid_version, :missing_version, :version_mismatch] do
     """
     # Error
@@ -140,7 +140,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:invalid_wand_file)
   end
 
-  defp handle_error(:wand_file_read, {:file_read_error, :eaccess}) do
+  defp handle_error(:wand_file_load, {:file_read_error, :eaccess}) do
     """
     # Error
     Permission error reading wand.json.
@@ -153,7 +153,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:missing_wand_file)
   end
 
-  defp handle_error(:wand_file_read, {:file_read_error, reason}) do
+  defp handle_error(:wand_file_load, {:file_read_error, reason}) do
     """
     # Error
     Could not find wand.json in the current directory.
@@ -167,7 +167,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:missing_wand_file)
   end
 
-  defp handle_error(:wand_file_read, :invalid_dependencies) do
+  defp handle_error(:wand_file_load, :invalid_dependencies) do
     """
     # Error
     The version field in wand.json is incorrect.
@@ -179,7 +179,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:invalid_wand_file)
   end
 
-  defp handle_error(:wand_file_read, {:invalid_dependency, name}) do
+  defp handle_error(:wand_file_load, {:invalid_dependency, name}) do
     """
     # Error
     A dependency in wand.json is formatted incorrectly.
@@ -231,7 +231,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     error(:package_already_exists)
   end
 
-  defp handle_error(:wand_file_write, reason) do
+  defp handle_error(:wand_file_save, reason) do
     """
     # Error
     Could not write to wand.json
