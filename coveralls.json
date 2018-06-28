@@ -1,6 +1,7 @@
 {
   "skip_files": [
     "deps",
-    "lib/interfaces"
+    "lib/interfaces",
+    "test/support"
   ]
 }
