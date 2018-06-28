@@ -187,14 +187,20 @@ defmodule AddExecuteTest do
     end
 
     test "add a path with an umbrella" do
-      stub_file(opts: %{path: "/path/to/app", in_umbrella: true})
-      package = get_package(details: %Path{path: "/path/to/app", in_umbrella: true})
+      stub_file(opts: %{path: "/path/to/app", in_umbrella: true, optional: true})
+      package = get_package(details: %Path{path: "/path/to/app", in_umbrella: true}, optional: true)
       assert Add.execute([package]) == :ok
     end
 
     test "do not include umbrella if false" do
       stub_file(opts: %{path: "/path/to/app"})
       package = get_package(details: %Path{path: "/path/to/app", in_umbrella: false})
+      assert Add.execute([package]) == :ok
+    end
+
+    test "add a hex package with all the fixings" do
+      stub_file(opts: %{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
+      package = get_package(details: %Hex{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
       assert Add.execute([package]) == :ok
     end
 
