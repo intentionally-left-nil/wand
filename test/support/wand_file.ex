@@ -1,6 +1,7 @@
 defmodule Wand.Test.Helpers.WandFile do
   import Mox
   alias Wand.WandFile
+  alias Wand.WandFile.Dependency
 
   def stub_load(file \\ %WandFile{}) do
     file
@@ -11,6 +12,14 @@ defmodule Wand.Test.Helpers.WandFile do
   def stub_save(file) do
     contents = file |> Poison.encode!(pretty: true)
     expect(Wand.FileMock, :write, fn _path, ^contents -> :ok end)
+  end
+
+  def poison() do
+    %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
+  end
+
+  def mox() do
+    %Dependency{name: "mox", requirement: ">= 0.3.2 and < 0.4.0", opts: %{only: [:test]}}
   end
 
   def stub_cannot_save(file, reason \\ :enoent) do

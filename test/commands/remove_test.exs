@@ -4,6 +4,7 @@ defmodule RemoveTest do
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Commands.Remove
   alias Wand.Test.Helpers
+  alias Wand.WandFile
 
   describe "validate" do
     test "returns help if no args are given" do
@@ -46,6 +47,51 @@ defmodule RemoveTest do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
       assert Remove.execute(["poison"]) == error(:missing_wand_file)
+    end
+
+    test "Error saving the wand file" do
+      file = %WandFile{}
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_cannot_save(file)
+      Helpers.IO.stub_stderr()
+      assert Remove.execute(["poison"]) == error(:file_write_error)
+    end
+
+    test "Does nothing if the dependency is not being used" do
+      file = %WandFile{}
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_save(file)
+      assert Remove.execute(["poison"]) == :ok
+    end
+
+    test "removes the dependency" do
+      file = %WandFile{
+        dependencies: [
+          Helpers.WandFile.poison(),
+          Helpers.WandFile.mox(),
+        ]
+      }
+      Helpers.WandFile.stub_load(file)
+
+      %WandFile{
+        dependencies: [
+          Helpers.WandFile.mox(),
+        ]
+      }
+      |> Helpers.WandFile.stub_save()
+      assert Remove.execute(["poison"]) == :ok
+    end
+
+    test "removes multiple dependencies" do
+      file = %WandFile{
+        dependencies: [
+          Helpers.WandFile.poison(),
+          Helpers.WandFile.mox(),
+        ]
+      }
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_save(%WandFile{})
+      assert Remove.execute(["mox", "poison", "not_present"]) == :ok
     end
   end
 end
