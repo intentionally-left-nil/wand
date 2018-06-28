@@ -48,7 +48,7 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defmodule Hex do
-    defstruct hex_name: nil,
+    defstruct hex: nil,
               organization: nil,
               repo: :hexpm
   end

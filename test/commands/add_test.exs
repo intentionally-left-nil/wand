@@ -52,7 +52,7 @@ defmodule AddTest do
             details: %Hex{
               organization: "mycompany",
               repo: "nothexpm",
-              hex_name: "mypoison"
+              hex: "mypoison"
             }
           }
         ]

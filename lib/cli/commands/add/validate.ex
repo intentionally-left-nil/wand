@@ -89,8 +89,10 @@ defmodule Wand.CLI.Commands.Add.Validate do
   end
 
   defp add_details(package, :hex, switches) do
+    hex = Keyword.get(switches, :hex_name, Map.fetch!(%Hex{}, :hex))
+
     details = %Hex{
-      hex_name: get_flag(switches, :hex_name, %Hex{}),
+      hex: hex,
       organization: get_flag(switches, :organization, %Hex{}),
       repo: get_flag(switches, :repo, %Hex{})
     }
