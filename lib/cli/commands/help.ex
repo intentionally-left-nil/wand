@@ -11,7 +11,7 @@ defmodule Wand.CLI.Commands.Help do
   <pre>
   add         Add dependencies to your project
   help        Get detailed help
-  init        Add the global wand tasks needed to use wand
+  init        Initialize wand for a project
   outdated    List packages that are out of date
   remove      Remove dependencies from your project
   upgrade     Upgrade a dependency in your project
