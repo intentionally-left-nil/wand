@@ -186,6 +186,18 @@ defmodule AddExecuteTest do
       assert Add.execute([package]) == :ok
     end
 
+    test "add a path with an umbrella" do
+      stub_file(opts: %{path: "/path/to/app", in_umbrella: true})
+      package = get_package(details: %Path{path: "/path/to/app", in_umbrella: true})
+      assert Add.execute([package]) == :ok
+    end
+
+    test "do not include umbrella if false" do
+      stub_file(opts: %{path: "/path/to/app"})
+      package = get_package(details: %Path{path: "/path/to/app", in_umbrella: false})
+      assert Add.execute([package]) == :ok
+    end
+
     defp get_package(opts \\ []) do
       fields = %Package{}
       |> Map.to_list()
