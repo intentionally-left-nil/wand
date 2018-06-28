@@ -3,7 +3,7 @@ defmodule AddExecuteTest do
   import Mox
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Commands.Add
-  alias Wand.CLI.Commands.Add.Package
+  alias Wand.CLI.Commands.Add.{Git,Hex,Package, Path}
   alias Wand.Test.Helpers
   alias Wand.WandFile
   alias Wand.WandFile.Dependency
@@ -171,6 +171,18 @@ defmodule AddExecuteTest do
     test "no opts for remaining opts if default" do
       stub_file()
       package = get_package(optional: false, override: false, runtime: true, read_app_file: true)
+      assert Add.execute([package]) == :ok
+    end
+
+    test "add a git package with all the fixings" do
+      stub_file(opts: %{git: "https://github.com/devinus/poison.git", ref: "master", sparse: true, submodules: "myfolder"})
+      package = get_package(details: %Git{git: "https://github.com/devinus/poison.git", ref: "master", sparse: true, submodules: "myfolder"})
+      assert Add.execute([package]) == :ok
+    end
+
+    test "do not add extra git flags" do
+      stub_file(opts: %{git: "https://github.com/devinus/poison.git", })
+      package = get_package(details: %Git{git: "https://github.com/devinus/poison.git", ref: nil, sparse: nil, submodules: false})
       assert Add.execute([package]) == :ok
     end
 

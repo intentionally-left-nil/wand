@@ -62,8 +62,9 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end)
   end
 
-  defp get_opts(package) do
+  defp get_opts(%Package{details: details}=package) do
     get_base_opts(package)
+    |> Keyword.merge(get_detail_opts(details))
     |> Enum.into(%{})
   end
 
@@ -77,6 +78,14 @@ defmodule Wand.CLI.Commands.Add.Execute do
       :runtime
     ]
     |> get_changed(package, %Package{})
+  end
+
+  def get_detail_opts(details) do
+    default = Map.fetch!(details, :__struct__)
+    |> struct()
+
+    Map.keys(details)
+    |> get_changed(details, default)
   end
 
   defp get_changed(keys, config, default) do
