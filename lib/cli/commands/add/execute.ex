@@ -29,18 +29,17 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end
   end
 
-  defp get_dependency(%Package{name: name, requirement: :latest}=package) do
+  defp get_dependency(%Package{name: name, requirement: {:latest, mode}}=package) do
     case Wand.Hex.releases(name) do
       {:ok, [version | _]} ->
-        requirement = get_requirement(version, package.mode)
+        requirement = Wand.Mode.get_requirement(mode, version)
         {:ok, %Dependency{name: name, requirement: requirement}}
       {:error, error} -> {:error, {error, name}}
     end
   end
 
   defp get_dependency(%Package{}=package) do
-    requirement = get_requirement(package.requirement, package.mode)
-    {:ok, %Dependency{name: package.name, requirement: requirement}}
+    {:ok, %Dependency{name: package.name, requirement: package.requirement}}
   end
 
   defp add_dependencies(file, dependencies) do
@@ -50,14 +49,6 @@ defmodule Wand.CLI.Commands.Add.Execute do
         {:error, reason} -> {:halt, {:error, :add_dependency, reason}}
       end
     end)
-  end
-
-  defp get_requirement(version, :normal) do
-    "~> " <> version
-  end
-
-  defp get_requirement(version, :exact) do
-    "== " <> version
   end
 
   defp load_file() do

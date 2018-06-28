@@ -29,6 +29,10 @@ defmodule ModeTest do
     test "Parses 3.1 as 3.1.0" do
       assert Wand.Mode.get_requirement(:caret, "3.1") == ">= 3.1.0 and < 4.0.0"
     end
+
+    test "latest" do
+      assert Wand.Mode.get_requirement(:caret, :latest) == {:latest, :caret}
+    end
   end
 
   describe "exact" do
@@ -43,6 +47,10 @@ defmodule ModeTest do
     test "3.1.2+build1" do
       assert Wand.Mode.get_requirement(:exact, "3.1.2+build1") == "== 3.1.2+build1"
     end
+
+    test "latest" do
+      assert Wand.Mode.get_requirement(:exact, :latest) == {:latest, :exact}
+    end
   end
 
   describe "tilde" do
@@ -56,6 +64,10 @@ defmodule ModeTest do
 
     test "3.1.2+build1" do
       assert Wand.Mode.get_requirement(:tilde, "3.1.2+build1") == "~> 3.1.2+build1"
+    end
+
+    test "latest" do
+      assert Wand.Mode.get_requirement(:tilde, :latest) == {:latest, :tilde}
     end
   end
 end

@@ -17,7 +17,6 @@ defmodule Wand.CLI.Commands.Add do
   ## Options
   The available flags depend on if wand is being used to add a single package, or multiple packages. Flags that can only be used in single-package-mode are denoted with (s).
   <pre>
-  --around            Stay within the minor version provided
   --compile           Run mix compile after adding (default: **true**)
   --compile-env   (s) The environment for the dependency (default: **prod**)
   --dev               Include the dependency in the dev environment
@@ -36,6 +35,7 @@ defmodule Wand.CLI.Commands.Add do
   --sparse        (s) Checkout a given directory inside git
   --submodules    (s) Initialize submodules for the repo
   --test              Include the dependency in the test environment
+  --tilde             Stay within the minor version provided
   --in-umbrella   (s) Sets a path dependency pointing to ../app
   </pre>
   """
@@ -61,17 +61,17 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defmodule Package do
+    @default_requirement Wand.Mode.get_requirement(:caret, :latest)
     defstruct compile: true,
               compile_env: nil,
               details: %Hex{},
               download: true,
               environments: [:all],
-              mode: :normal,
               name: nil,
               optional: nil,
               override: nil,
               read_app_file: nil,
-              requirement: :latest,
+              requirement: @default_requirement,
               runtime: nil
   end
 

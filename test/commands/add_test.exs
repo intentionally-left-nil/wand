@@ -3,7 +3,7 @@ defmodule AddTest do
   import Mox
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
-  
+
   describe "validate" do
     test "returns help if no args are given" do
       assert Add.validate(["add"]) == {:error, :missing_package}
@@ -58,7 +58,7 @@ defmodule AddTest do
 
     test "a package with a specific version" do
       assert Add.validate(["add", "poison@3.1"]) ==
-               {:ok, [%Package{name: "poison", requirement: "3.1"}]}
+               {:ok, [%Package{name: "poison", requirement: ">= 3.1.0 and < 4.0.0"}]}
     end
 
     test "a package only for the test environment" do
@@ -120,12 +120,12 @@ defmodule AddTest do
 
     test "an exact match" do
       assert Add.validate(["add", "ex_doc", "--exact"]) ==
-               {:ok, [%Package{name: "ex_doc", mode: :exact}]}
+               {:ok, [%Package{name: "ex_doc", requirement: {:latest, :exact}}]}
     end
 
     test "Install the closest minor version" do
-      assert Add.validate(["add", "ex_doc", "--around"]) ==
-               {:ok, [%Package{name: "ex_doc", mode: :around}]}
+      assert Add.validate(["add", "ex_doc", "--tilde"]) ==
+               {:ok, [%Package{name: "ex_doc", requirement: {:latest, :tilde}}]}
     end
 
     test "a local umbrella package" do
@@ -181,7 +181,7 @@ defmodule AddTest do
          [
            %Package{
              name: "poison",
-             requirement: "3.1",
+             requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
                uri: "https://github.com/devinus/poison.git"
              }
@@ -197,7 +197,7 @@ defmodule AddTest do
          [
            %Package{
              name: "poison",
-             requirement: "3.1",
+             requirement: ">= 3.1.0 and < 4.0.0",
              details: %Git{
                uri: "git@github.com:devinus/poison"
              }

@@ -17,10 +17,16 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
     packages =
       Enum.map(names, fn name ->
-        {name, requirement} = split_name(name)
+        {name, version} = split_name(name)
         type = package_type(switches)
+        requirement = get_mode(switches)
+        |> Wand.Mode.get_requirement(version)
 
-        %Package{base_package | name: name, requirement: requirement}
+        %Package{
+          base_package |
+          name: name,
+          requirement: requirement,
+        }
         |> add_details(type, switches)
       end)
 
@@ -36,7 +42,6 @@ defmodule Wand.CLI.Commands.Add.Validate do
       compile_env: Keyword.get(switches, :compile_env),
       download: download,
       environments: get_environments(switches),
-      mode: get_mode(switches),
       optional: Keyword.get(switches, :optional),
       override: Keyword.get(switches, :override),
       read_app_file: Keyword.get(switches, :read_app_file),
@@ -46,7 +51,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp split_name(package) do
     case String.split(package, "@", parts: 2) do
-      [package, name] -> {package, name}
+      [package, version] -> {package, version}
       [package] -> {package, :latest}
     end
   end
@@ -117,12 +122,12 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp get_mode(switches) do
     exact = Keyword.get(switches, :exact)
-    around = Keyword.get(switches, :around)
+    tilde = Keyword.get(switches, :tilde)
 
     cond do
       exact -> :exact
-      around -> :around
-      true -> :normal
+      tilde -> :tilde
+      true -> :caret
     end
   end
 
@@ -157,7 +162,6 @@ defmodule Wand.CLI.Commands.Add.Validate do
         read_app_file: :boolean,
       ],
       multi_package: [
-        around: :boolean,
         compile: :boolean,
         dev: :boolean,
         download: :boolean,
@@ -169,7 +173,8 @@ defmodule Wand.CLI.Commands.Add.Validate do
         prod: :boolean,
         repo: :string,
         runtime: :boolean,
-        test: :boolean
+        test: :boolean,
+        tilde: :boolean
       ],
     }
 

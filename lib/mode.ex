@@ -3,6 +3,7 @@ defmodule Wand.Mode do
   @type t :: :caret | :tilde | :exact
   @no_patch ~r/^(\d+)\.(\d+)($|\+.*$|-.*$)/
 
+  def get_requirement(mode, :latest), do: {:latest, mode}
   def get_requirement(mode, version) when is_binary(version) do
     case parse(version) do
       {:ok, version} -> get_requirement(mode, version)
