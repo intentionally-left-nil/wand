@@ -81,8 +81,17 @@ defmodule Wand.CLI.Commands.Init do
     end
   end
 
-  defp get_path([], switches), do: {:ok, {"./", switches}}
-  defp get_path([path], switches), do: {:ok, {path, switches}}
+  defp get_path([], switches), do: {:ok, {"wand.json", switches}}
+
+  defp get_path([path], switches) do
+    path = case Path.basename(path) do
+      "wand.json" -> path
+      _ -> Path.join(path, "wand.json")
+    end
+
+    {:ok, {path, switches}}
+  end
+
   defp get_path(_, _), do: {:error, :wrong_command}
 
   defp can_write?(path, switches) do
