@@ -60,7 +60,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     # Error
     Could not find wand.json in the current directory.
 
-    Make sure you are running `wand add` from the root folder of your project, and that wand.json exists. If you are missing wand.json, type `wand init` to create one.
+    Make sure you are running wand from the root folder of your project, and that wand.json exists. If you are missing wand.json, type `wand init` to create one.
 
     Detailed error: #{:file.format_error(reason)}
     """
@@ -74,7 +74,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     # Error
     The version field in wand.json is incorrect.
 
-    Either the key is missing, or it is not a map. Please edit the file, and then re-run wand add.
+    Either the key is missing, or it is not a map. Please edit the file, and then try again.
     """
     |> Display.error()
 
