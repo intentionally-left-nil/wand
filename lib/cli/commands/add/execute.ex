@@ -10,7 +10,9 @@ defmodule Wand.CLI.Commands.Add.Execute do
     with {:ok, file} <- WandFileWithHelp.load(),
          {:ok, dependencies} <- get_dependencies(packages),
          {:ok, file} <- add_dependencies(file, dependencies),
-         :ok <- WandFileWithHelp.save(file) do
+         :ok <- WandFileWithHelp.save(file),
+         :ok <- download(packages),
+         :ok <- compile(packages) do
       :ok
     else
       {:error, :wand_file_load, reason} ->
@@ -108,6 +110,24 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end)
   end
 
+  defp download([%Package{download: download} | _]) when not download, do: :ok
+
+  defp download(_) do
+    case Wand.CLI.Mix.update_deps() do
+      :ok -> :ok
+      {:error, reason} -> {:error, :download_failed, reason}
+    end
+  end
+
+  defp compile([%Package{compile: compile} | _]) when not compile, do: :ok
+
+  defp compile(_) do
+    case Wand.CLI.Mix.compile() do
+      :ok -> :ok
+      {:error, reason} -> {:error, :compile_failed, reason}
+    end
+  end
+
   defp handle_error(:dependency, {:not_found, name}) do
     """
     # Error
@@ -146,5 +166,31 @@ defmodule Wand.CLI.Commands.Add.Execute do
     |> Display.error()
 
     error(:package_already_exists)
+  end
+
+  defp handle_error(:download_failed, _reason) do
+    """
+    # Partial Success
+    Unable to run mix deps.get
+
+    The wand.json file was successfully updated,
+    however mix deps.get failed.
+    """
+    |> Display.error()
+
+    error(:install_deps_error)
+  end
+
+  defp handle_error(:compile_failed, _reason) do
+    """
+    # Partial Success
+    Unable to run mix compile
+
+    The wand.json file was successfully updated,
+    however mix compile failed.
+    """
+    |> Display.error()
+
+    error(:install_deps_error)
   end
 end
