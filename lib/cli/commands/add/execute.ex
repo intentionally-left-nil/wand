@@ -11,8 +11,8 @@ defmodule Wand.CLI.Commands.Add.Execute do
          {:ok, dependencies} <- get_dependencies(packages),
          {:ok, file} <- add_dependencies(file, dependencies),
          :ok <- WandFileWithHelp.save(file),
-         :ok <- download(),
-         :ok <- compile() do
+         :ok <- download(packages),
+         :ok <- compile(packages) do
       :ok
     else
       {:error, :wand_file_load, reason} ->
@@ -110,14 +110,18 @@ defmodule Wand.CLI.Commands.Add.Execute do
     end)
   end
 
-  defp download() do
+  defp download([%Package{download: download} |_]) when not download, do: :ok
+
+  defp download(_) do
     case Wand.CLI.Mix.update_deps() do
       :ok -> :ok
       {:error, reason} -> {:error, :download_failed, reason}
     end
   end
 
-  defp compile() do
+  defp compile([%Package{compile: compile} |_]) when not compile, do: :ok
+
+  defp compile(_) do
     case Wand.CLI.Mix.compile() do
       :ok -> :ok
       {:error, reason} -> {:error, :compile_failed, reason}
