@@ -47,7 +47,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
       compile: compile,
       compile_env: get_flag(switches, :compile_env),
       download: download,
-      environments: get_environments(switches),
+      only: get_environments(switches),
       optional: get_flag(switches, :optional),
       override: get_flag(switches, :override),
       read_app_file: get_flag(switches, :read_app_file),
@@ -124,7 +124,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
       |> add_custom_environments(switches)
 
     case environments do
-      [] -> [:all]
+      [] -> nil
       environments -> environments
     end
   end

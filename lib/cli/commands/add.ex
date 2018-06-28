@@ -64,7 +64,7 @@ defmodule Wand.CLI.Commands.Add do
               compile_env: "prod",
               details: %Hex{},
               download: true,
-              environments: [:all],
+              only: nil,
               name: nil,
               optional: false,
               override: false,

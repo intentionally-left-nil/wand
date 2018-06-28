@@ -68,17 +68,17 @@ defmodule AddTest do
 
     test "a package only for the test environment" do
       assert Add.validate(["add", "poison", "--test"]) ==
-               {:ok, [%Package{name: "poison", environments: [:test]}]}
+               {:ok, [%Package{name: "poison", only: [:test]}]}
     end
 
     test "a package for dev and test" do
       assert Add.validate(["add", "poison", "--test", "--dev"]) ==
-               {:ok, [%Package{name: "poison", environments: [:test, :dev]}]}
+               {:ok, [%Package{name: "poison", only: [:test, :dev]}]}
     end
 
     test "a package for a custom env" do
       assert Add.validate(["add", "ex_doc", "--env=docs"]) ==
-               {:ok, [%Package{name: "ex_doc", environments: [:docs]}]}
+               {:ok, [%Package{name: "ex_doc", only: [:docs]}]}
     end
 
     test "umbrella package" do
@@ -90,7 +90,7 @@ defmodule AddTest do
       command = OptionParser.split("add ex_doc --env=dogs --env=cat --prod")
 
       assert Add.validate(command) ==
-               {:ok, [%Package{name: "ex_doc", environments: [:prod, :dogs, :cat]}]}
+               {:ok, [%Package{name: "ex_doc", only: [:prod, :dogs, :cat]}]}
     end
 
     test "set the runtime flag to false" do
