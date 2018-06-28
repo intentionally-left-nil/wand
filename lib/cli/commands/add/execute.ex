@@ -8,13 +8,10 @@ defmodule Wand.CLI.Commands.Add.Execute do
   def execute(packages) do
     with \
       {:ok, file} <- load_file(),
-      {:ok, dependencies} <- get_dependencies(packages)
+      {:ok, dependencies} <- get_dependencies(packages),
+      {:ok, file} <- add_dependencies(file, dependencies)
     do
-      dependencies
-      |> Enum.reduce(file, fn (dependency, file) ->
-         WandFile.add(file, dependency) |> elem(1)
-       end)
-      |> WandFile.save()
+      WandFile.save(file)
     else
       {:error, step, reason} -> handle_error(step, reason)
     end
@@ -38,6 +35,13 @@ defmodule Wand.CLI.Commands.Add.Execute do
         {:ok, %Dependency{name: name, requirement: requirement}}
       {:error, error} -> {:error, {error, name}}
     end
+  end
+
+  defp add_dependencies(file, dependencies) do
+    file = Enum.reduce(dependencies, file, fn (dependency, file) ->
+       WandFile.add(file, dependency) |> elem(1)
+     end)
+     {:ok, file}
   end
 
   defp get_requirement(version, :normal) do
