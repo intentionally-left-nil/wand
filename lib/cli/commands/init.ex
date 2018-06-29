@@ -75,7 +75,8 @@ defmodule Wand.CLI.Commands.Init do
     with :ok <- can_write?(path, switches),
          {:ok, deps} <- get_dependencies(path),
          {:ok, file} <- add_dependencies(file, deps),
-         :ok <- WandFileWithHelp.save(file, path) do
+         :ok <- WandFileWithHelp.save(file, path),
+         :ok <- update_mix_file(path) do
       :ok
     else
       {:error, :wand_file_save, reason} ->
@@ -149,6 +150,23 @@ defmodule Wand.CLI.Commands.Init do
 
   defp convert_dependency(_), do: {:error, :invalid_dependency}
 
+  defp update_mix_file(path) do
+    mix_file = Path.dirname(path)
+    |> Path.join("mix.exs")
+
+    with \
+      true <- @f.exists?(mix_file),
+      {:ok, contents} <- @f.read(mix_file),
+      true <- String.contains?(contents, "deps: deps()"),
+      new_contents <- String.replace(contents, "deps: deps()", "deps: Mix.Tasks.WandCore.Deps.run([])"),
+      :ok <- @f.write(mix_file, new_contents)
+    do
+      :ok
+    else
+      _ -> {:error, :unable_to_modify_mix, nil}
+    end
+  end
+
   defp handle_error(:file_exists, path) do
     """
     # Error
@@ -174,5 +192,16 @@ defmodule Wand.CLI.Commands.Init do
     |> Display.error()
 
     error(:wand_core_api_error)
+  end
+
+  defp handle_error(:unable_to_modify_mix, nil) do
+    """
+    # Partial Success
+    wand.json was successfully created with your dependencies, however your mix.exs file could not be updated to use it. To complete the process, you need to change your deps() in mix.exs to the following:
+
+    deps: Mix.Tasks.WandCore.Deps.run([])
+    """
+    |> Display.error()
+    error(:mix_file_not_updated)
   end
 end
