@@ -11,7 +11,7 @@ defmodule Wand.Test.Helpers.WandFile do
 
   def stub_save(file) do
     contents = file |> WandCore.Poison.encode!(pretty: true)
-    expect(Wand.FileMock, :write, fn _path, ^contents -> :ok end)
+    expect(WandCore.FileMock, :write, fn _path, ^contents -> :ok end)
   end
 
   def poison() do
@@ -24,11 +24,11 @@ defmodule Wand.Test.Helpers.WandFile do
 
   def stub_cannot_save(file, reason \\ :enoent) do
     contents = file |> WandCore.Poison.encode!(pretty: true)
-    expect(Wand.FileMock, :write, fn _path, ^contents -> {:error, reason} end)
+    expect(WandCore.FileMock, :write, fn _path, ^contents -> {:error, reason} end)
   end
 
   def stub_no_file(reason \\ :enoent) do
-    expect(Wand.FileMock, :read, fn _path -> {:error, reason} end)
+    expect(WandCore.FileMock, :read, fn _path -> {:error, reason} end)
   end
 
   def stub_invalid_file() do
@@ -56,7 +56,7 @@ defmodule Wand.Test.Helpers.WandFile do
       }
       |> WandCore.Poison.encode!(pretty: true)
 
-    expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
+    expect(WandCore.FileMock, :read, fn _path -> {:ok, contents} end)
   end
 
   def stub_file_wrong_version(version) do
@@ -81,6 +81,6 @@ defmodule Wand.Test.Helpers.WandFile do
   end
 
   defp stub_read(contents) do
-    expect(Wand.FileMock, :read, fn _path -> {:ok, contents} end)
+    expect(WandCore.FileMock, :read, fn _path -> {:ok, contents} end)
   end
 end

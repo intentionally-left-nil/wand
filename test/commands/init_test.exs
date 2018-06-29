@@ -89,7 +89,7 @@ defmodule InitTest do
     test ":mix_file_not_updated when the mix_file doesn't have deps" do
       stub_exists("wand.json", false)
       stub_exists("./mix.exs", true)
-      expect(Wand.FileMock, :read, fn "./mix.exs" -> {:ok, "deps: deps(:prod)"} end)
+      expect(WandCore.FileMock, :read, fn "./mix.exs" -> {:ok, "deps: deps(:prod)"} end)
       Helpers.System.stub_get_deps()
       file = get_default_file()
       Helpers.WandFile.stub_save(file)
@@ -97,7 +97,7 @@ defmodule InitTest do
     end
 
     defp stub_exists(path, exists) do
-      expect(Wand.FileMock, :exists?, fn ^path -> exists end)
+      expect(WandCore.FileMock, :exists?, fn ^path -> exists end)
     end
   end
 
@@ -128,14 +128,14 @@ defmodule InitTest do
   end
 
   defp stub_read_mix_exs(path) do
-    expect(Wand.FileMock, :read, fn ^path -> {:ok, "deps: deps(), app: :test"} end)
+    expect(WandCore.FileMock, :read, fn ^path -> {:ok, "deps: deps(), app: :test"} end)
   end
 
   defp stub_all_writing(mix_path, wand_path, wand_file) do
     mix_contents = "deps: Mix.Tasks.WandCore.Deps.run([]), app: :test"
-    wand_contents = wand_file |> Poison.encode!(pretty: true)
+    wand_contents = wand_file |> WandCore.Poison.encode!(pretty: true)
 
-    expect(Wand.FileMock, :write, 2, fn
+    expect(WandCore.FileMock, :write, 2, fn
       ^mix_path, ^mix_contents -> :ok
       ^wand_path, ^wand_contents -> :ok
     end)

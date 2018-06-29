@@ -35,8 +35,7 @@ defmodule Wand.MixProject do
 
   defp aliases do
     [
-      build: [&build_cli/1],
-      copy_common_core: [&copy_common_core/1],
+      build: [&build_cli/1]
     ]
   end
 
@@ -47,16 +46,11 @@ defmodule Wand.MixProject do
     File.cp("../wand-archive/cli/wand", "../wand-archive/cli/wand-#{@version}")
   end
 
-  defp copy_common_core(_) do
-    Mix.Tasks.Compile.run([])
-    File.cp_r("lib/common", "../wand-core/lib/common")
-  end
-
   defp deps do
     [
       {:earmark, "~> 1.2"},
       {:httpoison, "~> 1.2"},
-      {:poison, "~> 3.1"},
+      {:wand_core, git: "https://github.com/AnilRedshift/wand-core.git"},
       {:excoveralls, "~> 0.9.1", only: :test},
       {:mox, "~> 0.3.2", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev},
