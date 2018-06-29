@@ -3,7 +3,7 @@ defmodule WandFileWithHelpTest do
   import Mox
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.WandFileWithHelp
-  alias Wand.WandFile
+  alias WandCore.WandFile
   alias Wand.Test.Helpers
 
   setup :verify_on_exit!

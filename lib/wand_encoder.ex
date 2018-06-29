@@ -1,6 +1,6 @@
 defmodule Wand.WandEncoder do
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
   alias Poison.Encoder
 
   defimpl Poison.Encoder, for: WandFile do

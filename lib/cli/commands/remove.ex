@@ -1,6 +1,6 @@
 defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
-  alias Wand.WandFile
+  alias WandCore.WandFile
   alias Wand.CLI.WandFileWithHelp
   import Wand.CLI.Errors, only: [error: 1]
 

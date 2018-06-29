@@ -4,8 +4,8 @@ defmodule InitTest do
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Commands.Init
   alias Wand.Test.Helpers
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
 
   describe "validate" do
     test "returns help if invalid flags are given" do

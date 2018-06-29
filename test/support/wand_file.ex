@@ -1,7 +1,7 @@
 defmodule Wand.Test.Helpers.WandFile do
   import Mox
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
 
   def stub_load(file \\ %WandFile{}) do
     file

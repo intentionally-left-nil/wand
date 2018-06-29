@@ -1,8 +1,8 @@
 defmodule WandFileTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
 
   setup :verify_on_exit!
 
