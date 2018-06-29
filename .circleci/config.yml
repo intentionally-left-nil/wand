@@ -10,9 +10,9 @@ jobs:
 
     steps:
       - checkout
+      - run: mix archive.install github anilredshift/wand-core --force
       - run: mix local.hex --force
       - run: mix local.rebar --force
-      - run: mix archive.install github anilredshift/wand-core --force
 
       - restore_cache:
           keys:
