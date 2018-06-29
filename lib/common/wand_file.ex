@@ -40,7 +40,7 @@ defmodule WandCore.WandFile do
   end
 
   def save(%WandFile{} = file, path \\ "wand.json") do
-    contents = Poison.encode!(file, pretty: true)
+    contents = WandCore.Poison.encode!(file, pretty: true)
     @f.write(path, contents)
   end
 
@@ -107,7 +107,7 @@ defmodule WandCore.WandFile do
   end
 
   defp parse(contents) do
-    case Poison.decode(contents, keys: :atoms) do
+    case WandCore.Poison.decode(contents, keys: :atoms) do
       {:ok, data} -> {:ok, data}
       {:error, _reason} -> {:error, :json_decode_error}
     end

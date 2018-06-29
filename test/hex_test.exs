@@ -80,7 +80,7 @@ defmodule HexTest do
   end
 
   defp stub_http(:ok, status, %{} = contents),
-    do: stub_http(:ok, status, Poison.encode!(contents))
+    do: stub_http(:ok, status, WandCore.Poison.encode!(contents))
 
   defp stub_http(:ok, status, contents) do
     response = %Response{
