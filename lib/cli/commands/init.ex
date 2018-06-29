@@ -151,16 +151,16 @@ defmodule Wand.CLI.Commands.Init do
   defp convert_dependency(_), do: {:error, :invalid_dependency}
 
   defp update_mix_file(path) do
-    mix_file = Path.dirname(path)
-    |> Path.join("mix.exs")
+    mix_file =
+      Path.dirname(path)
+      |> Path.join("mix.exs")
 
-    with \
-      true <- @f.exists?(mix_file),
-      {:ok, contents} <- @f.read(mix_file),
-      true <- String.contains?(contents, "deps: deps()"),
-      new_contents <- String.replace(contents, "deps: deps()", "deps: Mix.Tasks.WandCore.Deps.run([])"),
-      :ok <- @f.write(mix_file, new_contents)
-    do
+    with true <- @f.exists?(mix_file),
+         {:ok, contents} <- @f.read(mix_file),
+         true <- String.contains?(contents, "deps: deps()"),
+         new_contents <-
+           String.replace(contents, "deps: deps()", "deps: Mix.Tasks.WandCore.Deps.run([])"),
+         :ok <- @f.write(mix_file, new_contents) do
       :ok
     else
       _ -> {:error, :unable_to_modify_mix, nil}
@@ -202,6 +202,7 @@ defmodule Wand.CLI.Commands.Init do
     deps: Mix.Tasks.WandCore.Deps.run([])
     """
     |> Display.error()
+
     error(:mix_file_not_updated)
   end
 end

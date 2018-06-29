@@ -134,6 +134,7 @@ defmodule InitTest do
   defp stub_all_writing(mix_path, wand_path, wand_file) do
     mix_contents = "deps: Mix.Tasks.WandCore.Deps.run([]), app: :test"
     wand_contents = wand_file |> Poison.encode!(pretty: true)
+
     expect(Wand.FileMock, :write, 2, fn
       ^mix_path, ^mix_contents -> :ok
       ^wand_path, ^wand_contents -> :ok
