@@ -5,8 +5,8 @@ defmodule AddExecuteTest do
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
   alias Wand.Test.Helpers
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
 
   setup :verify_on_exit!
   setup :set_mox_global

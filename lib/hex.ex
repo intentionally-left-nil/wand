@@ -12,7 +12,7 @@ defmodule Wand.Hex do
   end
 
   defp parse_response({:ok, %Response{status_code: 200, body: body}}) do
-    Poison.decode(body)
+    WandCore.Poison.decode(body)
     |> parse_json
   end
 

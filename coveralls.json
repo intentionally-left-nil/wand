@@ -2,6 +2,8 @@
   "skip_files": [
     "deps",
     "lib/interfaces",
-    "test/support"
+    "test/support",
+    "lib/common/poison",
+    "lib/common/file.ex"
   ]
 }

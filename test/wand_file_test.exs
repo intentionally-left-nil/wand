@@ -1,8 +1,8 @@
 defmodule WandFileTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
 
   setup :verify_on_exit!
 
@@ -33,32 +33,32 @@ defmodule WandFileTest do
     end
 
     test ":invalid_version if the version is nil" do
-      json = Poison.encode!(%{version: nil, dependencies: %{}})
+      json = WandCore.Poison.encode!(%{version: nil, dependencies: %{}})
       stub_read(:ok, "wand.json", json)
       assert WandFile.load() == {:error, :invalid_version}
     end
 
     test ":invalid version if the version is bad" do
-      json = Poison.encode!(%{version: "1.0", dependencies: %{}})
+      json = WandCore.Poison.encode!(%{version: "1.0", dependencies: %{}})
       stub_read(:ok, "wand.json", json)
       assert WandFile.load() == {:error, :invalid_version}
     end
 
     test ":version_mismatch if the version is too high" do
-      json = Poison.encode!(%{version: "2.0.0", dependencies: %{}})
+      json = WandCore.Poison.encode!(%{version: "2.0.0", dependencies: %{}})
       stub_read(:ok, "wand.json", json)
       assert WandFile.load() == {:error, :version_mismatch}
     end
 
     test ":invalid_dependencies when the key is not a map" do
-      json = Poison.encode!(%{version: "1.0.0", dependencies: []})
+      json = WandCore.Poison.encode!(%{version: "1.0.0", dependencies: []})
       stub_read(:ok, "wand.json", json)
       assert WandFile.load() == {:error, :invalid_dependencies}
     end
 
     test ":invalid dependency when a dependency is invalid" do
       json =
-        Poison.encode!(%{
+        WandCore.Poison.encode!(%{
           version: "1.0.0",
           dependencies: %{
             mox: "== == 1.0.0"
@@ -102,7 +102,7 @@ defmodule WandFileTest do
           version: file.version,
           dependencies: %{}
         }
-        |> Poison.encode!(pretty: true)
+        |> WandCore.Poison.encode!(pretty: true)
 
       stub_write(:error, "wand.json", contents)
       assert WandFile.save(file) == {:error, :enoent}
@@ -116,7 +116,7 @@ defmodule WandFileTest do
           version: file.version,
           dependencies: %{}
         }
-        |> Poison.encode!(pretty: true)
+        |> WandCore.Poison.encode!(pretty: true)
 
       stub_write(:ok, "wand.json", expected)
       assert WandFile.save(file) == :ok
@@ -133,7 +133,7 @@ defmodule WandFileTest do
             "poison" => "~> 3.1"
           }
         }
-        |> Poison.encode!(pretty: true)
+        |> WandCore.Poison.encode!(pretty: true)
 
       stub_write(:ok, "wand.json", expected)
       WandFile.save(file)
@@ -169,7 +169,7 @@ defmodule WandFileTest do
   end
 
   defp stub_read_valid(path \\ "wand.json") do
-    contents = valid_deps() |> Poison.encode!(pretty: true)
+    contents = valid_deps() |> WandCore.Poison.encode!(pretty: true)
     stub_read(:ok, path, contents)
   end
 

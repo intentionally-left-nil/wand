@@ -18,7 +18,7 @@ defmodule Wand.CLI.Mix do
 
   def get_deps(root) do
     case mix("wand_core.get_deps", get_output: true, cd: root) do
-      {:ok, message} -> Poison.decode(message)
+      {:ok, message} -> WandCore.Poison.decode(message)
       error -> error
     end
   end

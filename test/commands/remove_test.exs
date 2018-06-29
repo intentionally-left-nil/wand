@@ -4,7 +4,7 @@ defmodule RemoveTest do
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Commands.Remove
   alias Wand.Test.Helpers
-  alias Wand.WandFile
+  alias WandCore.WandFile
 
   describe "validate" do
     test "returns help if no args are given" do

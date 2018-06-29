@@ -1,6 +1,6 @@
-defmodule Wand.WandFile do
-  alias Wand.WandFile
-  @f Wand.Interfaces.File.impl()
+defmodule WandCore.WandFile do
+  alias WandCore.WandFile
+  @f WandCore.Interfaces.File.impl()
   @requirement "~> 1.0"
   @vsn "1.0.0"
 
@@ -40,14 +40,14 @@ defmodule Wand.WandFile do
   end
 
   def save(%WandFile{} = file, path \\ "wand.json") do
-    contents = Poison.encode!(file, pretty: true)
+    contents = WandCore.Poison.encode!(file, pretty: true)
     @f.write(path, contents)
   end
 
   defp validate(data) do
     with {:ok, version} <- validate_version(extract_version(data)),
          {:ok, dependencies} <- validate_dependencies(Map.get(data, :dependencies, %{})) do
-      {:ok, %Wand.WandFile{version: to_string(version), dependencies: dependencies}}
+      {:ok, %WandCore.WandFile{version: to_string(version), dependencies: dependencies}}
     else
       error -> error
     end
@@ -107,7 +107,7 @@ defmodule Wand.WandFile do
   end
 
   defp parse(contents) do
-    case Poison.decode(contents, keys: :atoms) do
+    case WandCore.Poison.decode(contents, keys: :atoms) do
       {:ok, data} -> {:ok, data}
       {:error, _reason} -> {:error, :json_decode_error}
     end

@@ -1,9 +1,9 @@
 defmodule Wand.WandEncoder do
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
-  alias Poison.Encoder
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
+  alias WandCore.Poison.Encoder
 
-  defimpl Poison.Encoder, for: WandFile do
+  defimpl WandCore.Poison.Encoder, for: WandFile do
     @default_indent 2
     @default_offset 0
 

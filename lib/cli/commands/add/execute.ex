@@ -1,7 +1,7 @@
 defmodule Wand.CLI.Commands.Add.Execute do
   alias Wand.CLI.Commands.Add.Package
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.Display
   import Wand.CLI.Errors, only: [error: 1]

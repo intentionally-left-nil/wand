@@ -35,7 +35,8 @@ defmodule Wand.MixProject do
 
   defp aliases do
     [
-      build: [&build_cli/1]
+      build: [&build_cli/1],
+      copy_common_core: [&copy_common_core/1],
     ]
   end
 
@@ -44,6 +45,11 @@ defmodule Wand.MixProject do
     Mix.Tasks.Escript.Build.run([])
     File.rename("wand", "../wand-archive/cli/wand")
     File.cp("../wand-archive/cli/wand", "../wand-archive/cli/wand-#{@version}")
+  end
+
+  defp copy_common_core(_) do
+    Mix.Tasks.Compile.run([])
+    File.cp_r("lib/common", "../wand-core/lib/common")
   end
 
   defp deps do

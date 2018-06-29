@@ -1,12 +1,12 @@
 defmodule Wand.CLI.Commands.Init do
   @behaviour Wand.CLI.Command
   alias Wand.CLI.Display
-  alias Wand.WandFile
-  alias Wand.WandFile.Dependency
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
   import Wand.CLI.Errors, only: [error: 1]
 
-  @f Wand.Interfaces.File.impl()
+  @f WandCore.Interfaces.File.impl()
 
   @moduledoc """
   Convert an elixir project to use wand for dependencies.
