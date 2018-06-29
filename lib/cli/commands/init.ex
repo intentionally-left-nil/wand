@@ -71,6 +71,7 @@ defmodule Wand.CLI.Commands.Init do
 
   def execute({path, switches}) do
     file = %WandFile{}
+
     with :ok <- can_write?(path, switches),
          {:ok, deps} <- get_dependencies(path),
          {:ok, file} <- add_dependencies(file, deps),
@@ -108,13 +109,17 @@ defmodule Wand.CLI.Commands.Init do
   end
 
   defp get_dependencies(path) do
-    deps = Path.dirname(path)
-    |> Wand.CLI.Mix.get_deps()
+    deps =
+      Path.dirname(path)
+      |> Wand.CLI.Mix.get_deps()
+
     case deps do
       {:ok, deps} ->
         Enum.map(deps, &convert_dependency/1)
         |> validate_dependencies()
-      {:error, reason} -> {:error, :get_deps, reason}
+
+      {:error, reason} ->
+        {:error, :get_deps, reason}
     end
   end
 
@@ -123,7 +128,9 @@ defmodule Wand.CLI.Commands.Init do
       nil ->
         dependencies = Enum.unzip(dependencies) |> elem(1)
         {:ok, dependencies}
-      {:error, error} -> {:error, :get_deps, error}
+
+      {:error, error} ->
+        {:error, :get_deps, error}
     end
   end
 
@@ -139,6 +146,7 @@ defmodule Wand.CLI.Commands.Init do
     opts = Enum.into(opts, %{}, fn [key, val] -> {String.to_atom(key), val} end)
     {:ok, %Dependency{name: name, requirement: requirement, opts: opts}}
   end
+
   defp convert_dependency(_), do: {:error, :invalid_dependency}
 
   defp handle_error(:file_exists, path) do
