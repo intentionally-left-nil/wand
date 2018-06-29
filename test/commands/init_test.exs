@@ -96,6 +96,28 @@ defmodule InitTest do
       assert Init.execute({"wand.json", []}) == error(:mix_file_not_updated)
     end
 
+    test "Regression test: initialize a path with git" do
+      stub_exists("wand.json", false)
+      stub_exists("./mix.exs", false)
+
+      [
+        ["wand_core", [["git", "https://github.com/AnilRedshift/wand-core.git"]]]
+      ]
+      |> Helpers.System.stub_get_deps()
+
+      %WandFile{
+        dependencies: [
+          %Dependency{
+            name: "wand_core",
+            opts: %{git: "https://github.com/AnilRedshift/wand-core.git"}
+          }
+        ]
+      }
+      |> Helpers.WandFile.stub_save()
+
+      assert Init.execute({"wand.json", []}) == error(:mix_file_not_updated)
+    end
+
     defp stub_exists(path, exists) do
       expect(WandCore.FileMock, :exists?, fn ^path -> exists end)
     end

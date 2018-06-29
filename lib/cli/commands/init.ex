@@ -141,6 +141,9 @@ defmodule Wand.CLI.Commands.Init do
     end)
   end
 
+  defp convert_dependency([name, opts]) when is_list(opts),
+    do: convert_dependency([name, nil, opts])
+
   defp convert_dependency([name, requirement]), do: convert_dependency([name, requirement, []])
 
   defp convert_dependency([name, requirement, opts]) do

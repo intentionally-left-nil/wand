@@ -34,13 +34,16 @@ defmodule Wand.Test.Helpers.System do
   end
 
   def stub_get_deps() do
-    message =
-      [
-        ["earmark", "~> 1.2"],
-        ["mox", "~> 0.3.2", [["only", ":test"]]],
-        ["ex_doc", ">= 0.0.0", [["only", ":dev"]]]
-      ]
-      |> WandCore.Poison.encode!()
+    [
+      ["earmark", "~> 1.2"],
+      ["mox", "~> 0.3.2", [["only", ":test"]]],
+      ["ex_doc", ">= 0.0.0", [["only", ":dev"]]]
+    ]
+    |> stub_get_deps()
+  end
+
+  def stub_get_deps(deps) do
+    message = WandCore.Poison.encode!(deps)
 
     expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {message, 0} end)
   end
