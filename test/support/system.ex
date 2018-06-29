@@ -37,6 +37,10 @@ defmodule Wand.Test.Helpers.System do
     message = [["mox","~> 0.3.2",[["only","test"]]],["ex_doc",">= 0.0.0",[["only","dev"]]]]
     |> Poison.encode!()
 
-    expect(Wand.SystemMock, :cmd, fn "mix", ["wand.get_deps"], _opts -> {message, 0} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {message, 0} end)
+  end
+
+  def stub_failed_get_deps() do
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {"", 1} end)
   end
 end

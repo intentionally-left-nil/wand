@@ -67,8 +67,15 @@ defmodule InitTest do
 
     test ":file_write_error when saving the file" do
       stub_exists("wand.json", false)
+      Helpers.System.stub_get_deps()
       Helpers.WandFile.stub_cannot_save(%WandFile{})
       assert Init.execute({"wand.json", []}) == error(:file_write_error)
+    end
+
+    test ":wand_core_api_error when get_deps fails" do
+      stub_exists("wand.json", false)
+      Helpers.System.stub_failed_get_deps()
+      assert Init.execute({"wand.json", []}) == error(:wand_core_api_error)
     end
 
     defp stub_exists(path, exists) do

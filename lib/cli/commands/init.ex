@@ -69,8 +69,10 @@ defmodule Wand.CLI.Commands.Init do
   end
 
   def execute({path, switches}) do
+    file = %WandFile{}
     with :ok <- can_write?(path, switches),
-         :ok <- WandFileWithHelp.save(%WandFile{}, path) do
+         {:ok, deps} <- get_deps(path),
+         :ok <- WandFileWithHelp.save(file, path) do
       :ok
     else
       {:error, :wand_file_save, reason} ->
@@ -103,6 +105,15 @@ defmodule Wand.CLI.Commands.Init do
     end
   end
 
+  defp get_deps(path) do
+    deps = Path.dirname(path)
+    |> Wand.CLI.Mix.get_deps()
+    case deps do
+      {:ok, deps} -> {:ok, deps}
+      {:error, reason} -> {:error, :get_deps, reason}
+    end
+  end
+
   defp handle_error(:file_exists, path) do
     """
     # Error
@@ -115,5 +126,18 @@ defmodule Wand.CLI.Commands.Init do
     |> Display.error()
 
     error(:file_already_exists)
+  end
+
+  defp handle_error(:get_deps, _reason) do
+    """
+    # Error
+    Unable to read existing deps
+
+    mix wand_core.get_deps did not return successfully.
+    Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
+    """
+    |> Display.error()
+
+    error(:wand_core_api_error)
   end
 end

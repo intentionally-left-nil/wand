@@ -41,6 +41,11 @@ defmodule MixTest do
 
   test "get_deps" do
     Helpers.System.stub_get_deps()
-    assert Wand.CLI.Mix.get_deps() == {:ok, [["mox","~> 0.3.2",[["only","test"]]],["ex_doc",">= 0.0.0",[["only","dev"]]]]}
+    assert Wand.CLI.Mix.get_deps(".") == {:ok, [["mox","~> 0.3.2",[["only","test"]]],["ex_doc",">= 0.0.0",[["only","dev"]]]]}
+  end
+
+  test "get_deps fails" do
+    Helpers.System.stub_failed_get_deps()
+    assert Wand.CLI.Mix.get_deps(".") == {:error, {1, ""}}
   end
 end

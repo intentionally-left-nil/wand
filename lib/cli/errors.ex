@@ -7,7 +7,8 @@ defmodule Wand.CLI.Errors do
     hex_api_error: 68,
     file_write_error: 69,
     install_deps_error: 70,
-    file_already_exists: 71
+    file_already_exists: 71,
+    wand_core_api_error: 72,
   }
 
   def code(key), do: Map.fetch!(@errors, key)
