@@ -45,7 +45,7 @@ defmodule Wand.Test.Helpers.System do
   def stub_get_deps(deps) do
     message = WandCore.Poison.encode!(deps)
 
-  expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {message, 0} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {message, 0} end)
   end
 
   def stub_failed_get_deps() do

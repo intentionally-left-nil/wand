@@ -99,8 +99,9 @@ defmodule InitTest do
     test "Regression test: initialize a path with git" do
       stub_exists("wand.json", false)
       stub_exists("./mix.exs", false)
+
       [
-        ["wand_core", [["git", "https://github.com/AnilRedshift/wand-core.git"]]],
+        ["wand_core", [["git", "https://github.com/AnilRedshift/wand-core.git"]]]
       ]
       |> Helpers.System.stub_get_deps()
 
