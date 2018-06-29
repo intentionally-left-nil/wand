@@ -177,6 +177,7 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp get_flag(switches, key, struct \\ %Package{}) do
     value = Keyword.get(switches, key, Map.fetch!(struct, key))
+
     cond do
       is_atom(value) -> value
       Enum.member?(atom_flags(), key) -> String.to_atom(value)

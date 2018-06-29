@@ -64,9 +64,7 @@ defmodule AddTest do
       }
 
       command =
-        OptionParser.split(
-          "add poison --repo=nothexpm --organization=mycompany --hex=mypoison"
-        )
+        OptionParser.split("add poison --repo=nothexpm --organization=mycompany --hex=mypoison")
 
       assert Add.validate(command) == expected
     end
