@@ -46,8 +46,8 @@ defmodule Wand.CLI.Commands.Add.Help do
     The following flags are provided. They are boolean flags unless specified.
 
     ### Hex flags
-    --hex-name=NAME means that the local name of the dependency is different from its name on hex
-    E.g. wand add mypoison --hex-name=poison
+    --hex=NAME means that the local name of the dependency is different from its name on hex
+    E.g. wand add mypoison --hex=poison
     --organization=ORGANIZATION corresponds to the private org to pull the package(s) from.
     --repo=REPO An alternative repository to use. Configure with mix hex.repo. Default: hexpm
 

@@ -24,7 +24,7 @@ defmodule Wand.CLI.Commands.Add do
   --env               Add the dependency to a specific environment
   --exact             Set the version to exactly match the version provided
   --git           (s) The Git URI to download the package from
-  --hex-name      (s) The name of the package in hex to download
+  --hex           (s) The name of the package in hex to download
   --optional          Mark the dependency as optional
   --organization      Set the hex.pm organization to use
   --path          (s) The local directory to install the package from

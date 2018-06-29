@@ -89,10 +89,8 @@ defmodule Wand.CLI.Commands.Add.Validate do
   end
 
   defp add_details(package, :hex, switches) do
-    hex = Keyword.get(switches, :hex_name, Map.fetch!(%Hex{}, :hex))
-
     details = %Hex{
-      hex: hex,
+      hex: get_flag(switches, :hex, %Hex{}),
       organization: get_flag(switches, :organization, %Hex{}),
       repo: get_flag(switches, :repo, %Hex{})
     }
@@ -178,13 +176,26 @@ defmodule Wand.CLI.Commands.Add.Validate do
   end
 
   defp get_flag(switches, key, struct \\ %Package{}) do
-    Keyword.get(switches, key, Map.fetch!(struct, key))
+    value = Keyword.get(switches, key, Map.fetch!(struct, key))
+    cond do
+      is_atom(value) -> value
+      Enum.member?(atom_flags(), key) -> String.to_atom(value)
+      true -> value
+    end
+  end
+
+  defp atom_flags() do
+    [
+      :hex,
+      :compile_env,
+      :repo
+    ]
   end
 
   defp allowed_flags(args) do
     all_flags = %{
       hex: [
-        hex_name: :string
+        hex: :string
       ],
       path: [
         path: :string,
