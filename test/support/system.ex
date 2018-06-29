@@ -15,12 +15,12 @@ defmodule Wand.Test.Helpers.System do
 
   def stub_compile() do
     message = "===> Compiling parse_trans"
-    expect(Wand.SystemMock, :cmd, fn "mix", ["compile"], _opts -> {message, 0} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["deps.compile"], _opts -> {message, 0} end)
   end
 
   def stub_failed_compile() do
     message = "** (SyntaxError) mix.exs:9"
-    expect(Wand.SystemMock, :cmd, fn "mix", ["compile"], _opts -> {message, 1} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["deps.compile"], _opts -> {message, 1} end)
   end
 
   def stub_cleanup_deps() do

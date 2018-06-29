@@ -12,7 +12,7 @@ defmodule Wand.CLI.Mix do
   end
 
   def compile() do
-    mix("compile", print_output: true)
+    mix("deps.compile", print_output: true)
     |> strip_ok
   end
 
