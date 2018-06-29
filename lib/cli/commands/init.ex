@@ -2,6 +2,7 @@ defmodule Wand.CLI.Commands.Init do
   @behaviour Wand.CLI.Command
   alias Wand.CLI.Display
   alias Wand.WandFile
+  alias Wand.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
   import Wand.CLI.Errors, only: [error: 1]
 
@@ -69,8 +70,12 @@ defmodule Wand.CLI.Commands.Init do
   end
 
   def execute({path, switches}) do
+    file = %WandFile{}
+
     with :ok <- can_write?(path, switches),
-         :ok <- WandFileWithHelp.save(%WandFile{}, path) do
+         {:ok, deps} <- get_dependencies(path),
+         {:ok, file} <- add_dependencies(file, deps),
+         :ok <- WandFileWithHelp.save(file, path) do
       :ok
     else
       {:error, :wand_file_save, reason} ->
@@ -103,6 +108,47 @@ defmodule Wand.CLI.Commands.Init do
     end
   end
 
+  defp get_dependencies(path) do
+    deps =
+      Path.dirname(path)
+      |> Wand.CLI.Mix.get_deps()
+
+    case deps do
+      {:ok, deps} ->
+        Enum.map(deps, &convert_dependency/1)
+        |> validate_dependencies()
+
+      {:error, reason} ->
+        {:error, :get_deps, reason}
+    end
+  end
+
+  defp validate_dependencies(dependencies) do
+    case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
+      nil ->
+        dependencies = Enum.unzip(dependencies) |> elem(1)
+        {:ok, dependencies}
+
+      {:error, error} ->
+        {:error, :get_deps, error}
+    end
+  end
+
+  defp add_dependencies(file, dependencies) do
+    Enum.reduce(dependencies, {:ok, file}, fn dependency, {:ok, file} ->
+      WandFile.add(file, dependency)
+    end)
+  end
+
+  defp convert_dependency([name, requirement]), do: convert_dependency([name, requirement, []])
+
+  defp convert_dependency([name, requirement, opts]) do
+    opts = Enum.into(opts, %{}, fn [key, val] -> {String.to_atom(key), val} end)
+    {:ok, %Dependency{name: name, requirement: requirement, opts: opts}}
+  end
+
+  defp convert_dependency(_), do: {:error, :invalid_dependency}
+
   defp handle_error(:file_exists, path) do
     """
     # Error
@@ -115,5 +161,18 @@ defmodule Wand.CLI.Commands.Init do
     |> Display.error()
 
     error(:file_already_exists)
+  end
+
+  defp handle_error(:get_deps, _reason) do
+    """
+    # Error
+    Unable to read existing deps
+
+    mix wand_core.get_deps did not return successfully.
+    Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
+    """
+    |> Display.error()
+
+    error(:wand_core_api_error)
   end
 end
