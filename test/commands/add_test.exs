@@ -30,8 +30,8 @@ defmodule AddTest do
     end
 
     test "returns help if a flag for the wrong file type is given" do
-      command = OptionParser.split("add ex_doc --path=/test --hex-name=foo")
-      assert Add.validate(command) == {:error, {:invalid_flag, "--hex-name"}}
+      command = OptionParser.split("add ex_doc --path=/test --hex=foo")
+      assert Add.validate(command) == {:error, {:invalid_flag, "--hex"}}
     end
 
     test "a simple package" do
@@ -56,17 +56,15 @@ defmodule AddTest do
             name: "poison",
             details: %Hex{
               organization: "mycompany",
-              repo: "nothexpm",
-              hex: "mypoison"
+              repo: :nothexpm,
+              hex: :mypoison
             }
           }
         ]
       }
 
       command =
-        OptionParser.split(
-          "add poison --repo=nothexpm --organization=mycompany --hex-name=mypoison"
-        )
+        OptionParser.split("add poison --repo=nothexpm --organization=mycompany --hex=mypoison")
 
       assert Add.validate(command) == expected
     end
@@ -165,7 +163,7 @@ defmodule AddTest do
         [
           %Package{
             name: "poison",
-            compile_env: "prod",
+            compile_env: :prod,
             read_app_file: false
           }
         ]

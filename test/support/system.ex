@@ -37,8 +37,8 @@ defmodule Wand.Test.Helpers.System do
     message =
       [
         ["earmark", "~> 1.2"],
-        ["mox", "~> 0.3.2", [["only", "test"]]],
-        ["ex_doc", ">= 0.0.0", [["only", "dev"]]]
+        ["mox", "~> 0.3.2", [["only", ":test"]]],
+        ["ex_doc", ">= 0.0.0", [["only", ":dev"]]]
       ]
       |> WandCore.Poison.encode!()
 
