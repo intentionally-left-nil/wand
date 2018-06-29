@@ -14,7 +14,7 @@ defmodule Wand.MixProject do
     [
       aliases: aliases(),
       app: :wand,
-      deps: deps(),
+      deps: Mix.Tasks.WandCore.Deps.run([]),
       description: @description,
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -44,18 +44,6 @@ defmodule Wand.MixProject do
     Mix.Tasks.Escript.Build.run([])
     File.rename("wand", "../wand-archive/cli/wand")
     File.cp("../wand-archive/cli/wand", "../wand-archive/cli/wand-#{@version}")
-  end
-
-  defp deps do
-    [
-      {:earmark, "~> 1.2"},
-      {:httpoison, "~> 1.2"},
-      {:wand_core, git: "https://github.com/AnilRedshift/wand-core.git"},
-      {:excoveralls, "~> 0.9.1", only: :test},
-      {:mox, "~> 0.3.2", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev},
-      {:junit_formatter, "~> 2.2", only: [:test]}
-    ]
   end
 
   defp elixirc_paths(:test), do: ["test/support", "lib"]
