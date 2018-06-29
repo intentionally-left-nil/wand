@@ -3,14 +3,24 @@ defmodule Wand.CLI.Mix do
 
   def update_deps() do
     mix("deps.get", print_output: true)
+    |> strip_ok
   end
 
   def cleanup_deps() do
     mix("deps.unlock --unused")
+    |> strip_ok
   end
 
   def compile() do
     mix("compile", print_output: true)
+    |> strip_ok
+  end
+
+  def get_deps() do
+    case mix("wand.get_deps", get_output: true) do
+      {:ok, message} -> Poison.decode(message)
+      error -> error
+    end
   end
 
   defp mix(command, opts \\ []) do
@@ -25,8 +35,11 @@ defmodule Wand.CLI.Mix do
     {message, code} = @system.cmd("mix", args, opts)
 
     case code do
-      0 -> :ok
+      0 -> {:ok, message}
       code -> {:error, {code, message}}
     end
   end
+
+  defp strip_ok({:ok, _}), do: :ok
+  defp strip_ok(error), do: error
 end
