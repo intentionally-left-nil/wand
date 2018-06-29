@@ -107,6 +107,7 @@ defmodule InitTest do
 
   defp get_default_file() do
     dependencies = [
+      %Dependency{name: "earmark", requirement: "~> 1.2"},
       %Dependency{name: "ex_doc", requirement: ">= 0.0.0", opts: %{only: :dev}},
       %Dependency{name: "mox", requirement: "~> 0.3.2", opts: %{only: :test}},
     ]
