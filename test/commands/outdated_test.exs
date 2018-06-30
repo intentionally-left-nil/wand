@@ -2,10 +2,15 @@ defmodule OutdatedTest do
   use ExUnit.Case, async: true
   import Mox
   alias Wand.CLI.Commands.Outdated
+  alias Wand.Test.Helpers
 
   describe "validate" do
     test "returns help when arguments are given" do
       assert Outdated.validate(["outdated", "poison"]) == {:error, :wrong_command}
+    end
+
+    test "returns :ok without args" do
+      assert Outdated.validate(["outdated"]) == {:ok, []}
     end
   end
 
@@ -32,6 +37,14 @@ defmodule OutdatedTest do
     def stub_io(_) do
       expect(Wand.IOMock, :puts, fn _message -> :ok end)
       :ok
+    end
+  end
+
+  describe "execute" do
+    setup :verify_on_exit!
+    test "outsources to hex.outdated" do
+      Helpers.System.stub_outdated()
+      assert Outdated.execute([]) == :ok
     end
   end
 end

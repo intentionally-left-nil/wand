@@ -26,6 +26,12 @@ defmodule Wand.CLI.Commands.Outdated do
 
   def help(_type), do: Display.print(@moduledoc)
 
-  def validate([]), do: {:ok, []}
+
+  def validate(["outdated"]), do: {:ok, []}
   def validate(_args), do: {:error, :wrong_command}
+
+  def execute([]) do
+    Wand.CLI.Mix.outdated()
+    :ok
+  end
 end

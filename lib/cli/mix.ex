@@ -23,6 +23,11 @@ defmodule Wand.CLI.Mix do
     end
   end
 
+  def outdated() do
+    mix("hex.outdated", print_output: true)
+    |> strip_ok
+  end
+
   defp mix(command, opts \\ []) do
     args = OptionParser.split(command)
 
