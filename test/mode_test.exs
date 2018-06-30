@@ -161,4 +161,31 @@ defmodule ModeTest do
       assert Mode.from_requirement(">= 1.2.3 and < 2.3.0") == :custom
     end
   end
+
+  describe "Round-trip tests" do
+    [:exact, :tilde, :caret]
+    |> Enum.each(fn mode ->
+      test "#{mode} patch" do
+        validate("0.0.2", unquote(mode))
+      end
+
+      test "#{mode} minor" do
+        validate("0.3.2", unquote(mode))
+      end
+
+      test "#{mode} major" do
+        validate("2.3.2", unquote(mode))
+      end
+
+      test "#{mode} major with dev and build" do
+        validate("2.3.2-dev+123", unquote(mode))
+      end
+    end)
+
+    defp validate(version, mode) do
+      requirement = Mode.get_requirement!(mode, version)
+      assert Mode.from_requirement(requirement) == mode
+      assert Version.match?(version, requirement) == true
+    end
+  end
 end
