@@ -72,6 +72,8 @@ defmodule Wand.CLI.Commands.Upgrade do
     end
   end
 
+  defp get_dependencies(%WandFile{dependencies: dependencies}, :all), do: {:ok, dependencies}
+
   defp get_dependencies(%WandFile{dependencies: dependencies}, names) do
     dependencies = Enum.map(names, fn name -> Enum.find(dependencies, {:error, name}, &(&1.name == name)) end)
 

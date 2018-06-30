@@ -92,5 +92,10 @@ defmodule UpgradeTest do
       Helpers.IO.stub_stderr()
       assert Upgrade.execute({["poison"], %Options{}}) == error(:package_not_found)
     end
+
+    test "update all the dependencies" do
+      Helpers.WandFile.stub_load()
+      assert Upgrade.execute({:all, %Options{}}) == :ok
+    end
   end
 end
