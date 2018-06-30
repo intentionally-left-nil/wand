@@ -30,7 +30,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   """
 
   defmodule Options do
-    defstruct mode: nil,
+    defstruct mode: :caret,
               download: true,
               compile: true,
               latest: false
@@ -88,7 +88,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   end
 
   defp update_dependencies(file, dependencies, options) do
-    resp = Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
+    Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
       case update_dependency(dependency, options) do
         {:ok, dependency} -> {:cont, {:ok, [dependency | filtered]}}
         {:error, reason} -> {:halt, {:error, :update_dependencies, reason}}
@@ -133,6 +133,10 @@ defmodule Wand.CLI.Commands.Upgrade do
     end
   end
 
+  defp update_hex_requirement(_requirement, [version | _], %Options{mode: mode}, _mode) do
+    Mode.get_requirement!(mode, version)
+  end
+
   defp sort_releases(releases) do
     Enum.sort(releases, fn (a, b) ->
       case Version.compare(a, b) do
@@ -163,7 +167,7 @@ defmodule Wand.CLI.Commands.Upgrade do
       Keyword.get(switches, :exact) -> :exact
       Keyword.get(switches, :tilde) -> :tilde
       Keyword.get(switches, :caret) -> :caret
-      true -> nil
+      true -> %Options{}.mode
     end
   end
 

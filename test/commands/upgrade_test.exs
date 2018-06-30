@@ -124,7 +124,7 @@ defmodule UpgradeTest do
 
   describe "execute poison successfully" do
     test "No-ops if on the latest version" do
-      validate(">= 3.1.0 and < 4.0.0")
+      validate(">= 2.2.0 and < 3.0.0")
     end
 
     test "No-ops a custom environment" do
@@ -147,8 +147,31 @@ defmodule UpgradeTest do
       validate(">= 0.0.3 and <= 0.0.3")
     end
 
-    defp validate(requirement), do: validate(requirement, requirement)
-    defp validate(requirement, expected) do
+    test "No-ops with --latest if on the newest version" do
+      validate(">= 3.1.0 and < 4.0.0", %Options{latest: true})
+    end
+
+    test "Updates to the latest tilde with --latest" do
+      validate("~> 1.2.0", "~> 3.1.0", %Options{latest: true, mode: :tilde})
+    end
+
+    test "Updates to the latest exact with --latest" do
+      validate("~> 1.2.0", "== 3.1.0", %Options{latest: true, mode: :exact})
+    end
+
+    test "Updates to the latest caret with --latest" do
+      validate("~> 1.2.0", ">= 3.1.0 and < 4.0.0", %Options{latest: true, mode: :caret})
+    end
+
+    test "Updates a custom to the latest caret with --latest" do
+      validate("~> 1.2.0-dev and != 1.2.1", ">= 3.1.0 and < 4.0.0", %Options{latest: true, mode: :caret})
+    end
+
+    defp validate(requirement), do: validate(requirement, requirement, %Options{})
+
+    defp validate(requirement, %Options{}=options), do: validate(requirement, requirement, options)
+    defp validate(requirement, expected), do: validate(requirement, expected, %Options{})
+    defp validate(requirement, expected, options) do
       %WandFile{
         dependencies: [
           %Dependency{name: "poison", requirement: requirement}
@@ -163,7 +186,7 @@ defmodule UpgradeTest do
       }
       |> Helpers.WandFile.stub_save()
       Helpers.Hex.stub_poison()
-      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+      assert Upgrade.execute({["poison"], options}) == :ok
     end
   end
 end
