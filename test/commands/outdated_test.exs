@@ -42,6 +42,7 @@ defmodule OutdatedTest do
 
   describe "execute" do
     setup :verify_on_exit!
+
     test "outsources to hex.outdated" do
       Helpers.System.stub_outdated()
       assert Outdated.execute([]) == :ok
