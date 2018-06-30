@@ -1,5 +1,6 @@
 defmodule Wand.CLI.Commands.Upgrade do
   import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.Mode
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
@@ -59,7 +60,8 @@ defmodule Wand.CLI.Commands.Upgrade do
   def execute({names, %Options{}=options}) do
     with {:ok, file} <- WandFileWithHelp.load(),
     {:ok, dependencies} <- get_dependencies(file, names),
-    {:ok, file} <- update_dependencies(file, dependencies)
+    {:ok, file} <- update_dependencies(file, dependencies, options),
+    :ok <- WandFileWithHelp.save(file)
     do
       :ok
     else
@@ -85,9 +87,9 @@ defmodule Wand.CLI.Commands.Upgrade do
     end)
   end
 
-  defp update_dependencies(file, dependencies) do
+  defp update_dependencies(file, dependencies, options) do
     resp = Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
-      case update_dependency(dependency) do
+      case update_dependency(dependency, options) do
         {:ok, dependency} -> {:cont, {:ok, [dependency | filtered]}}
         {:error, reason} -> {:halt, {:error, :update_dependencies, reason}}
       end
@@ -100,18 +102,36 @@ defmodule Wand.CLI.Commands.Upgrade do
     end
   end
 
-  defp update_dependency(dependency) do
-    with {:ok, releases} <- Wand.Hex.releases(dependency.name),
-    {:ok, requirement} <- get_newest_requirement(dependency, releases)
+  defp update_dependency(%Dependency{name: name, requirement: requirement}=dependency, options) do
+    with mode <- Mode.from_requirement(requirement),
+    {:ok, requirement} <- update_requirement(dependency, options, mode)
     do
       {:ok, %Dependency{dependency | requirement: requirement}}
     else
-      {:error, error} -> {:error, {error, dependency.name}}
+      {:error, error} -> {:error, {error, name}}
     end
   end
 
-  defp get_newest_requirement(dependency, releases) do
-    {:ok, hd(releases)}
+  defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :custom), do: {:ok, requirement}
+  defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :exact), do: {:ok, requirement}
+
+  defp update_requirement(dependency, %Options{latest: false}, mode) do
+    with {:ok, releases} <- Wand.Hex.releases(dependency.name)
+    do
+      {:ok, dependency.requirement}
+    else
+      error -> error
+    end
+
+  end
+
+  defp sort_releases(releases) do
+    Enum.sort(releases, fn (a, b) ->
+      case Version.compare(a, b) do
+      :lt -> false
+      _  -> true
+      end
+    end)
   end
 
   defp parse(commands, switches) do

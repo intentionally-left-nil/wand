@@ -114,20 +114,44 @@ defmodule UpgradeTest do
       assert Upgrade.execute({:all, %Options{}}) == error(:file_write_error)
     end
 
-    test "Returns the same version if there isn't a newer one" do
-      file = %WandFile{
-        dependencies: [
-          %Dependency{name: "poison", requirement: ">= 3.1.0 and < 4.0.0"}
-        ]
-      }
+    test "update all no-ops if the dependencies are empty" do
+      file = %WandFile{}
       Helpers.WandFile.stub_load(file)
-      Helpers.Hex.stub_poison()
-      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+      Helpers.WandFile.stub_save(file)
+      assert Upgrade.execute({:all, %Options{}}) == :ok
+    end
+  end
+
+  describe "execute poison successfully" do
+    test "No-ops if on the latest version" do
+      validate(">= 3.1.0 and < 4.0.0")
     end
 
-    test "update all the dependencies" do
-      Helpers.WandFile.stub_load()
-      assert Upgrade.execute({:all, %Options{}}) == :ok
+    test "No-ops a custom environment" do
+      validate("== 3.2.0 or ==3.2.0--dev")
+    end
+
+    test "No-ops an exact match" do
+      validate("== 3.2.0")
+    end
+
+    defp validate(requirement), do: validate(requirement, requirement)
+    defp validate(requirement, expected) do
+      %WandFile{
+        dependencies: [
+          %Dependency{name: "poison", requirement: requirement}
+        ]
+      }
+      |> Helpers.WandFile.stub_load()
+
+      %WandFile{
+        dependencies: [
+          %Dependency{name: "poison", requirement: expected}
+        ]
+      }
+      |> Helpers.WandFile.stub_save()
+      Helpers.Hex.stub_poison()
+      assert Upgrade.execute({["poison"], %Options{}}) == :ok
     end
   end
 end
