@@ -50,7 +50,7 @@ defmodule Wand.MixProject do
     [
       {:earmark, "~> 1.2"},
       {:httpoison, "~> 1.2"},
-      {:wand_core, git: "https://github.com/AnilRedshift/wand-core.git"},
+      {:wand_core, "~> 0.2.2"},
       {:excoveralls, "~> 0.9.1", only: :test},
       {:mox, "~> 0.3.2", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev},

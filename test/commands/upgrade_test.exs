@@ -199,4 +199,32 @@ defmodule UpgradeTest do
       assert Upgrade.execute({["poison"], options}) == :ok
     end
   end
+
+  describe "execute with git dependencies" do
+    test "No-ops if git without a requirement" do
+      file = %WandFile{
+        dependencies: [
+          %Dependency{name: "poison", opts: %{git: "https://github.com/devinus/poison.git"}}
+        ]
+      }
+
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_save(file)
+      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+    end
+  end
+
+  describe "execute with file dependencies" do
+    test "No-ops" do
+      file = %WandFile{
+        dependencies: [
+          %Dependency{name: "poison", opts: %{path: "../poison"}}
+        ]
+      }
+
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_save(file)
+      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+    end
+  end
 end

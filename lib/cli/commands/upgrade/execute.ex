@@ -54,11 +54,17 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   end
 
   defp update_dependency(%Dependency{name: name, requirement: requirement} = dependency, options) do
-    with mode <- Mode.from_requirement(requirement),
+    with {:source, :hex} <- {:source, Dependency.source(dependency)},
+         mode <- Mode.from_requirement(requirement),
          {:ok, requirement} <- update_requirement(dependency, options, mode) do
       {:ok, %Dependency{dependency | requirement: requirement}}
     else
-      {:error, error} -> {:error, {error, name}}
+      # Non-hex dependencies are currently not touched by wand
+      {:source, _source} ->
+        {:ok, dependency}
+
+      {:error, error} ->
+        {:error, {error, name}}
     end
   end
 
