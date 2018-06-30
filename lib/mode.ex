@@ -1,5 +1,5 @@
 defmodule Wand.Mode do
-  @type t :: :caret | :tilde | :exact
+  @type t :: :caret | :tilde | :exact | :custom
   @no_patch ~r/^(\d+)\.(\d+)($|\+.*$|-.*$)/
 
   def from_requirement(requirement) do
