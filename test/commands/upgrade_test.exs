@@ -127,6 +127,10 @@ defmodule UpgradeTest do
       validate(">= 2.2.0 and < 3.0.0")
     end
 
+    test "No-ops if there are no matching releases" do
+      validate(">= 4.2.0 and < 5.0.0")
+    end
+
     test "No-ops a custom environment" do
       validate("== 3.2.0 or ==3.2.0--dev")
     end
