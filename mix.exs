@@ -42,8 +42,6 @@ defmodule Wand.MixProject do
   defp build_cli(_) do
     Mix.Tasks.Compile.run([])
     Mix.Tasks.Escript.Build.run([])
-    File.rename("wand", "../wand-archive/cli/wand")
-    File.cp("../wand-archive/cli/wand", "../wand-archive/cli/wand-#{@version}")
   end
 
   defp deps do
