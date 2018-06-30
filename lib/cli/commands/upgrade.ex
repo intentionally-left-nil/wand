@@ -59,7 +59,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   def execute({names, %Options{}=options}) do
     with {:ok, file} <- WandFileWithHelp.load(),
     {:ok, dependencies} <- get_dependencies(file, names),
-    {:ok, dependencies} <- update_dependencies(dependencies)
+    {:ok, file} <- update_dependencies(file, dependencies)
     do
       :ok
     else
@@ -85,13 +85,19 @@ defmodule Wand.CLI.Commands.Upgrade do
     end)
   end
 
-  defp update_dependencies(dependencies) do
-    Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
+  defp update_dependencies(file, dependencies) do
+    resp = Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
       case update_dependency(dependency) do
         {:ok, dependency} -> {:cont, {:ok, [dependency | filtered]}}
         {:error, reason} -> {:halt, {:error, :update_dependencies, reason}}
       end
     end)
+    |> case do
+      {:ok, dependencies} ->
+        file = %WandFile{file | dependencies: dependencies}
+        {:ok, file}
+      error -> error
+    end
   end
 
   defp update_dependency(dependency) do

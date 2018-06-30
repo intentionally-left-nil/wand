@@ -104,7 +104,25 @@ defmodule UpgradeTest do
       Helpers.Hex.stub_not_found()
 
       assert Upgrade.execute({["poison"], %Options{}}) == error(:hex_api_error)
+    end
 
+    test "Error saving the wand file" do
+      file = %WandFile{}
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_cannot_save(file)
+      Helpers.IO.stub_stderr()
+      assert Upgrade.execute({:all, %Options{}}) == error(:file_write_error)
+    end
+
+    test "Returns the same version if there isn't a newer one" do
+      file = %WandFile{
+        dependencies: [
+          %Dependency{name: "poison", requirement: ">= 3.1.0 and < 4.0.0"}
+        ]
+      }
+      Helpers.WandFile.stub_load(file)
+      Helpers.Hex.stub_poison()
+      assert Upgrade.execute({["poison"], %Options{}}) == :ok
     end
 
     test "update all the dependencies" do
