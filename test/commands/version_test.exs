@@ -31,17 +31,16 @@ defmodule CLI.VersionTest do
     end
   end
 
-
   describe "execute" do
     test "get the version" do
       message = get_version()
       expect(Wand.IOMock, :puts, fn ^message -> :ok end)
       assert Version.execute([]) == :ok
     end
-  
+
     defp get_version() do
       Mix.Project.config()
-      |>Keyword.fetch!(:version)
+      |> Keyword.fetch!(:version)
     end
   end
 end
