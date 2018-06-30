@@ -2,6 +2,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Display
   alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
   @behaviour Wand.CLI.Command
 
@@ -57,7 +58,8 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   def execute({names, %Options{}=options}) do
     with {:ok, file} <- WandFileWithHelp.load(),
-    {:ok, dependencies} <- get_dependencies(file, names)
+    {:ok, dependencies} <- get_dependencies(file, names),
+    {:ok, dependencies} <- update_dependencies(dependencies)
     do
       :ok
     else
@@ -75,12 +77,35 @@ defmodule Wand.CLI.Commands.Upgrade do
   defp get_dependencies(%WandFile{dependencies: dependencies}, :all), do: {:ok, dependencies}
 
   defp get_dependencies(%WandFile{dependencies: dependencies}, names) do
-    dependencies = Enum.map(names, fn name -> Enum.find(dependencies, {:error, name}, &(&1.name == name)) end)
+    Enum.reduce_while(names, {:ok, []}, fn name, {:ok, filtered} ->
+      case Enum.find(dependencies, &(&1.name == name)) do
+        nil -> {:halt, {:error, :get_dependencies, name}}
+        item -> {:cont, {:ok, [item | filtered]}}
+      end
+    end)
+  end
 
-    case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
-      nil -> {:ok, dependencies}
-      {:error, error} -> {:error, :get_dependencies, error}
+  defp update_dependencies(dependencies) do
+    Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
+      case update_dependency(dependency) do
+        {:ok, dependency} -> {:cont, {:ok, [dependency | filtered]}}
+        {:error, reason} -> {:halt, {:error, :update_dependencies, reason}}
+      end
+    end)
+  end
+
+  defp update_dependency(dependency) do
+    with {:ok, releases} <- Wand.Hex.releases(dependency.name),
+    {:ok, requirement} <- get_newest_requirement(dependency, releases)
+    do
+      {:ok, %Dependency{dependency | requirement: requirement}}
+    else
+      {:error, error} -> {:error, {error, dependency.name}}
     end
+  end
+
+  defp get_newest_requirement(dependency, releases) do
+    {:ok, hd(releases)}
   end
 
   defp parse(commands, switches) do
@@ -135,5 +160,15 @@ defmodule Wand.CLI.Commands.Upgrade do
     """
     |> Display.error()
     error(:package_not_found)
+  end
+
+  defp handle_error(:update_dependencies, {reason, name}) do
+    """
+    # Error
+    There was a problem finding the latest version for #{name}.
+    The exact reason was #{reason}
+    """
+    |> Display.error()
+    error(:hex_api_error)
   end
 end

@@ -5,6 +5,8 @@ defmodule UpgradeTest do
   alias Wand.Test.Helpers
   alias Wand.CLI.Commands.Upgrade
   alias Wand.CLI.Commands.Upgrade.Options
+  alias WandCore.WandFile
+  alias WandCore.WandFile.Dependency
 
   describe "validate" do
     test "returns help if invalid flags are given" do
@@ -91,6 +93,18 @@ defmodule UpgradeTest do
       Helpers.WandFile.stub_load()
       Helpers.IO.stub_stderr()
       assert Upgrade.execute({["poison"], %Options{}}) == error(:package_not_found)
+    end
+
+    test ":hex_api_error if getting the package from hex fails" do
+      file = %WandFile{
+        dependencies: [Helpers.WandFile.poison()]
+      }
+      Helpers.WandFile.stub_load(file)
+      Helpers.IO.stub_stderr()
+      Helpers.Hex.stub_not_found()
+
+      assert Upgrade.execute({["poison"], %Options{}}) == error(:hex_api_error)
+
     end
 
     test "update all the dependencies" do
