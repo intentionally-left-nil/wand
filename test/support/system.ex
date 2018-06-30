@@ -45,11 +45,11 @@ defmodule Wand.Test.Helpers.System do
   def stub_get_deps(deps) do
     message = WandCore.Poison.encode!(deps)
 
-    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {message, 0} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.init"], _opts -> {message, 0} end)
   end
 
   def stub_failed_get_deps() do
-    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {"", 1} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.init"], _opts -> {"", 1} end)
   end
 
   def stub_get_bad_deps() do
@@ -57,7 +57,7 @@ defmodule Wand.Test.Helpers.System do
       [["mox", "~> 0.3.2", [["only", "test"]]], ["oops", "ex_doc", ">= 0.0.0", [["only", "dev"]]]]
       |> WandCore.Poison.encode!()
 
-    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.get_deps"], _opts -> {message, 0} end)
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.init"], _opts -> {message, 0} end)
   end
 
   def stub_outdated() do

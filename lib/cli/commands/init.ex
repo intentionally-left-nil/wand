@@ -189,7 +189,7 @@ defmodule Wand.CLI.Commands.Init do
     # Error
     Unable to read existing deps
 
-    mix wand_core.get_deps did not return successfully.
+    mix wand.init did not return successfully.
     Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
     """
     |> Display.error()
