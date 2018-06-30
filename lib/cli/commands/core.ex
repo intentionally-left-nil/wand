@@ -42,7 +42,7 @@ defmodule Wand.CLI.Commands.Core do
   end
 
   def validate(args) do
-    {switches, [_ | commands], errors} = OptionParser.parse(args, get_flags(args))
+    {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
     case Wand.CLI.Command.parse_errors(errors) do
       :ok -> parse(commands, switches)
       error -> error

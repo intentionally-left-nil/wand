@@ -7,8 +7,13 @@ defmodule CoreTest do
     test "returns help if nothing is passed in" do
       assert Core.validate(["core"]) == {:error, :wrong_command}
     end
+
     test "returns help if invalid commands are given" do
       assert Core.validate(["core", "wrong"]) == {:error, :wrong_command}
+    end
+
+    test "returns help if an invalid flag is given" do
+      assert Core.validate(["core", "install", "--version"]) == {:error, {:invalid_flag, "--version"}}
     end
 
     test "install" do
