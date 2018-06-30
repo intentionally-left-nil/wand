@@ -34,9 +34,14 @@ defmodule CLI.VersionTest do
 
   describe "execute" do
     test "get the version" do
-      message = "0.2.0"
+      message = get_version()
       expect(Wand.IOMock, :puts, fn ^message -> :ok end)
       assert Version.execute([]) == :ok
+    end
+  
+    defp get_version() do
+      Mix.Project.config()
+      |>Keyword.fetch!(:version)
     end
   end
 end

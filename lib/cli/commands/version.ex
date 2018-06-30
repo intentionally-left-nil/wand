@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Version do
   alias Wand.CLI.Display
   @io Wand.Interfaces.IO.impl()
+  @version Mix.Project.config() |> Keyword.get(:version, "unknown")
   @behaviour Wand.CLI.Command
   @moduledoc """
   Get the installed version of wand and wand-core
@@ -15,8 +16,7 @@ defmodule Wand.CLI.Commands.Version do
   def validate(_args), do: {:ok, []}
 
   def execute(_args) do
-    "0.2.0"
-    |> @io.puts()
+    @io.puts(@version)
     :ok
   end
 end
