@@ -212,4 +212,17 @@ defmodule UpgradeTest do
       assert Upgrade.execute({["poison"], %Options{}}) == :ok
     end
   end
+
+  describe "execute with file dependencies" do
+    test "No-ops" do
+      file = %WandFile{
+        dependencies: [
+          %Dependency{name: "poison", opts: %{path: "../poison"}}
+        ]
+      }
+      Helpers.WandFile.stub_load(file)
+      Helpers.WandFile.stub_save(file)
+      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+    end
+  end
 end
