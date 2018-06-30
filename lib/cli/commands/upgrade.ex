@@ -13,16 +13,22 @@ defmodule Wand.CLI.Commands.Upgrade do
   <pre>
   --compile           Run mix compile after adding (default: **true**)
   --download          Run mix deps.get after adding (default: **true**)
-  --latest            Upgrade to the latest version in hex
-  --major            Upgrade to the highest version within the current major version
-  --minor            Upgrade to the highest version within the current minor version
+  --latest            Upgrade to the latest version, ignoring wand.json restrictions
   </pre>
+
+  The following flags are additionally allowed if --latest is passed in:
+  <pre>
+  --caret             After updating, set the version in wand.json with ^ semantics
+  --exact             After updating, set the version in wand.json with ^ semantics
+  --tilde             After updating, set the version in wand.json with ~> semantics
+  </pr>
   """
 
   defmodule Options do
-    defstruct level: :major,
+    defstruct mode: :caret,
               download: true,
-              compile: true
+              compile: true,
+              latest: false
   end
 
   def help(:banner), do: Display.print(@moduledoc)
@@ -31,22 +37,14 @@ defmodule Wand.CLI.Commands.Upgrade do
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
-    Allowed flags are --compile, --download, --latest, --major, and --minor.
+    Allowed flags are --caret, --compile, --download, --exact, --latest, and --tilde.
     See wand help upgrade --verbose for more information
     """
     |> Display.print()
   end
 
   def validate(args) do
-    flags = [
-      latest: :boolean,
-      major: :boolean,
-      minor: :boolean,
-      download: :boolean,
-      compile: :boolean
-    ]
-
-    {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
+    {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
 
     case Wand.CLI.Command.parse_errors(errors) do
       :ok -> {:ok, parse(commands, switches)}
@@ -54,30 +52,52 @@ defmodule Wand.CLI.Commands.Upgrade do
     end
   end
 
+  def execute(args), do: Wand.CLI.Commands.Upgrade.Execute.execute(args)
+
   defp parse(commands, switches) do
-    packages = get_packages(commands)
     download = Keyword.get(switches, :download, true)
     compile = download and Keyword.get(switches, :compile, true)
-    level = get_level(switches)
 
     options = %Options{
       download: download,
       compile: compile,
-      level: level
+      latest: Keyword.get(switches, :latest, false),
+      mode: get_mode(switches)
     }
 
-    {packages, options}
+    {get_packages(commands), options}
   end
 
   defp get_packages([]), do: :all
   defp get_packages(commands), do: commands
 
-  defp get_level(switches) do
+  defp get_mode(switches) do
     cond do
-      Keyword.get(switches, :latest) -> :latest
-      Keyword.get(switches, :major) -> :major
-      Keyword.get(switches, :minor) -> :minor
-      true -> :major
+      Keyword.get(switches, :exact) -> :exact
+      Keyword.get(switches, :tilde) -> :tilde
+      Keyword.get(switches, :caret) -> :caret
+      true -> %Options{}.mode
+    end
+  end
+
+  defp get_flags(args) do
+    base_flags = [
+      compile: :boolean,
+      download: :boolean,
+      latest: :boolean
+    ]
+
+    latest_flags = [
+      caret: :boolean,
+      exact: :boolean,
+      tilde: :boolean
+    ]
+
+    {switches, _commands, _errors} = OptionParser.parse(args)
+
+    case Keyword.get(switches, :latest) do
+      true -> latest_flags ++ base_flags
+      _ -> base_flags
     end
   end
 end
