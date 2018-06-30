@@ -4,16 +4,31 @@ defmodule CoreTest do
   alias Wand.CLI.Commands.Core
 
   describe "validate" do
+    test "returns help if nothing is passed in" do
+      assert Core.validate(["core"]) == {:error, :wrong_command}
+    end
     test "returns help if invalid commands are given" do
       assert Core.validate(["core", "wrong"]) == {:error, :wrong_command}
     end
 
     test "install" do
-      assert Core.validate(["core", "install"]) == {:ok, :install}
+      assert Core.validate(["core", "install"]) == {:ok, {:install, []}}
+    end
+
+    test "install --force" do
+      assert Core.validate(["core", "install", "--force"]) == {:ok, {:install, [force: true]}}
     end
 
     test "uninstall" do
       assert Core.validate(["core", "uninstall"]) == {:ok, :uninstall}
+    end
+
+    test "--version" do
+      assert Core.validate(["core", "--version"]) == {:ok, :version}
+    end
+
+    test "version" do
+      assert Core.validate(["core", "version"]) == {:ok, :version}
     end
   end
 
