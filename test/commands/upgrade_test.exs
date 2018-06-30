@@ -207,6 +207,7 @@ defmodule UpgradeTest do
           %Dependency{name: "poison", opts: %{git: "https://github.com/devinus/poison.git"}}
         ]
       }
+
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
       assert Upgrade.execute({["poison"], %Options{}}) == :ok
@@ -220,6 +221,7 @@ defmodule UpgradeTest do
           %Dependency{name: "poison", opts: %{path: "../poison"}}
         ]
       }
+
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
       assert Upgrade.execute({["poison"], %Options{}}) == :ok
