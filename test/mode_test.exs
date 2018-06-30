@@ -4,15 +4,15 @@ defmodule ModeTest do
 
   describe "caret" do
     test "allows no updates for 0.0.1" do
-      assert Mode.get_requirement(:caret, "0.0.1") == {:ok, "== 0.0.1"}
+      assert Mode.get_requirement(:caret, "0.0.1") == {:ok, ">= 0.0.1 and <= 0.0.1"}
     end
 
     test "allows no updates for 0.0.7-dev" do
-      assert Mode.get_requirement(:caret, "0.0.7-dev") == {:ok, "== 0.0.7-dev"}
+      assert Mode.get_requirement(:caret, "0.0.7-dev") == {:ok, ">= 0.0.7-dev and <= 0.0.7-dev"}
     end
 
     test "allows ~> updates for 0.1.2" do
-      assert Mode.get_requirement(:caret, "0.1.2") == {:ok, "~> 0.1.2"}
+      assert Mode.get_requirement(:caret, "0.1.2") == {:ok, ">= 0.1.2 and < 0.2.0"}
     end
 
     test "allows all minor updates for 3.4.5" do
@@ -20,11 +20,11 @@ defmodule ModeTest do
     end
 
     test "Parses 0.1 as 0.1.0" do
-      assert Mode.get_requirement(:caret, "0.1") == {:ok, "~> 0.1.0"}
+      assert Mode.get_requirement(:caret, "0.1") == {:ok, ">= 0.1.0 and < 0.2.0"}
     end
 
     test "Parses 0.1-dev as 0.1.0-dev" do
-      assert Mode.get_requirement(:caret, "0.1-dev") == {:ok, "~> 0.1.0-dev"}
+      assert Mode.get_requirement(:caret, "0.1-dev") == {:ok, ">= 0.1.0-dev and < 0.2.0"}
     end
 
     test "Parses 3.1 as 3.1.0" do
@@ -106,11 +106,11 @@ defmodule ModeTest do
     end
 
     test "caret patch" do
-      assert Mode.from_requirement(">= 0.0.3 and < 0.0.3") == :caret
+      assert Mode.from_requirement(">= 0.0.3 and <= 0.0.3") == :caret
     end
 
     test "caret with pre" do
-      assert Mode.from_requirement(">= 0.0.3-dev and < 0.0.3-dev") == :caret
+      assert Mode.from_requirement(">= 0.0.3-dev and <= 0.0.3-dev") == :caret
     end
 
     test "caret with minor" do
