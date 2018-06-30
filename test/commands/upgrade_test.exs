@@ -10,33 +10,39 @@ defmodule UpgradeTest do
                {:error, {:invalid_flag, "--wrong-flag"}}
     end
 
+    test ":invalid_flag if --exact is given without --latest" do
+      assert Upgrade.validate(["upgrade", "poison", "--exact"]) ==
+               {:error, {:invalid_flag, "--exact"}}
+    end
+
     test "a single package" do
       assert Upgrade.validate(["upgrade", "poison"]) ==
-               {:ok, {["poison"], %Options{level: :major}}}
+               {:ok, {["poison"], %Options{}}}
     end
 
     test "Upgrade to the latest version" do
       assert Upgrade.validate(["upgrade", "poison", "--latest"]) ==
-               {:ok, {["poison"], %Options{level: :latest}}}
+               {:ok, {["poison"], %Options{latest: true}}}
     end
 
-    test "a single package to the next minor version" do
-      assert Upgrade.validate(["upgrade", "poison", "--minor"]) ==
-               {:ok, {["poison"], %Options{level: :minor}}}
+    test "Latest, using the exact version" do
+      assert Upgrade.validate(["upgrade", "poison", "--exact", "--latest"]) ==
+               {:ok, {["poison"], %Options{latest: true, mode: :exact}}}
     end
 
-    test "If both major and minor are passed in, prefer major" do
-      assert Upgrade.validate(["upgrade", "poison", "--minor", "--major"]) ==
-               {:ok, {["poison"], %Options{level: :major}}}
+
+    test "If both tilde and exact are passed in, prefer exact" do
+      assert Upgrade.validate(["upgrade", "poison", "--tilde", "--latest", "--exact"]) ==
+               {:ok, {["poison"], %Options{latest: true, mode: :exact}}}
     end
 
     test "upgrade multiple packages" do
-      assert Upgrade.validate(["upgrade", "poison", "ex_doc", "--minor"]) ==
-               {:ok, {["poison", "ex_doc"], %Options{level: :minor}}}
+      assert Upgrade.validate(["upgrade", "poison", "ex_doc"]) ==
+               {:ok, {["poison", "ex_doc"], %Options{}}}
     end
 
     test "upgrade all packages if none passed in" do
-      assert Upgrade.validate(["upgrade", "--minor"]) == {:ok, {:all, %Options{level: :minor}}}
+      assert Upgrade.validate(["upgrade"]) == {:ok, {:all, %Options{}}}
     end
 
     test "skip compiling" do
