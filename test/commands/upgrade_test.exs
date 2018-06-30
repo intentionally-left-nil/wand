@@ -1,6 +1,8 @@
 defmodule UpgradeTest do
   use ExUnit.Case, async: true
   import Mox
+  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.Test.Helpers
   alias Wand.CLI.Commands.Upgrade
   alias Wand.CLI.Commands.Upgrade.Options
 
@@ -75,6 +77,20 @@ defmodule UpgradeTest do
     def stub_io(_) do
       expect(Wand.IOMock, :puts, fn _message -> :ok end)
       :ok
+    end
+  end
+
+  describe "execute" do
+    test ":missing_wand_file if cannot open wand file" do
+      Helpers.WandFile.stub_no_file()
+      Helpers.IO.stub_stderr()
+      assert Upgrade.execute({["poison"], %Options{}}) == error(:missing_wand_file)
+    end
+
+    test ":package_not_found if the package is not in wand.json" do
+      Helpers.WandFile.stub_load()
+      Helpers.IO.stub_stderr()
+      assert Upgrade.execute({["poison"], %Options{}}) == error(:package_not_found)
     end
   end
 end

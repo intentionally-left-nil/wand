@@ -1,5 +1,8 @@
 defmodule Wand.CLI.Commands.Upgrade do
+  import Wand.CLI.Errors, only: [error: 1]
   alias Wand.CLI.Display
+  alias WandCore.WandFile
+  alias Wand.CLI.WandFileWithHelp
   @behaviour Wand.CLI.Command
 
   @moduledoc """
@@ -52,6 +55,32 @@ defmodule Wand.CLI.Commands.Upgrade do
     end
   end
 
+  def execute({names, %Options{}=options}) do
+    with {:ok, file} <- WandFileWithHelp.load(),
+    {:ok, dependencies} <- get_dependencies(file, names)
+    do
+      :ok
+    else
+      {:error, :wand_file_load, reason} ->
+        WandFileWithHelp.handle_error(:wand_file_load, reason)
+
+      {:error, :wand_file_save, reason} ->
+        WandFileWithHelp.handle_error(:wand_file_save, reason)
+
+      {:error, step, reason} ->
+        handle_error(step, reason)
+    end
+  end
+
+  defp get_dependencies(%WandFile{dependencies: dependencies}, names) do
+    dependencies = Enum.map(names, fn name -> Enum.find(dependencies, {:error, name}, &(&1.name == name)) end)
+
+    case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
+      nil -> {:ok, dependencies}
+      {:error, error} -> {:error, :get_dependencies, error}
+    end
+  end
+
   defp parse(commands, switches) do
     download = Keyword.get(switches, :download, true)
     compile = download and Keyword.get(switches, :compile, true)
@@ -94,5 +123,15 @@ defmodule Wand.CLI.Commands.Upgrade do
       true -> latest_flags ++ base_flags
       _ -> base_flags
     end
+  end
+
+  defp handle_error(:get_dependencies, name) do
+    """
+    # Error
+    Could not find #{name} in wand.json
+    Did you mean to type wand add #{name} instead?
+    """
+    |> Display.error()
+    error(:package_not_found)
   end
 end
