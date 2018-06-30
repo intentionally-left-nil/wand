@@ -57,6 +57,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   defp parse(commands, switches) do
     download = Keyword.get(switches, :download, true)
     compile = download and Keyword.get(switches, :compile, true)
+
     options = %Options{
       download: download,
       compile: compile,
@@ -83,15 +84,17 @@ defmodule Wand.CLI.Commands.Upgrade do
     base_flags = [
       compile: :boolean,
       download: :boolean,
-      latest: :boolean,
+      latest: :boolean
     ]
+
     latest_flags = [
       caret: :boolean,
       exact: :boolean,
-      tilde: :boolean,
+      tilde: :boolean
     ]
 
     {switches, _commands, _errors} = OptionParser.parse(args)
+
     case Keyword.get(switches, :latest) do
       true -> latest_flags ++ base_flags
       _ -> base_flags

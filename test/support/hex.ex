@@ -31,7 +31,7 @@ defmodule Wand.Test.Helpers.Hex do
         "0.4.3",
         "0.0.3",
         "0.0.1",
-        "0.0.1-dev",
+        "0.0.1-dev"
       ]
       |> Enum.map(&%{version: &1})
 

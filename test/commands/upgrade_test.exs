@@ -20,8 +20,7 @@ defmodule UpgradeTest do
     end
 
     test "a single package" do
-      assert Upgrade.validate(["upgrade", "poison"]) ==
-               {:ok, {["poison"], %Options{}}}
+      assert Upgrade.validate(["upgrade", "poison"]) == {:ok, {["poison"], %Options{}}}
     end
 
     test "Upgrade to the latest version" do
@@ -33,7 +32,6 @@ defmodule UpgradeTest do
       assert Upgrade.validate(["upgrade", "poison", "--exact", "--latest"]) ==
                {:ok, {["poison"], %Options{latest: true, mode: :exact}}}
     end
-
 
     test "If both tilde and exact are passed in, prefer exact" do
       assert Upgrade.validate(["upgrade", "poison", "--tilde", "--latest", "--exact"]) ==
@@ -99,6 +97,7 @@ defmodule UpgradeTest do
       file = %WandFile{
         dependencies: [Helpers.WandFile.poison()]
       }
+
       Helpers.WandFile.stub_load(file)
       Helpers.IO.stub_stderr()
       Helpers.Hex.stub_not_found()
@@ -168,13 +167,19 @@ defmodule UpgradeTest do
     end
 
     test "Updates a custom to the latest caret with --latest" do
-      validate("~> 1.2.0-dev and != 1.2.1", ">= 3.1.0 and < 4.0.0", %Options{latest: true, mode: :caret})
+      validate("~> 1.2.0-dev and != 1.2.1", ">= 3.1.0 and < 4.0.0", %Options{
+        latest: true,
+        mode: :caret
+      })
     end
 
     defp validate(requirement), do: validate(requirement, requirement, %Options{})
 
-    defp validate(requirement, %Options{}=options), do: validate(requirement, requirement, options)
+    defp validate(requirement, %Options{} = options),
+      do: validate(requirement, requirement, options)
+
     defp validate(requirement, expected), do: validate(requirement, expected, %Options{})
+
     defp validate(requirement, expected, options) do
       %WandFile{
         dependencies: [
@@ -189,6 +194,7 @@ defmodule UpgradeTest do
         ]
       }
       |> Helpers.WandFile.stub_save()
+
       Helpers.Hex.stub_poison()
       assert Upgrade.execute({["poison"], options}) == :ok
     end

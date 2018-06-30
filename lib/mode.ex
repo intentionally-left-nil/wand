@@ -6,8 +6,8 @@ defmodule Wand.Mode do
     case Version.Parser.lexer(requirement, []) do
       [:==, _] -> :exact
       [:~>, _] -> :tilde
-      [:>=, _, :&&, :<=, _]=p -> parse_caret_patch(p)
-      [:>=, _, :&&, :<, _]=p -> parse_caret(p)
+      [:>=, _, :&&, :<=, _] = p -> parse_caret_patch(p)
+      [:>=, _, :&&, :<, _] = p -> parse_caret(p)
       _ -> :custom
     end
   end
@@ -65,22 +65,33 @@ defmodule Wand.Mode do
   defp parse_caret([:>=, old, :&&, :<, new]) do
     old = Version.parse!(old)
     new = Version.parse!(new)
+
     cond do
       # patches are handled by parse_caret_patch
       # So anything that gets to here is not a caret.
-      new.major == 0 and new.minor == 0 -> :custom
-      new.patch != 0 -> :custom
-      Version.compare(old, new) != :lt -> :custom
+      new.major == 0 and new.minor == 0 ->
+        :custom
+
+      new.patch != 0 ->
+        :custom
+
+      Version.compare(old, new) != :lt ->
+        :custom
 
       # check for ^0.1.3
-      new.major == 0 and old.major == 0 and old.minor + 1 == new.minor -> :caret
+      new.major == 0 and old.major == 0 and old.minor + 1 == new.minor ->
+        :caret
 
       # throw away all other cases of 0.x
-      new.major == 0 or new.minor != 0 or old.major == 0 -> :custom
+      new.major == 0 or new.minor != 0 or old.major == 0 ->
+        :custom
 
       # check for ^1.2.3
-      new.major == old.major + 1 -> :caret
-      true -> :custom
+      new.major == old.major + 1 ->
+        :caret
+
+      true ->
+        :custom
     end
   end
 end

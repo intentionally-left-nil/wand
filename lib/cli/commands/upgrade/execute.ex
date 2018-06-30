@@ -7,12 +7,11 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   alias Wand.CLI.Commands.Upgrade.Options
   import Wand.CLI.Errors, only: [error: 1]
 
-  def execute({names, %Options{}=options}) do
+  def execute({names, %Options{} = options}) do
     with {:ok, file} <- WandFileWithHelp.load(),
-    {:ok, dependencies} <- get_dependencies(file, names),
-    {:ok, file} <- update_dependencies(file, dependencies, options),
-    :ok <- WandFileWithHelp.save(file)
-    do
+         {:ok, dependencies} <- get_dependencies(file, names),
+         {:ok, file} <- update_dependencies(file, dependencies, options),
+         :ok <- WandFileWithHelp.save(file) do
       :ok
     else
       {:error, :wand_file_load, reason} ->
@@ -48,22 +47,30 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
       {:ok, dependencies} ->
         file = %WandFile{file | dependencies: dependencies}
         {:ok, file}
-      error -> error
+
+      error ->
+        error
     end
   end
 
-  defp update_dependency(%Dependency{name: name, requirement: requirement}=dependency, options) do
+  defp update_dependency(%Dependency{name: name, requirement: requirement} = dependency, options) do
     with mode <- Mode.from_requirement(requirement),
-    {:ok, requirement} <- update_requirement(dependency, options, mode)
-    do
+         {:ok, requirement} <- update_requirement(dependency, options, mode) do
       {:ok, %Dependency{dependency | requirement: requirement}}
     else
       {:error, error} -> {:error, {error, name}}
     end
   end
 
-  defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :custom), do: {:ok, requirement}
-  defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :exact), do: {:ok, requirement}
+  defp update_requirement(
+         %Dependency{requirement: requirement},
+         %Options{latest: false},
+         :custom
+       ),
+       do: {:ok, requirement}
+
+  defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :exact),
+    do: {:ok, requirement}
 
   defp update_requirement(%Dependency{name: name, requirement: requirement}, options, mode) do
     case Wand.Hex.releases(name) do
@@ -71,7 +78,9 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
         releases = sort_releases(releases)
         requirement = update_hex_requirement(requirement, releases, options, mode)
         {:ok, requirement}
-      error -> error
+
+      error ->
+        error
     end
   end
 
@@ -88,10 +97,10 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   end
 
   defp sort_releases(releases) do
-    Enum.sort(releases, fn (a, b) ->
+    Enum.sort(releases, fn a, b ->
       case Version.compare(a, b) do
-      :lt -> false
-      _  -> true
+        :lt -> false
+        _ -> true
       end
     end)
   end
@@ -103,6 +112,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     Did you mean to type wand add #{name} instead?
     """
     |> Display.error()
+
     error(:package_not_found)
   end
 
@@ -113,6 +123,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     The exact reason was #{reason}
     """
     |> Display.error()
+
     error(:hex_api_error)
   end
 end
