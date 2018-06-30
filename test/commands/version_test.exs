@@ -30,4 +30,13 @@ defmodule CLI.VersionTest do
       :ok
     end
   end
+
+
+  describe "execute" do
+    test "get the version" do
+      message = "0.2.0"
+      expect(Wand.IOMock, :puts, fn ^message -> :ok end)
+      assert Version.execute([]) == :ok
+    end
+  end
 end
