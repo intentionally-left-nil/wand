@@ -115,16 +115,21 @@ defmodule Wand.CLI.Commands.Upgrade do
   defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :custom), do: {:ok, requirement}
   defp update_requirement(%Dependency{requirement: requirement}, %Options{latest: false}, :exact), do: {:ok, requirement}
 
-  defp update_requirement(%Dependency{name: name, requirement: requirement}=dependency, %Options{latest: false}, mode) do
+  defp update_requirement(%Dependency{name: name, requirement: requirement}, options, mode) do
     case Wand.Hex.releases(name) do
       {:ok, releases} ->
-        sort_releases(releases)
-        |> Enum.find(&Version.match?(&1, requirement))
-        |> case do
-          nil -> {:ok, requirement}
-          version -> Mode.get_requirement(mode, version)
-        end
+        releases = sort_releases(releases)
+        requirement = update_hex_requirement(requirement, releases, options, mode)
+        {:ok, requirement}
       error -> error
+    end
+  end
+
+  defp update_hex_requirement(requirement, releases, %Options{latest: false}, mode) do
+    Enum.find(releases, &Version.match?(&1, requirement))
+    |> case do
+      nil -> requirement
+      version -> Mode.get_requirement!(mode, version)
     end
   end
 
