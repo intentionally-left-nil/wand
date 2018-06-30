@@ -55,4 +55,9 @@ defmodule MixTest do
     Helpers.System.stub_failed_get_deps()
     assert Wand.CLI.Mix.get_deps(".") == {:error, {1, ""}}
   end
+
+  test "outdated" do
+    Helpers.System.stub_outdated()
+    assert Wand.CLI.Mix.outdated() == :ok
+  end
 end
