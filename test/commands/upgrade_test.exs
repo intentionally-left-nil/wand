@@ -135,6 +135,18 @@ defmodule UpgradeTest do
       validate("== 3.2.0")
     end
 
+    test "Updates a tilde match" do
+      validate("~> 1.5.0", "~> 1.5.2")
+    end
+
+    test "Updates a caret match" do
+      validate(" >= 1.2.1 and < 2.0.0", ">= 1.5.2 and < 2.0.0")
+    end
+
+    test "No-ops a patch caret match" do
+      validate(">= 0.0.3 and <= 0.0.3")
+    end
+
     defp validate(requirement), do: validate(requirement, requirement)
     defp validate(requirement, expected) do
       %WandFile{
