@@ -2,6 +2,15 @@ defmodule Wand.Mode do
   @type t :: :caret | :tilde | :exact
   @no_patch ~r/^(\d+)\.(\d+)($|\+.*$|-.*$)/
 
+  def from_requirement(requirement) do
+    case Version.Parser.lexer(requirement, []) do
+      [:==, _] -> :exact
+      [:~>, _] -> :tilde
+      [:>=, _, :&&, :<, _]=p -> parse_caret(p)
+      _ -> :custom
+    end
+  end
+
   def get_requirement!(mode, version) do
     {:ok, requirement} = get_requirement(mode, version)
     requirement
@@ -43,5 +52,28 @@ defmodule Wand.Mode do
 
   defp parse(version) do
     add_missing_patch(version) |> Version.parse()
+  end
+
+  defp parse_caret([:>=, old, :&&, :<, new]) do
+    old = Version.parse!(old)
+    new = Version.parse!(new)
+    cond do
+      # First check for patch range, they should be equal
+      new.major == 0 and new.minor == 0 and Version.compare(old, new) == :eq -> :caret
+
+      # Now that it's not a patch, throw away old >= new, and new versions with a patch
+      Version.compare(old, new) != :lt -> :custom
+      new.patch != 0 -> :custom
+
+      # check for ^0.1.3
+      new.major == 0 and old.major == 0 and old.minor + 1 == new.minor -> :caret
+
+      # throw away all other cases of 0.x
+      new.major == 0 or new.minor != 0 or old.major == 0 -> :custom
+
+      # check for ^1.2.3
+      new.major == old.major + 1 -> :caret
+      true -> :custom
+    end
   end
 end
