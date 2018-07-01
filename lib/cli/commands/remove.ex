@@ -33,7 +33,8 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   def execute(names) do
-    with {:ok, file} <- WandFileWithHelp.load(),
+    with :ok <- Wand.CLI.CoreValidator.require_core(),
+      {:ok, file} <- WandFileWithHelp.load(),
          file <- remove_names(file, names),
          :ok <- WandFileWithHelp.save(file),
          :ok <- cleanup() do
@@ -44,6 +45,8 @@ defmodule Wand.CLI.Commands.Remove do
 
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
+
+      {:error, :require_core, reason} -> Wand.CLI.CoreValidator.handle_error(:require_core, reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)
