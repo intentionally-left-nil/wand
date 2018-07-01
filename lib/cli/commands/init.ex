@@ -72,7 +72,8 @@ defmodule Wand.CLI.Commands.Init do
   def execute({path, switches}) do
     file = %WandFile{}
 
-    with :ok <- can_write?(path, switches),
+    with :ok <- Wand.CLI.CoreValidator.require_core(),
+      :ok <- can_write?(path, switches),
          {:ok, deps} <- get_dependencies(path),
          {:ok, file} <- add_dependencies(file, deps),
          :ok <- WandFileWithHelp.save(file, path),
@@ -81,6 +82,8 @@ defmodule Wand.CLI.Commands.Init do
     else
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
+
+      {:error, :require_core, reason} -> Wand.CLI.CoreValidator.handle_error(:require_core, reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)

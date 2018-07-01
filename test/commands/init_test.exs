@@ -56,6 +56,7 @@ defmodule InitTest do
   end
 
   describe "execute fails" do
+    setup :stub_core_version
     setup do
       Helpers.IO.stub_stderr()
       :ok
@@ -124,6 +125,7 @@ defmodule InitTest do
   end
 
   describe "execute successfully" do
+    setup :stub_core_version
     setup do
       stub_exists("wand.json", false)
       stub_exists("./mix.exs", true)
@@ -137,6 +139,12 @@ defmodule InitTest do
       stub_all_writing("./mix.exs", "wand.json", file)
       assert Init.execute({"wand.json", []}) == :ok
     end
+  end
+
+  test "Handle wand_core errors" do
+    Helpers.System.stub_core_version_missing()
+    Helpers.IO.stub_stderr()
+    assert Init.execute({"wand.json", []}) == error(:wand_core_missing)
   end
 
   defp get_default_file() do
@@ -161,5 +169,10 @@ defmodule InitTest do
       ^mix_path, ^mix_contents -> :ok
       ^wand_path, ^wand_contents -> :ok
     end)
+  end
+
+  defp stub_core_version(_) do
+    Helpers.System.stub_core_version()
+    :ok
   end
 end
