@@ -1,7 +1,7 @@
 defmodule Wand.MixProject do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.3.0"
   @description "A CLI tool to manage package dependencies"
   @cli_env [
     coveralls: :test,
@@ -16,14 +16,20 @@ defmodule Wand.MixProject do
       app: :wand,
       deps: deps(),
       description: @description,
+      docs: [
+        source_ref: "v#{@version}",
+        main: "readme",
+        extras: ["README.md"]
+      ],
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       escript: [main_module: Wand.CLI],
       package: package(),
       preferred_cli_env: @cli_env,
+      source_url: "https://github.com/AnilRedshift/wand-core",
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: @version
+      version: @version,
     ]
   end
 
@@ -63,7 +69,6 @@ defmodule Wand.MixProject do
     [
       name: :wand,
       files: ["lib", "mix.exs"],
-      docs: [extras: ["README.md"]],
       maintainers: ["Anil Kulkarni"],
       licenses: ["BSD-3"],
       links: %{"Github" => "https://github.com/AnilRedshift/wand"}
