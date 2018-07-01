@@ -10,6 +10,12 @@ defmodule Wand.CLI.Commands.Remove do
 
   ## Usage
   **wand** remove [package] [package]
+
+  ## Examples
+  ```
+  wand remove poison
+  wand remove poison ex_doc mox my_git_package
+  ```
   """
   def help(:missing_package) do
     """
