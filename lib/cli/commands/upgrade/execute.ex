@@ -21,7 +21,8 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
 
-      {:error, :require_core, reason} -> Wand.CLI.CoreValidator.handle_error(:require_core, reason)
+      {:error, :require_core, reason} ->
+        Wand.CLI.CoreValidator.handle_error(:require_core, reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)

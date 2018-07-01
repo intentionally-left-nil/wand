@@ -42,6 +42,7 @@ defmodule Wand.CLI.Commands.Core do
 
   def validate(args) do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
+
     case Wand.CLI.Command.parse_errors(errors) do
       :ok -> parse(commands, switches)
       error -> error
@@ -53,8 +54,11 @@ defmodule Wand.CLI.Commands.Core do
       {:ok, version} ->
         String.trim(version)
         |> @io.puts()
+
         :ok
-      {:error, _} -> missing_core()
+
+      {:error, _} ->
+        missing_core()
     end
   end
 
@@ -82,6 +86,7 @@ defmodule Wand.CLI.Commands.Core do
 
   defp get_flags(args) do
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
+
     case commands do
       ["version"] -> [version: :boolean]
       [] -> [version: :boolean]
@@ -95,6 +100,7 @@ defmodule Wand.CLI.Commands.Core do
     Could not install the wand_core archive. Please check the error message and then run wand core install again.
     """
     |> Display.error()
+
     {:error, 1}
   end
 
@@ -103,7 +109,9 @@ defmodule Wand.CLI.Commands.Core do
     # Error
     Could not determine the version for wand_core.
     You can try installing it with wand core install
-    """ |> Display.error()
+    """
+    |> Display.error()
+
     error(:wand_core_missing)
   end
 end

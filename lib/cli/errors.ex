@@ -11,7 +11,7 @@ defmodule Wand.CLI.Errors do
     wand_core_api_error: 72,
     mix_file_not_updated: 73,
     wand_core_missing: 74,
-    bad_wand_core_version: 75,
+    bad_wand_core_version: 75
   }
 
   def code(key), do: Map.fetch!(@errors, key)

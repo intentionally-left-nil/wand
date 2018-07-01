@@ -57,6 +57,7 @@ defmodule InitTest do
 
   describe "execute fails" do
     setup :stub_core_version
+
     setup do
       Helpers.IO.stub_stderr()
       :ok
@@ -126,6 +127,7 @@ defmodule InitTest do
 
   describe "execute successfully" do
     setup :stub_core_version
+
     setup do
       stub_exists("wand.json", false)
       stub_exists("./mix.exs", true)

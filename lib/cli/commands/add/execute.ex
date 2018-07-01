@@ -8,7 +8,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
   def execute(packages) do
     with :ok <- Wand.CLI.CoreValidator.require_core(),
-        {:ok, file} <- WandFileWithHelp.load(),
+         {:ok, file} <- WandFileWithHelp.load(),
          {:ok, dependencies} <- get_dependencies(packages),
          {:ok, file} <- add_dependencies(file, dependencies),
          :ok <- WandFileWithHelp.save(file),
@@ -22,7 +22,8 @@ defmodule Wand.CLI.Commands.Add.Execute do
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
 
-      {:error, :require_core, reason} -> Wand.CLI.CoreValidator.handle_error(:require_core, reason)
+      {:error, :require_core, reason} ->
+        Wand.CLI.CoreValidator.handle_error(:require_core, reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)

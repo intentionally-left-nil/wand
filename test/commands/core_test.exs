@@ -15,7 +15,8 @@ defmodule CoreTest do
     end
 
     test "returns help if an invalid flag is given" do
-      assert Core.validate(["core", "install", "--version"]) == {:error, {:invalid_flag, "--version"}}
+      assert Core.validate(["core", "install", "--version"]) ==
+               {:error, {:invalid_flag, "--version"}}
     end
 
     test "install" do
@@ -55,6 +56,7 @@ defmodule CoreTest do
 
   describe "execute version" do
     setup :verify_on_exit!
+
     test "succesfully gets the version" do
       version = "3.2.1"
       Helpers.System.stub_core_version(version)

@@ -1,6 +1,7 @@
 defmodule Wand.CLI.CoreValidator do
   alias Wand.CLI.Display
   import Wand.CLI.Errors, only: [error: 1]
+
   def require_core() do
     case Wand.CLI.Mix.core_version() do
       {:ok, version} -> validate_version(version)
@@ -24,6 +25,7 @@ defmodule Wand.CLI.CoreValidator do
     The wand_core archive task is missing, and needs to be installed. You can type wand core install to install the task
     """
     |> Display.error()
+
     error(:wand_core_missing)
   end
 
@@ -43,6 +45,7 @@ defmodule Wand.CLI.CoreValidator do
     </pre>
     """
     |> Display.error()
+
     error(:bad_wand_core_version)
   end
 end
