@@ -1,4 +1,19 @@
 defmodule Wand.CLI.Errors do
+  @type key ::
+          :missing_wand_file
+          | :invalid_wand_file
+          | :package_not_found
+          | :package_already_exists
+          | :hex_api_error
+          | :file_write_error
+          | :install_deps_error
+          | :file_already_exists
+          | :wand_core_api_error
+          | :mix_file_not_updated
+          | :wand_core_missing
+          | :bad_wand_core_version
+  @type t :: integer()
+
   @errors %{
     missing_wand_file: 64,
     invalid_wand_file: 65,
@@ -14,6 +29,9 @@ defmodule Wand.CLI.Errors do
     bad_wand_core_version: 75
   }
 
+  @spec code(key) :: t
   def code(key), do: Map.fetch!(@errors, key)
+
+  @spec error(key) :: {:error, t}
   def error(key), do: {:error, code(key)}
 end

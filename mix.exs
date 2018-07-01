@@ -29,7 +29,7 @@ defmodule Wand.MixProject do
       source_url: "https://github.com/AnilRedshift/wand",
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: @version,
+      version: @version
     ]
   end
 

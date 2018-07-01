@@ -1,5 +1,10 @@
 defmodule Wand.CLI do
   @system Wand.Interfaces.System.impl()
+  @moduledoc """
+  The main entrypoint for the wand escript
+  See `Wand` for more information
+  """
+  @spec main([String.t()]) :: :ok | no_return()
   def main(args) do
     Wand.CLI.ArgParser.parse(args)
     |> route

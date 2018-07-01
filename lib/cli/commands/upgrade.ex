@@ -57,7 +57,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   @doc false
   def help(:banner), do: Display.print(@banner)
   @doc false
-  def help(:verbose), do:  Display.print(@moduledoc)
+  def help(:verbose), do: Display.print(@moduledoc)
 
   @doc false
   def help({:invalid_flag, flag}) do
