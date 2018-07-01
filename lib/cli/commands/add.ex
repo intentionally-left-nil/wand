@@ -8,15 +8,15 @@ defmodule Wand.CLI.Commands.Add do
   **wand** add [package] [package] ... [flags]
 
   ## Examples
-  <pre>
-  **wand** add ex_doc mox --test
-  **wand** add poison --git=https://github.com/devinus/poison.git
-  **wand** add poison@3.1 --exact
-  </pre>
+  ```
+  wand add ex_doc mox --test
+  wand add poison --git="https://github.com/devinus/poison.git"
+  wand add poison@3.1 --exact
+  ```
 
   ## Options
   The available flags depend on if wand is being used to add a single package, or multiple packages. Flags that can only be used in single-package-mode are denoted with (s).
-  <pre>
+  ```
   --compile           Run mix compile after adding (default: **true**)
   --compile-env   (s) The environment for the dependency (default: **prod**)
   --dev               Include the dependency in the dev environment
@@ -37,7 +37,7 @@ defmodule Wand.CLI.Commands.Add do
   --test              Include the dependency in the test environment
   --tilde             Stay within the minor version provided
   --in-umbrella   (s) Sets a path dependency pointing to ../app
-  </pre>
+  ```
   """
 
   defmodule Git do
