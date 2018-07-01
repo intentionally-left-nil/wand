@@ -28,4 +28,7 @@ defmodule Wand do
 
   @doc false
   def banner(), do: @moduledoc
+
+  @version Mix.Project.config() |> Keyword.get(:version, "unknown")
+  def version(), do: @version
 end
