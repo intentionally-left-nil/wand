@@ -9,11 +9,15 @@ defmodule Wand.CLI.Commands.Version do
   **wand** version
   """
 
+  @doc false
   def help(:banner), do: Display.print(@moduledoc)
+  @doc false
   def help(:verbose), do: help(:banner)
 
+  @doc false
   def validate(_args), do: {:ok, []}
 
+  @doc false
   def execute(_args) do
     @io.puts(Wand.version())
     :ok

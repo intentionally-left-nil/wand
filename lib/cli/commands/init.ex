@@ -30,8 +30,10 @@ defmodule Wand.CLI.Commands.Init do
   ```
   """
 
+  @doc false
   def help(:banner), do: Display.print(@moduledoc)
 
+  @doc false
   def help(:verbose) do
     """
     wand init walks through the current list of dependencies for a project, and transfers it to wand.json.
@@ -43,7 +45,7 @@ defmodule Wand.CLI.Commands.Init do
     ## Options
     By default, wand init will refuse to overwrite an existing wand.json file. This is controllable via flags.
 
-    
+
     ```
     --overwrite           Ignore the presence of an existing wand.json file, and create a new one
     ```
@@ -51,6 +53,7 @@ defmodule Wand.CLI.Commands.Init do
     |> Display.print()
   end
 
+  @doc false
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
@@ -60,6 +63,7 @@ defmodule Wand.CLI.Commands.Init do
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     flags = [
       overwrite: :boolean
@@ -73,6 +77,7 @@ defmodule Wand.CLI.Commands.Init do
     end
   end
 
+  @doc false
   def execute({path, switches}) do
     file = %WandFile{}
 

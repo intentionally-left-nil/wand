@@ -4,8 +4,10 @@ defmodule Wand.CLI.Commands.Help do
 
   @moduledoc Wand.banner()
 
+  @doc false
   def help(:banner), do: Display.print(Wand.banner())
 
+  @doc false
   def help(:verbose) do
     help(:banner)
 
@@ -21,6 +23,7 @@ defmodule Wand.CLI.Commands.Help do
     end)
   end
 
+  @doc false
   def help({:invalid_flag, flag}) do
     """
     # Error
@@ -32,6 +35,7 @@ defmodule Wand.CLI.Commands.Help do
     |> Display.print()
   end
 
+  @doc false
   def help({:unrecognized, command}) do
     """
     # Error
@@ -41,6 +45,7 @@ defmodule Wand.CLI.Commands.Help do
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     flags = [
       verbose: :boolean,
@@ -55,6 +60,7 @@ defmodule Wand.CLI.Commands.Help do
     end
   end
 
+  @doc false
   def execute(_), do: help(:banner)
 
   defp parse(["help"], _verbose), do: {:error, :verbose}

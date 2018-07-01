@@ -19,6 +19,7 @@ defmodule Wand.CLI.Commands.Core do
   Wand validates to make sure the CLI is using a compatible version of wand_core. If they get out of sync, you can type wand core upgrade to fix the issue.
   """
 
+  @doc false
   def help(:banner) do
     """
     Manage the related wand_core package
@@ -32,8 +33,10 @@ defmodule Wand.CLI.Commands.Core do
     |> Display.print()
   end
 
+  @doc false
   def help(:verbose), do: Display.print(@moduledoc)
 
+  @doc false
   def help(:wrong_command) do
     """
     The command is invalid.
@@ -47,6 +50,7 @@ defmodule Wand.CLI.Commands.Core do
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
 
@@ -56,6 +60,7 @@ defmodule Wand.CLI.Commands.Core do
     end
   end
 
+  @doc false
   def execute(:version) do
     case Wand.CLI.Mix.core_version() do
       {:ok, version} ->
@@ -69,6 +74,7 @@ defmodule Wand.CLI.Commands.Core do
     end
   end
 
+  @doc false
   def execute(:install) do
     case Wand.CLI.Mix.install_core() do
       :ok -> :ok

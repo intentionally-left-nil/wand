@@ -53,9 +53,12 @@ defmodule Wand.CLI.Commands.Upgrade do
               latest: false
   end
 
+  @doc false
   def help(:banner), do: Display.print(@banner)
+  @doc false
   def help(:verbose), do:  Display.print(@moduledoc)
 
+  @doc false
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
@@ -65,6 +68,7 @@ defmodule Wand.CLI.Commands.Upgrade do
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
 
@@ -74,6 +78,7 @@ defmodule Wand.CLI.Commands.Upgrade do
     end
   end
 
+  @doc false
   def execute(args), do: Wand.CLI.Commands.Upgrade.Execute.execute(args)
 
   defp parse(commands, switches) do
