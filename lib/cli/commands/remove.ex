@@ -42,7 +42,7 @@ defmodule Wand.CLI.Commands.Remove do
     else
       {:error, :wand_file, reason} -> WandFileWithHelp.handle_error(reason)
       {:error, :require_core, reason} ->
-        Wand.CLI.CoreValidator.handle_error(:require_core, reason)
+        Wand.CLI.CoreValidator.handle_error(reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)

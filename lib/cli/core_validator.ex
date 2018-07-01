@@ -19,7 +19,7 @@ defmodule Wand.CLI.CoreValidator do
     end
   end
 
-  def handle_error(:require_core, :missing_core) do
+  def handle_error(:missing_core) do
     """
     # Error
     The wand_core archive task is missing, and needs to be installed. You can type wand core install to install the task
@@ -29,7 +29,7 @@ defmodule Wand.CLI.CoreValidator do
     error(:wand_core_missing)
   end
 
-  def handle_error(:require_core, {:version_mismatch, version}) do
+  def handle_error({:version_mismatch, version}) do
     """
     # Error
     The versions of wand and wand_core are out of sync.

@@ -37,11 +37,11 @@ defmodule CoreValidatorTest do
     end
 
     test ":wand_core_missing" do
-      assert CoreValidator.handle_error(:require_core, :missing_core) == error(:wand_core_missing)
+      assert CoreValidator.handle_error(:missing_core) == error(:wand_core_missing)
     end
 
     test ":bad_wand_core_version" do
-      assert CoreValidator.handle_error(:require_core, {:version_mismatch, "0.4.3"}) ==
+      assert CoreValidator.handle_error({:version_mismatch, "0.4.3"}) ==
                error(:bad_wand_core_version)
     end
   end
