@@ -10,8 +10,8 @@ defmodule Wand.CLI.Commands.Outdated do
 
   def help(:wrong_command) do
     """
-    wand outdated takes no commands.
-    See wand help outdated
+    wand outdated takes no arguments.
+    Please enter just wand outdated
     """
     |> Display.print()
   end
