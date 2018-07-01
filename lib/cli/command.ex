@@ -3,6 +3,19 @@ defmodule Wand.CLI.Command do
   @callback help(type :: any()) :: any()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
 
+  def routes() do
+    [
+      "add",
+      "core",
+      "help",
+      "init",
+      "outdated",
+      "remove",
+      "upgrade",
+      "version"
+    ]
+  end
+
   def route(key, name, args) do
     get_module(key)
     |> Kernel.apply(name, args)

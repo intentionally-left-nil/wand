@@ -1,45 +1,16 @@
 defmodule Wand.CLI.Commands.Help do
   alias Wand.CLI.Display
-  alias Wand.CLI.Commands
   @behaviour Wand.CLI.Command
 
-  @moduledoc """
-  Displays detailed help documentation for wand
-  ## Usage
-  **wand** help [command]
-
-  ## Available commands
-  <pre>
-  add         Add dependencies to your project
-  core        Manage the related wand_core package
-  help        Get detailed help
-  init        Initialize wand for a project
-  outdated    List packages that are out of date
-  remove      Remove dependencies from your project
-  upgrade     Upgrade a dependency in your project
-  version     Get the version of wand installed on the system
-  </pre>
-
-  ## Options
-  <pre>
-  --verbose   Detailed help for every command
-  --?         Same as --verbose
-  </pre>
-  """
+  @moduledoc Wand.banner()
 
   def help(:banner), do: Display.print(Wand.banner())
 
   def help(:verbose) do
     help(:banner)
-    [
-      "add",
-      "core",
-      "init",
-      "outdated",
-      "remove",
-      "upgrade",
-      "version"
-    ]
+
+    Wand.CLI.Command.routes()
+    |> List.delete("help")
     |> Enum.each(fn name ->
       """
       # #{String.capitalize(name)}
@@ -49,7 +20,6 @@ defmodule Wand.CLI.Commands.Help do
       "------------------------------------" |> Display.print()
     end)
   end
-  def help(:verbose), do: Display.print(@moduledoc)
 
   def help({:invalid_flag, flag}) do
     """
