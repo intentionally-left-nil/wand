@@ -62,7 +62,7 @@ defmodule CoreTest do
       Helpers.System.stub_core_version(version)
       expect(Wand.IOMock, :puts, fn ^version -> :ok end)
       Sys
-      assert Core.execute(:version) == :ok
+      assert Core.execute(:version) == {:ok, :silent}
     end
 
     test "fails to get the version" do

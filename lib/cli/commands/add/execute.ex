@@ -15,7 +15,13 @@ defmodule Wand.CLI.Commands.Add.Execute do
          :ok <- WandFileWithHelp.save(file),
          :ok <- download(packages),
          :ok <- compile(packages) do
-      :ok
+      message =
+        Enum.map(dependencies, fn %Dependency{name: name, requirement: requirement} ->
+          "Succesfully added #{name}: #{requirement}"
+        end)
+        |> Enum.join("\n")
+
+      {:ok, message}
     else
       {:error, :wand_file, reason} ->
         WandFileWithHelp.handle_error(reason)

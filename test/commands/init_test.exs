@@ -139,7 +139,7 @@ defmodule InitTest do
       Helpers.System.stub_get_deps()
       file = get_default_file()
       stub_all_writing("./mix.exs", "wand.json", file)
-      assert Init.execute({"wand.json", []}) == :ok
+      assert Init.execute({"wand.json", []}) |> elem(0) == :ok
     end
   end
 

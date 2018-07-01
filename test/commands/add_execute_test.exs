@@ -101,7 +101,7 @@ defmodule AddExecuteTest do
       Helpers.WandFile.stub_load()
       stub_file()
       package = get_package(download: false, compile: false)
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
   end
 
@@ -123,7 +123,7 @@ defmodule AddExecuteTest do
       stub_file()
       Helpers.System.stub_update_deps()
       package = get_package(compile: false)
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
   end
 
@@ -140,50 +140,67 @@ defmodule AddExecuteTest do
     test "adds a single package" do
       Helpers.Hex.stub_poison()
       stub_file(requirement: ">= 3.1.0 and < 4.0.0")
-      assert Add.execute([@poison]) == :ok
+      assert Add.execute([@poison]) |> elem(0) == :ok
     end
 
     test "add a package with a version" do
       stub_file()
       package = get_package()
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) == {:ok, "Succesfully added poison: >= 3.1.3 and < 4.0.0"}
+    end
+
+    test "add two packages" do
+      %WandFile{
+        dependencies: [
+          %Dependency{name: "mox", requirement: ">= 3.1.3 and < 4.0.0"},
+          %Dependency{name: "poison", requirement: ">= 3.1.3 and < 4.0.0"}
+        ]
+      }
+      |> Helpers.WandFile.stub_save()
+
+      poison = get_package()
+      mox = get_named_package("mox")
+
+      assert Add.execute([poison, mox]) ==
+               {:ok,
+                "Succesfully added poison: >= 3.1.3 and < 4.0.0\nSuccesfully added mox: >= 3.1.3 and < 4.0.0"}
     end
 
     test "add a package with the exact version" do
       stub_file(requirement: "== 3.1.2")
       package = get_package(requirement: "== 3.1.2")
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "add a package with the compile_env flag" do
       stub_file(opts: %{compile_env: :test})
       package = get_package(compile_env: :test)
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "does not add compile_env if it's set to prod" do
       stub_file()
       package = get_package(compile_env: :prod)
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "add the latest version only to test and dev" do
       stub_file(requirement: ">= 3.1.0 and < 4.0.0", opts: %{only: [:test, :dev]})
       Helpers.Hex.stub_poison()
       package = get_package(only: [:test, :dev], requirement: {:latest, :caret})
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "add the optional, override, and runtime flag if set" do
       stub_file(opts: %{optional: true, override: true, runtime: false, read_app_file: false})
       package = get_package(optional: true, override: true, runtime: false, read_app_file: false)
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "no opts for remaining opts if default" do
       stub_file()
       package = get_package(optional: false, override: false, runtime: true, read_app_file: true)
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "add a git package with all the fixings" do
@@ -206,7 +223,7 @@ defmodule AddExecuteTest do
           }
         )
 
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "do not add extra git flags" do
@@ -222,7 +239,7 @@ defmodule AddExecuteTest do
           }
         )
 
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "add a path with an umbrella" do
@@ -231,13 +248,13 @@ defmodule AddExecuteTest do
       package =
         get_package(details: %Path{path: "/path/to/app", in_umbrella: true}, optional: true)
 
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "do not include umbrella if false" do
       stub_file(opts: %{path: "/path/to/app"})
       package = get_package(details: %Path{path: "/path/to/app", in_umbrella: false})
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
 
     test "add a hex package with all the fixings" do
@@ -246,7 +263,7 @@ defmodule AddExecuteTest do
       package =
         get_package(details: %Hex{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
 
-      assert Add.execute([package]) == :ok
+      assert Add.execute([package]) |> elem(0) == :ok
     end
   end
 
@@ -257,12 +274,14 @@ defmodule AddExecuteTest do
     assert Add.execute([package]) == Error.get(:wand_core_missing)
   end
 
-  defp get_package(opts \\ []) do
+  defp get_package(opts \\ []), do: get_named_package("poison", opts)
+
+  def get_named_package(name, opts \\ []) do
     fields =
       %Package{}
       |> Map.to_list()
       |> Keyword.merge(
-        name: "poison",
+        name: name,
         requirement: ">= 3.1.3 and < 4.0.0"
       )
       |> Keyword.merge(opts)

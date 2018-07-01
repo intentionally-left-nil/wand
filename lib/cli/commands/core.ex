@@ -68,7 +68,7 @@ defmodule Wand.CLI.Commands.Core do
         String.trim(version)
         |> @io.puts()
 
-        :ok
+        {:ok, :silent}
 
       {:error, _} ->
         missing_core()

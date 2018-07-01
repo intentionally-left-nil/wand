@@ -15,6 +15,9 @@ defmodule DisplayTest do
   @r ANSI.red()
   @rr ANSI.default_color()
 
+  @g ANSI.green()
+  @gg ANSI.default_color()
+
   @t @u <> @b
   @tt @bb <> @uu
 
@@ -99,8 +102,18 @@ defmodule DisplayTest do
     Display.error("hello")
   end
 
+  test "success message" do
+    stub_color("hello", @g)
+    Display.success("hello")
+  end
+
   defp stub_io(message) do
     message = "\n" <> message <> "\n"
+    expect(Wand.IOMock, :puts, fn ^message -> :ok end)
+  end
+
+  defp stub_color(message, color) do
+    message = "#{color}\n#{message}\n#{@gg}"
     expect(Wand.IOMock, :puts, fn ^message -> :ok end)
   end
 

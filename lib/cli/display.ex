@@ -90,12 +90,21 @@ defmodule Wand.CLI.Display do
   @io Wand.Interfaces.IO.impl()
   def print(message) do
     convert(message)
-    |> @io.puts
+    |> stdout()
   end
 
   def error(message) do
-    (ANSI.red() <> convert(message) <> ANSI.default_color())
+    colorize(message, :red)
     |> stderr()
+  end
+
+  def success(message) do
+    colorize(message, :green)
+    |> stdout()
+  end
+
+  defp colorize(message, color) do
+    Kernel.apply(ANSI, color, []) <> convert(message) <> ANSI.default_color()
   end
 
   defp convert(message) do
@@ -108,6 +117,10 @@ defmodule Wand.CLI.Display do
 
   defp stderr(message) do
     @io.puts(:stderr, message)
+  end
+
+  defp stdout(message) do
+    @io.puts(message)
   end
 
   defp pretty(message) do
