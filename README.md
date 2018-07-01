@@ -3,17 +3,17 @@
 **wand** is a dependency manager that uses a _wand.json_ file to replace your deps() in mix.exs. This allows you to add, remove, and upgrade packages easily using the wand cli.
 
 ## Quickstart
-**To install**: `mix archive.install hex wand --force && mix archive.install hex wand_core --force`
+To install: `mix escript.install hex wand --force && mix archive.install hex wand_core --force`
 
-**To use wand in a project**: `wand init`
+To use wand in a project: `wand init`
 
-**Add a dependency**: `wand add poison`
+Add a dependency: `wand add poison`
 
-**Remove a dependency**: `wand remove poison`
+Remove a dependency: `wand remove poison`
 
-**Upgrade a dependency**: `wand upgrade poison --latest`
+Upgrade a dependency: `wand upgrade poison --latest`
 
-**help**: `wand --help`
+help: `wand --?`
 
 # Installing wand
 
@@ -21,7 +21,7 @@
 Wand requires [elixir](https://elixir-lang.org/install.html) before installing. You also need to have hex installed by running `mix local.hex`
 
 ## Installation
-`mix archive.install hex wand --force && mix archive.install hex wand_core --force`
+`mix escript.install hex wand --force && mix archive.install hex wand_core --force`
 
 After installation, you need to add the escript directory to your `PATH`. This is usually `~/.mix/escripts`
 
