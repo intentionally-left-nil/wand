@@ -1,11 +1,15 @@
 defmodule Wand.CLI.Commands.Core do
   alias Wand.CLI.Display
+  import Wand.CLI.Errors, only: [error: 1]
   @behaviour Wand.CLI.Command
+  @io Wand.Interfaces.IO.impl()
   @moduledoc """
   Manage the related wand-core tasks
   ## Usage
-  **wand** core install
-  **wand** core uninstall
+  <pre>
+  **wand** core install [--force]
+  **wand** core --version
+  </pre>
   """
 
   def help(:banner), do: Display.print(@moduledoc)
@@ -15,7 +19,10 @@ defmodule Wand.CLI.Commands.Core do
     Wand comes in two parts, the CLI and the wand.core tasks.
     In order to run mix deps.get, only the wand.core tasks are needed. For everything else, the CLI is needed.
 
-    This command lets you control wand.core and install it if missing.
+    Wand validates to make sure the CLI is using a compatible version of WandCore. If they get out of sync, you can type wand core upgrade to fix the issue.
+
+    ## Options
+    wand core install will install the archive globally.
     """
     |> Display.print()
   end
@@ -26,7 +33,7 @@ defmodule Wand.CLI.Commands.Core do
     The correct commands are:
     <pre>
     wand core install
-    wand core uninstall
+    wand core --version
     </pre>
     See wand help core --verbose for more information
     """
@@ -34,11 +41,77 @@ defmodule Wand.CLI.Commands.Core do
   end
 
   def validate(args) do
-    {_switches, [_ | commands], _errors} = OptionParser.parse(args)
-    parse(commands)
+    {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
+
+    case Wand.CLI.Command.parse_errors(errors) do
+      :ok -> parse(commands, switches)
+      error -> error
+    end
   end
 
-  defp parse(["install"]), do: {:ok, :install}
-  defp parse(["uninstall"]), do: {:ok, :uninstall}
-  defp parse(_commands), do: {:error, :wrong_command}
+  def execute(:version) do
+    case Wand.CLI.Mix.core_version() do
+      {:ok, version} ->
+        String.trim(version)
+        |> @io.puts()
+
+        :ok
+
+      {:error, _} ->
+        missing_core()
+    end
+  end
+
+  def execute(:install) do
+    case Wand.CLI.Mix.install_core() do
+      :ok -> :ok
+      {:error, _} -> cannot_install()
+    end
+  end
+
+  defp parse([], switches) do
+    case Keyword.get(switches, :version) do
+      true -> {:ok, :version}
+      _ -> {:error, :wrong_command}
+    end
+  end
+
+  defp parse(commands, _switches) do
+    case commands do
+      ["install"] -> {:ok, :install}
+      ["version"] -> {:ok, :version}
+      _ -> {:error, :wrong_command}
+    end
+  end
+
+  defp get_flags(args) do
+    {_switches, [_ | commands], _errors} = OptionParser.parse(args)
+
+    case commands do
+      ["version"] -> [version: :boolean]
+      [] -> [version: :boolean]
+      _ -> []
+    end
+  end
+
+  defp cannot_install() do
+    """
+    # Error
+    Could not install the wand_core archive. Please check the error message and then run wand core install again.
+    """
+    |> Display.error()
+
+    {:error, 1}
+  end
+
+  defp missing_core() do
+    """
+    # Error
+    Could not determine the version for wand_core.
+    You can try installing it with wand core install
+    """
+    |> Display.error()
+
+    error(:wand_core_missing)
+  end
 end

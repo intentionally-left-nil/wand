@@ -14,6 +14,7 @@ defmodule CliTest do
 
   test "add without a json file returns a status code of 64" do
     stub_exit(code(:missing_wand_file))
+    Helpers.System.stub_core_version()
     Helpers.WandFile.stub_no_file()
     Helpers.IO.stub_stderr()
     CLI.main(["add", "poison"])
