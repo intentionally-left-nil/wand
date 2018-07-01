@@ -1,5 +1,5 @@
 defmodule Wand.CLI.Display.Renderer do
-  alias Earmark.Block.{Heading, Html, HtmlOther, Para, Code}
+  alias Earmark.Block.{Heading, Html, HtmlOther, Para, Code, Ruler}
   alias IO.ANSI
   @moduledoc false
 
@@ -54,6 +54,13 @@ defmodule Wand.CLI.Display.Renderer do
 
   defp render_block(%Code{lines: lines}, _context) do
     Enum.join(lines, "\n")
+  end
+
+  defp render_block(%Ruler{}, _context) do
+    """
+    ______________________________________
+    --------------------------------------
+    """
   end
 
   defp render_block(%HtmlOther{html: ["<pre>" <> html]}, context) do

@@ -46,6 +46,8 @@ defmodule HelpTest do
     end
 
     test "verbose" do
+      # This is a bad test and if it breaks, just remove it
+      expect(Wand.IOMock, :puts, 21, fn _message -> :ok end)
       Help.help(:verbose)
     end
 

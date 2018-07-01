@@ -1,5 +1,6 @@
 defmodule Wand.CLI.Commands.Help do
   alias Wand.CLI.Display
+  alias Wand.CLI.Commands
   @behaviour Wand.CLI.Command
 
   @moduledoc """
@@ -27,6 +28,27 @@ defmodule Wand.CLI.Commands.Help do
   """
 
   def help(:banner), do: Display.print(Wand.banner())
+
+  def help(:verbose) do
+    help(:banner)
+    [
+      "add",
+      "core",
+      "init",
+      "outdated",
+      "remove",
+      "upgrade",
+      "version"
+    ]
+    |> Enum.each(fn name ->
+      """
+      # #{String.capitalize(name)}
+      """
+      |> Display.print()
+      Wand.CLI.Command.route(name, :help, [:banner])
+      "------------------------------------" |> Display.print()
+    end)
+  end
   def help(:verbose), do: Display.print(@moduledoc)
 
   def help({:invalid_flag, flag}) do
