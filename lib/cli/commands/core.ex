@@ -1,6 +1,6 @@
 defmodule Wand.CLI.Commands.Core do
   alias Wand.CLI.Display
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   @behaviour Wand.CLI.Command
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
@@ -126,6 +126,6 @@ defmodule Wand.CLI.Commands.Core do
     """
     |> Display.error()
 
-    error(:wand_core_missing)
+    Error.get(:wand_core_missing)
   end
 end

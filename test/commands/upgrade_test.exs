@@ -1,7 +1,7 @@
 defmodule UpgradeTest do
   use ExUnit.Case, async: true
   import Mox
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   alias Wand.Test.Helpers
   alias Wand.CLI.Commands.Upgrade
   alias Wand.CLI.Commands.Upgrade.Options
@@ -86,13 +86,13 @@ defmodule UpgradeTest do
     test ":missing_wand_file if cannot open wand file" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}) == error(:missing_wand_file)
+      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:missing_wand_file)
     end
 
     test ":package_not_found if the package is not in wand.json" do
       Helpers.WandFile.stub_load()
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}) == error(:package_not_found)
+      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:package_not_found)
     end
 
     test ":hex_api_error if getting the package from hex fails" do
@@ -104,7 +104,7 @@ defmodule UpgradeTest do
       Helpers.IO.stub_stderr()
       Helpers.Hex.stub_not_found()
 
-      assert Upgrade.execute({["poison"], %Options{}}) == error(:hex_api_error)
+      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:hex_api_error)
     end
 
     test "Error saving the wand file" do
@@ -112,7 +112,7 @@ defmodule UpgradeTest do
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_cannot_save(file)
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({:all, %Options{}}) == error(:file_write_error)
+      assert Upgrade.execute({:all, %Options{}}) == Error.get(:file_write_error)
     end
 
     test "update all no-ops if the dependencies are empty" do
@@ -239,7 +239,7 @@ defmodule UpgradeTest do
   test "Handle wand_core errors" do
     Helpers.System.stub_core_version_missing()
     Helpers.IO.stub_stderr()
-    assert Upgrade.execute({["poison"], %Options{}}) == error(:wand_core_missing)
+    assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:wand_core_missing)
   end
 
   defp stub_core_version(_) do

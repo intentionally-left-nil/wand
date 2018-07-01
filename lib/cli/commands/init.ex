@@ -4,7 +4,7 @@ defmodule Wand.CLI.Commands.Init do
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   @f WandCore.Interfaces.File.impl()
 
@@ -195,7 +195,7 @@ defmodule Wand.CLI.Commands.Init do
     """
     |> Display.error()
 
-    error(:file_already_exists)
+    Error.get(:file_already_exists)
   end
 
   defp handle_error(:get_deps, _reason) do
@@ -208,7 +208,7 @@ defmodule Wand.CLI.Commands.Init do
     """
     |> Display.error()
 
-    error(:wand_core_api_error)
+    Error.get(:wand_core_api_error)
   end
 
   defp handle_error(:unable_to_modify_mix, nil) do
@@ -220,6 +220,6 @@ defmodule Wand.CLI.Commands.Init do
     """
     |> Display.error()
 
-    error(:mix_file_not_updated)
+    Error.get(:mix_file_not_updated)
   end
 end

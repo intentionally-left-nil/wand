@@ -2,7 +2,7 @@ defmodule Wand.CLI.WandFileWithHelp do
   @moduledoc false
   alias WandCore.WandFile
   alias Wand.CLI.Display
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   def load() do
     case WandFile.load() do
@@ -33,7 +33,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:invalid_wand_file)
+    Error.get(:invalid_wand_file)
   end
 
   def handle_error({:load, reason})
@@ -48,7 +48,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:invalid_wand_file)
+    Error.get(:invalid_wand_file)
   end
 
   def handle_error({:load, {:file_read_error, :eaccess}}) do
@@ -61,7 +61,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:missing_wand_file)
+    Error.get(:missing_wand_file)
   end
 
   def handle_error({:load, {:file_read_error, reason}}) do
@@ -75,7 +75,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:missing_wand_file)
+    Error.get(:missing_wand_file)
   end
 
   def handle_error({:load, :invalid_dependencies}) do
@@ -87,7 +87,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:invalid_wand_file)
+    Error.get(:invalid_wand_file)
   end
 
   def handle_error({:load, {:invalid_dependency, name}}) do
@@ -99,7 +99,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:invalid_wand_file)
+    Error.get(:invalid_wand_file)
   end
 
   def handle_error({:save, reason}) do
@@ -113,6 +113,6 @@ defmodule Wand.CLI.WandFileWithHelp do
     """
     |> Display.error()
 
-    error(:file_write_error)
+    Error.get(:file_write_error)
   end
 end

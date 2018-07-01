@@ -1,4 +1,4 @@
-defmodule Wand.CLI.Errors do
+defmodule Wand.CLI.Error do
   @type key ::
           :missing_wand_file
           | :invalid_wand_file
@@ -32,6 +32,6 @@ defmodule Wand.CLI.Errors do
   @spec code(key) :: t
   def code(key), do: Map.fetch!(@errors, key)
 
-  @spec error(key) :: {:error, t}
-  def error(key), do: {:error, code(key)}
+  @spec get(key) :: {:error, t}
+  def get(key), do: {:error, code(key)}
 end

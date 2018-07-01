@@ -6,7 +6,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.Commands.Upgrade.Options
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   def execute({names, %Options{} = options}) do
     with :ok <- Wand.CLI.CoreValidator.require_core(),
@@ -121,7 +121,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     """
     |> Display.error()
 
-    error(:package_not_found)
+    Error.get(:package_not_found)
   end
 
   defp handle_error(:update_dependencies, {reason, name}) do
@@ -132,6 +132,6 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     """
     |> Display.error()
 
-    error(:hex_api_error)
+    Error.get(:hex_api_error)
   end
 end

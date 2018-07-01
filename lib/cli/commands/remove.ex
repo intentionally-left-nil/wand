@@ -2,7 +2,7 @@ defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias Wand.CLI.WandFileWithHelp
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   @behaviour Wand.CLI.Command
   @moduledoc """
@@ -84,6 +84,6 @@ defmodule Wand.CLI.Commands.Remove do
     """
     |> Display.error()
 
-    error(:install_deps_error)
+    Error.get(:install_deps_error)
   end
 end

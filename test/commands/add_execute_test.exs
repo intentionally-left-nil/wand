@@ -1,7 +1,7 @@
 defmodule AddExecuteTest do
   use ExUnit.Case
   import Mox
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
   alias Wand.Test.Helpers
@@ -19,7 +19,7 @@ defmodule AddExecuteTest do
     test "Error loading the wand file" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
-      assert Add.execute([@poison]) == error(:missing_wand_file)
+      assert Add.execute([@poison]) == Error.get(:missing_wand_file)
     end
 
     test "Error saving the wand file" do
@@ -29,7 +29,7 @@ defmodule AddExecuteTest do
       |> Helpers.WandFile.stub_cannot_save()
 
       Helpers.IO.stub_stderr()
-      assert Add.execute([get_package()]) == error(:file_write_error)
+      assert Add.execute([get_package()]) == Error.get(:file_write_error)
     end
   end
 
@@ -44,17 +44,17 @@ defmodule AddExecuteTest do
 
     test ":package_not_found when the package is not in hex" do
       Helpers.Hex.stub_not_found()
-      assert Add.execute([@poison]) == error(:package_not_found)
+      assert Add.execute([@poison]) == Error.get(:package_not_found)
     end
 
     test ":hex_api_error if there is no internet" do
       Helpers.Hex.stub_no_connection()
-      assert Add.execute([@poison]) == error(:hex_api_error)
+      assert Add.execute([@poison]) == Error.get(:hex_api_error)
     end
 
     test ":hex_api_error if hex returns :bad_response" do
       Helpers.Hex.stub_bad_response()
-      assert Add.execute([@poison]) == error(:hex_api_error)
+      assert Add.execute([@poison]) == Error.get(:hex_api_error)
     end
   end
 
@@ -75,13 +75,13 @@ defmodule AddExecuteTest do
       }
       |> Helpers.WandFile.stub_load()
 
-      assert Add.execute([@poison]) == error(:package_already_exists)
+      assert Add.execute([@poison]) == Error.get(:package_already_exists)
     end
 
     test ":package_already_exists when trying to add the same package twice" do
       Helpers.WandFile.stub_load()
       Helpers.Hex.stub_poison()
-      assert Add.execute([@poison, @poison]) == error(:package_already_exists)
+      assert Add.execute([@poison, @poison]) == Error.get(:package_already_exists)
     end
   end
 
@@ -94,7 +94,7 @@ defmodule AddExecuteTest do
       Helpers.System.stub_failed_update_deps()
       Helpers.IO.stub_stderr()
       package = get_package()
-      assert Add.execute([package]) == error(:install_deps_error)
+      assert Add.execute([package]) == Error.get(:install_deps_error)
     end
 
     test "skips downloading if download: false is set" do
@@ -115,7 +115,7 @@ defmodule AddExecuteTest do
       Helpers.System.stub_failed_compile()
       Helpers.IO.stub_stderr()
       package = get_package(compile_env: :prod)
-      assert Add.execute([package]) == error(:install_deps_error)
+      assert Add.execute([package]) == Error.get(:install_deps_error)
     end
 
     test "skips compiling if compile: false is set" do
@@ -254,7 +254,7 @@ defmodule AddExecuteTest do
     Helpers.System.stub_core_version_missing()
     Helpers.IO.stub_stderr()
     package = get_package()
-    assert Add.execute([package]) == error(:wand_core_missing)
+    assert Add.execute([package]) == Error.get(:wand_core_missing)
   end
 
   defp get_package(opts \\ []) do

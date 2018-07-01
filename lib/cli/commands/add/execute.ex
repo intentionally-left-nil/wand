@@ -5,7 +5,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
   alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.Display
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   def execute(packages) do
     with :ok <- Wand.CLI.CoreValidator.require_core(),
@@ -140,7 +140,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
 
-    error(:package_not_found)
+    Error.get(:package_not_found)
   end
 
   defp handle_error(:dependency, {reason, _name})
@@ -154,7 +154,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
 
-    error(:hex_api_error)
+    Error.get(:hex_api_error)
   end
 
   defp handle_error(:add_dependency, {:already_exists, name}) do
@@ -167,7 +167,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
 
-    error(:package_already_exists)
+    Error.get(:package_already_exists)
   end
 
   defp handle_error(:download_failed, _reason) do
@@ -180,7 +180,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
 
-    error(:install_deps_error)
+    Error.get(:install_deps_error)
   end
 
   defp handle_error(:compile_failed, _reason) do
@@ -193,6 +193,6 @@ defmodule Wand.CLI.Commands.Add.Execute do
     """
     |> Display.error()
 
-    error(:install_deps_error)
+    Error.get(:install_deps_error)
   end
 end

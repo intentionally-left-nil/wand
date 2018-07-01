@@ -1,7 +1,7 @@
 defmodule RemoveTest do
   use ExUnit.Case, async: true
   import Mox
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   alias Wand.CLI.Commands.Remove
   alias Wand.Test.Helpers
   alias WandCore.WandFile
@@ -48,7 +48,7 @@ defmodule RemoveTest do
     test "Error reading the WandFile" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == error(:missing_wand_file)
+      assert Remove.execute(["poison"]) == Error.get(:missing_wand_file)
     end
 
     test "Error saving the wand file" do
@@ -56,7 +56,7 @@ defmodule RemoveTest do
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_cannot_save(file)
       Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == error(:file_write_error)
+      assert Remove.execute(["poison"]) == Error.get(:file_write_error)
     end
 
     test ":install_deps_error if cleaning the deps fails" do
@@ -65,7 +65,7 @@ defmodule RemoveTest do
       Helpers.WandFile.stub_save(file)
       Helpers.System.stub_failed_cleanup_deps()
       Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == error(:install_deps_error)
+      assert Remove.execute(["poison"]) == Error.get(:install_deps_error)
     end
   end
 
@@ -121,7 +121,7 @@ defmodule RemoveTest do
   test "Handle wand_core errors" do
     Helpers.System.stub_core_version_missing()
     Helpers.IO.stub_stderr()
-    assert Remove.execute(["poison"]) == error(:wand_core_missing)
+    assert Remove.execute(["poison"]) == Error.get(:wand_core_missing)
   end
 
   defp stub_core_version(_) do
