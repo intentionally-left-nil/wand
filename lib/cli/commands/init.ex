@@ -15,17 +15,19 @@ defmodule Wand.CLI.Commands.Init do
   **wand** init [path] [flags]
 
   ## Examples
-  <pre>
-  **wand** init
-  **wand** init /path/to/project
-  **wand** init --overwrite
-  </pre>
+  ```
+  wand init
+  wand init /path/to/project
+  wand init --overwrite
+  ```
 
   ## Options
   By default, wand init will refuse to overwrite an existing wand.json file. It will also refuse to install the wand.core task without confirmation. This is controllable via flags.
-  <pre>
+
+
+  ```
   --overwrite           Ignore the presence of an existing wand.json file, and create a new one
-  </pre>
+  ```
   """
 
   def help(:banner), do: Display.print(@moduledoc)
@@ -40,9 +42,11 @@ defmodule Wand.CLI.Commands.Init do
 
     ## Options
     By default, wand init will refuse to overwrite an existing wand.json file. This is controllable via flags.
-    <pre>
+
+    
+    ```
     --overwrite           Ignore the presence of an existing wand.json file, and create a new one
-    </pre>
+    ```
     """
     |> Display.print()
   end
