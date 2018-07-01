@@ -2,6 +2,8 @@ defmodule CoreTest do
   use ExUnit.Case, async: true
   import Mox
   alias Wand.CLI.Commands.Core
+  alias Wand.Test.Helpers
+  import Wand.CLI.Errors, only: [error: 1]
 
   describe "validate" do
     test "returns help if nothing is passed in" do
@@ -56,6 +58,23 @@ defmodule CoreTest do
     def stub_io(_) do
       expect(Wand.IOMock, :puts, fn _message -> :ok end)
       :ok
+    end
+  end
+
+  describe "execute version" do
+    setup :verify_on_exit!
+    test "succesfully gets the version" do
+      version = "3.2.1"
+      Helpers.System.stub_core_version(version)
+      expect(Wand.IOMock, :puts, fn ^version -> :ok end)
+      Sys
+      assert Core.execute(:version) == :ok
+    end
+
+    test "fails to get the version" do
+      Helpers.System.stub_core_version_missing()
+      Helpers.IO.stub_stderr()
+      assert Core.execute(:version) == error(:wand_core_missing)
     end
   end
 end

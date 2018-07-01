@@ -28,6 +28,10 @@ defmodule Wand.CLI.Mix do
     |> strip_ok
   end
 
+  def core_version() do
+    mix("wand_core.version", get_output: true)
+  end
+
   defp mix(command, opts \\ []) do
     args = OptionParser.split(command)
 

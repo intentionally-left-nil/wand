@@ -64,4 +64,14 @@ defmodule Wand.Test.Helpers.System do
     message = "A green version"
     expect(Wand.SystemMock, :cmd, fn "mix", ["hex.outdated"], _opts -> {message, 0} end)
   end
+
+  def stub_core_version(version) do
+    message = "#{version}\n"
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.version"], _opts -> {message, 0} end)
+  end
+
+  def stub_core_version_missing() do
+    message = "** (Mix) The task"
+    expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.version"], _opts -> {message, 1} end)
+  end
 end

@@ -9,7 +9,8 @@ defmodule Wand.CLI.Errors do
     install_deps_error: 70,
     file_already_exists: 71,
     wand_core_api_error: 72,
-    mix_file_not_updated: 73
+    mix_file_not_updated: 73,
+    wand_core_missing: 74,
   }
 
   def code(key), do: Map.fetch!(@errors, key)

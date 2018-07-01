@@ -1,6 +1,8 @@
 defmodule Wand.CLI.Commands.Core do
   alias Wand.CLI.Display
+  import Wand.CLI.Errors, only: [error: 1]
   @behaviour Wand.CLI.Command
+  @io Wand.Interfaces.IO.impl()
   @moduledoc """
   Manage the related wand-core tasks
   ## Usage
@@ -49,6 +51,16 @@ defmodule Wand.CLI.Commands.Core do
     end
   end
 
+  def execute(:version) do
+    case Wand.CLI.Mix.core_version() do
+      {:ok, version} ->
+        String.trim(version)
+        |> @io.puts()
+        :ok
+      {:error, {_exit, message}} -> missing_core(message)
+    end
+  end
+
   defp parse([], switches) do
     case Keyword.get(switches, :version) do
       true -> {:ok, :version}
@@ -73,5 +85,16 @@ defmodule Wand.CLI.Commands.Core do
       [] -> [version: :boolean]
       _ -> []
     end
+  end
+
+  defp missing_core(error) do
+    """
+    # Error
+    Could not determine the version for wand_core.
+    If you need to install it, try wand core install
+
+    Detailed error: #{error}
+    """ |> Display.error()
+    error(:wand_core_missing)
   end
 end

@@ -60,4 +60,9 @@ defmodule MixTest do
     Helpers.System.stub_outdated()
     assert Wand.CLI.Mix.outdated() == :ok
   end
+
+  test "core_version" do
+    Helpers.System.stub_core_version("3.2.1")
+    assert Wand.CLI.Mix.core_version() == {:ok, "3.2.1\n"}
+  end
 end
