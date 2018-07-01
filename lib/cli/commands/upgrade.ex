@@ -2,26 +2,47 @@ defmodule Wand.CLI.Commands.Upgrade do
   alias Wand.CLI.Display
   @behaviour Wand.CLI.Command
 
-  @moduledoc """
+  @banner """
   Upgrade dependencies in your wand.json file
 
   ## Usage
+  ```
   wand upgrade
   wand upgrade poison ex_doc --latest
+  ```
+
 
   ## Options
-  <pre>
+  ```
   --compile           Run mix compile after adding (default: **true**)
   --download          Run mix deps.get after adding (default: **true**)
   --latest            Upgrade to the latest version, ignoring wand.json restrictions
-  </pre>
+  ```
 
-  The following flags are additionally allowed if --latest is passed in:
-  <pre>
-  --caret             After updating, set the version in wand.json with ^ semantics
+
+  The following flags are additionally allowed if `--latest` is passed in:
+  ```
   --exact             After updating, set the version in wand.json with ^ semantics
   --tilde             After updating, set the version in wand.json with ~> semantics
-  </pr>
+  ```
+  """
+
+  @moduledoc """
+  #{@banner}
+
+
+
+  By default, upgrade will respect the restrictions set in your wand.json file. Meaning,
+  if your requirement is `>= 3.2.0 and < 4.0.0`, and the latest version in hex is `3.7.3`, wand will update the lower bound of wand.json to `3.7.3`, but leave the upper bound alone.
+
+
+
+  If you want to update the upper bound, you need to use the --latest flag. The latest flag will always grab the newest (non pre) version in hex, and set that as the new lower bound. The upper bound is set to the next major version, unless you pass in the `--exact` or `--tilde` flags to override this behavior.
+
+
+
+  Wand prefers setting versions by the caret semantic. That means that the lower bound is the exact version specified, and the upper bound is the next major version. If the version is less than 1.0.0, the upper bound becomes the next minor version, and so forth.
+
   """
 
   defmodule Options do
@@ -32,13 +53,13 @@ defmodule Wand.CLI.Commands.Upgrade do
               latest: false
   end
 
-  def help(:banner), do: Display.print(@moduledoc)
-  def help(:verbose), do: help(:banner)
+  def help(:banner), do: Display.print(@banner)
+  def help(:verbose), do:  Display.print(@moduledoc)
 
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
-    Allowed flags are --caret, --compile, --download, --exact, --latest, and --tilde.
+    Allowed flags are --compile, --download, --exact, --latest, and --tilde.
     See wand help upgrade --verbose for more information
     """
     |> Display.print()
@@ -76,7 +97,6 @@ defmodule Wand.CLI.Commands.Upgrade do
     cond do
       Keyword.get(switches, :exact) -> :exact
       Keyword.get(switches, :tilde) -> :tilde
-      Keyword.get(switches, :caret) -> :caret
       true -> %Options{}.mode
     end
   end
@@ -89,7 +109,6 @@ defmodule Wand.CLI.Commands.Upgrade do
     ]
 
     latest_flags = [
-      caret: :boolean,
       exact: :boolean,
       tilde: :boolean
     ]
