@@ -16,7 +16,9 @@ defmodule Wand.CLI.Commands.Add.Execute do
          :ok <- compile(packages) do
       :ok
     else
-      {:error, :wand_file, reason} -> WandFileWithHelp.handle_error(reason)
+      {:error, :wand_file, reason} ->
+        WandFileWithHelp.handle_error(reason)
+
       {:error, :require_core, reason} ->
         Wand.CLI.CoreValidator.handle_error(reason)
 

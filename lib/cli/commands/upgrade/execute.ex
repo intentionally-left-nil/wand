@@ -15,7 +15,8 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
          :ok <- WandFileWithHelp.save(file) do
       :ok
     else
-      {:error, :wand_file, reason} -> WandFileWithHelp.handle_error(reason)
+      {:error, :wand_file, reason} ->
+        WandFileWithHelp.handle_error(reason)
 
       {:error, :require_core, reason} ->
         Wand.CLI.CoreValidator.handle_error(reason)
