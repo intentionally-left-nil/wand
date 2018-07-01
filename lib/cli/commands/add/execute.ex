@@ -166,9 +166,9 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp handle_error(:add_dependency, {:already_exists, name}) do
     """
     # Error
-    Package already exists in wand.json
+    Dependency already exists in wand.json
 
-    Attempted to add #{name} to wand.json, but that name already exists.
+    Attempted to add #{name} to wand.json, but that package already exists.
     Did you mean to type wand upgrade #{name} instead?
     """
     |> Display.error()
