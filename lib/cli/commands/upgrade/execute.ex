@@ -8,7 +8,8 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   import Wand.CLI.Errors, only: [error: 1]
 
   def execute({names, %Options{} = options}) do
-    with {:ok, file} <- WandFileWithHelp.load(),
+    with :ok <- Wand.CLI.CoreValidator.require_core(),
+         {:ok, file} <- WandFileWithHelp.load(),
          {:ok, dependencies} <- get_dependencies(file, names),
          {:ok, file} <- update_dependencies(file, dependencies, options),
          :ok <- WandFileWithHelp.save(file) do
@@ -19,6 +20,8 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
 
       {:error, :wand_file_save, reason} ->
         WandFileWithHelp.handle_error(:wand_file_save, reason)
+
+      {:error, :require_core, reason} -> Wand.CLI.CoreValidator.handle_error(:require_core, reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)
