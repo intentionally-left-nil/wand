@@ -15,7 +15,13 @@ defmodule Wand.CLI.Commands.Add.Execute do
          :ok <- WandFileWithHelp.save(file),
          :ok <- download(packages),
          :ok <- compile(packages) do
-      :ok
+      message =
+        Enum.map(dependencies, fn %Dependency{name: name, requirement: requirement} ->
+          "Succesfully added #{name}: #{requirement}"
+        end)
+        |> Enum.join("\n")
+
+      {:ok, message}
     else
       {:error, :wand_file, reason} ->
         WandFileWithHelp.handle_error(reason)
@@ -160,9 +166,9 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp handle_error(:add_dependency, {:already_exists, name}) do
     """
     # Error
-    Package already exists in wand.json
+    Dependency already exists in wand.json
 
-    Attempted to add #{name} to wand.json, but that name already exists.
+    Attempted to add #{name} to wand.json, but that package already exists.
     Did you mean to type wand upgrade #{name} instead?
     """
     |> Display.error()

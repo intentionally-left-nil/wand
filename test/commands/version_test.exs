@@ -35,7 +35,7 @@ defmodule CLI.VersionTest do
     test "get the version" do
       message = get_version()
       expect(Wand.IOMock, :puts, fn ^message -> :ok end)
-      assert Version.execute([]) == :ok
+      assert Version.execute([]) == {:ok, :silent}
     end
 
     defp get_version() do

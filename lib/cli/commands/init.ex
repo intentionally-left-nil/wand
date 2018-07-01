@@ -88,7 +88,12 @@ defmodule Wand.CLI.Commands.Init do
          {:ok, file} <- add_dependencies(file, deps),
          :ok <- WandFileWithHelp.save(file, path),
          :ok <- update_mix_file(path) do
-      :ok
+      message = """
+      Successfully initialized wand.json and copied your dependencies to it.
+      Type wand add [package] to add new packages, or wand upgrade to upgrade them
+      """
+
+      {:ok, message}
     else
       {:error, :wand_file, reason} ->
         WandFileWithHelp.handle_error(reason)
