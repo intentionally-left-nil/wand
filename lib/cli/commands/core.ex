@@ -8,7 +8,7 @@ defmodule Wand.CLI.Commands.Core do
   ## Usage
   <pre>
   **wand** core install [--force]
-  **wand** core uninstall
+  **wand** core --version
   </pre>
   """
 
@@ -22,9 +22,7 @@ defmodule Wand.CLI.Commands.Core do
     Wand validates to make sure the CLI is using a compatible version of WandCore. If they get out of sync, you can type wand core upgrade to fix the issue.
 
     ## Options
-    wand core install will install the archive globally. By default, it will _not_ overwrite an older version of WandCore. You can pass in the --latest flag to do so.
-
-    wand core uninstall will remove the core task globally.
+    wand core install will install the archive globally.
     """
     |> Display.print()
   end
@@ -34,8 +32,7 @@ defmodule Wand.CLI.Commands.Core do
     The command is invalid.
     The correct commands are:
     <pre>
-    wand core install [--force]
-    wand core uninstall
+    wand core install
     wand core --version
     </pre>
     See wand help core --verbose for more information
@@ -57,7 +54,14 @@ defmodule Wand.CLI.Commands.Core do
         String.trim(version)
         |> @io.puts()
         :ok
-      {:error, {_exit, message}} -> missing_core(message)
+      {:error, _} -> missing_core()
+    end
+  end
+
+  def execute(:install) do
+    case Wand.CLI.Mix.install_core() do
+      :ok -> :ok
+      {:error, _} -> cannot_install()
     end
   end
 
@@ -68,10 +72,9 @@ defmodule Wand.CLI.Commands.Core do
     end
   end
 
-  defp parse(commands, switches) do
+  defp parse(commands, _switches) do
     case commands do
-      ["install"] -> {:ok, {:install, switches}}
-      ["uninstall"] -> {:ok, :uninstall}
+      ["install"] -> {:ok, :install}
       ["version"] -> {:ok, :version}
       _ -> {:error, :wrong_command}
     end
@@ -80,20 +83,26 @@ defmodule Wand.CLI.Commands.Core do
   defp get_flags(args) do
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
     case commands do
-      ["install"] -> [force: :boolean]
       ["version"] -> [version: :boolean]
       [] -> [version: :boolean]
       _ -> []
     end
   end
 
-  defp missing_core(error) do
+  defp cannot_install() do
+    """
+    # Error
+    Could not install the wand_core archive. Please check the error message and then run wand core install again.
+    """
+    |> Display.error()
+    {:error, 1}
+  end
+
+  defp missing_core() do
     """
     # Error
     Could not determine the version for wand_core.
-    If you need to install it, try wand core install
-
-    Detailed error: #{error}
+    You can try installing it with wand core install
     """ |> Display.error()
     error(:wand_core_missing)
   end

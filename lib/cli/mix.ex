@@ -32,6 +32,11 @@ defmodule Wand.CLI.Mix do
     mix("wand_core.version", get_output: true)
   end
 
+  def install_core() do
+    mix("archive.install hex wand_core --force", print_output: true)
+    |> strip_ok
+  end
+
   defp mix(command, opts \\ []) do
     args = OptionParser.split(command)
 

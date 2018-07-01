@@ -65,4 +65,14 @@ defmodule MixTest do
     Helpers.System.stub_core_version("3.2.1")
     assert Wand.CLI.Mix.core_version() == {:ok, "3.2.1\n"}
   end
+
+  test "archive.install" do
+    Helpers.System.stub_install_core()
+    assert Wand.CLI.Mix.install_core() == :ok
+  end
+
+  test "archive.install failed" do
+    Helpers.System.stub_failed_install_core()
+    assert Wand.CLI.Mix.install_core() == {:error, {1, "Elixir.Mix.Local.Installer.Fetch"}}
+  end
 end

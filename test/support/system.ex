@@ -74,4 +74,14 @@ defmodule Wand.Test.Helpers.System do
     message = "** (Mix) The task"
     expect(Wand.SystemMock, :cmd, fn "mix", ["wand_core.version"], _opts -> {message, 1} end)
   end
+
+  def stub_install_core() do
+    message = "Resolving Hex dependencies"
+    expect(Wand.SystemMock, :cmd, fn "mix", ["archive.install", "hex", "wand_core", "--force"], _opts -> {message, 0} end)
+  end
+
+  def stub_failed_install_core() do
+    message = "Elixir.Mix.Local.Installer.Fetch"
+    expect(Wand.SystemMock, :cmd, fn "mix", ["archive.install", "hex", "wand_core", "--force"], _opts -> {message, 1} end)
+  end
 end

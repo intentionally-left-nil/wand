@@ -19,15 +19,7 @@ defmodule CoreTest do
     end
 
     test "install" do
-      assert Core.validate(["core", "install"]) == {:ok, {:install, []}}
-    end
-
-    test "install --force" do
-      assert Core.validate(["core", "install", "--force"]) == {:ok, {:install, [force: true]}}
-    end
-
-    test "uninstall" do
-      assert Core.validate(["core", "uninstall"]) == {:ok, :uninstall}
+      assert Core.validate(["core", "install"]) == {:ok, :install}
     end
 
     test "--version" do
@@ -75,6 +67,19 @@ defmodule CoreTest do
       Helpers.System.stub_core_version_missing()
       Helpers.IO.stub_stderr()
       assert Core.execute(:version) == error(:wand_core_missing)
+    end
+  end
+
+  describe "execute install" do
+    test "successfully installs the core" do
+      Helpers.System.stub_install_core()
+      assert Core.execute(:install) == :ok
+    end
+
+    test "Returns an error if installing the core fails" do
+      Helpers.System.stub_failed_install_core()
+      Helpers.IO.stub_stderr()
+      assert Core.execute(:install) == {:error, 1}
     end
   end
 end
