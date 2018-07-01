@@ -53,6 +53,10 @@ defmodule HelpTest do
       Help.help({:unrecognized, "not_add"})
     end
 
+    test "execute" do
+      Help.execute([])
+    end
+
     def stub_io(_) do
       expect(Wand.IOMock, :puts, fn _message -> :ok end)
       :ok
