@@ -1,4 +1,5 @@
 defmodule Wand.CLI.Commands.Add.Help do
+  @moduledoc false
   def help(:banner) do
     Wand.CLI.Display.print(Wand.CLI.Commands.Add.moduledoc())
   end

@@ -1,4 +1,5 @@
 defmodule Wand.Hex do
+  @moduledoc false
   alias HTTPoison.{Error, Response}
   @http Wand.Interfaces.Http.impl()
   @base "https://hex.pm/"

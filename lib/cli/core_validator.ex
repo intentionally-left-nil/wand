@@ -1,4 +1,5 @@
 defmodule Wand.CLI.CoreValidator do
+  @moduledoc false
   alias Wand.CLI.Display
   import Wand.CLI.Errors, only: [error: 1]
 

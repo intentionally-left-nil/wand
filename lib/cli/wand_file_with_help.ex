@@ -1,4 +1,5 @@
 defmodule Wand.CLI.WandFileWithHelp do
+  @moduledoc false
   alias WandCore.WandFile
   alias Wand.CLI.Display
   import Wand.CLI.Errors, only: [error: 1]

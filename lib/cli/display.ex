@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Display.Renderer do
   alias Earmark.Block.{Heading, Html, HtmlOther, Para}
   alias IO.ANSI
+  @moduledoc false
 
   def parse(message) do
     options = %Earmark.Options{
@@ -73,6 +74,7 @@ defmodule Wand.CLI.Display.Renderer do
 end
 
 defmodule Wand.CLI.Display do
+  @moduledoc false
   alias IO.ANSI
   @io Wand.Interfaces.IO.impl()
   def print(message) do

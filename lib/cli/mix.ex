@@ -1,4 +1,5 @@
 defmodule Wand.CLI.Mix do
+  @moduledoc false
   @system Wand.Interfaces.System.impl()
 
   def update_deps() do

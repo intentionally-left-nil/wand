@@ -1,4 +1,5 @@
 defmodule Wand.CLI.Commands.Upgrade.Execute do
+  @moduledoc false
   alias Wand.Mode
   alias Wand.CLI.Display
   alias WandCore.WandFile

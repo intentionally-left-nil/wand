@@ -25,6 +25,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   """
 
   defmodule Options do
+    @moduledoc false
     defstruct mode: :caret,
               download: true,
               compile: true,
