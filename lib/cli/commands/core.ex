@@ -4,7 +4,7 @@ defmodule Wand.CLI.Commands.Core do
   @behaviour Wand.CLI.Command
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
-  Manage the related wand-core tasks
+  Manage the related wand_core package
   ## Usage
   <pre>
   **wand** core install [--force]

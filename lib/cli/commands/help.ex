@@ -10,6 +10,7 @@ defmodule Wand.CLI.Commands.Help do
   ## Available commands
   <pre>
   add         Add dependencies to your project
+  core        Manage the related wand_core package
   help        Get detailed help
   init        Initialize wand for a project
   outdated    List packages that are out of date
