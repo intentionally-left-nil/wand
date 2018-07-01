@@ -1,7 +1,11 @@
 defmodule Wand.Mode do
   @type t :: :caret | :tilde | :exact | :custom
+  @type requirement :: String.t() | {:latest, t}
+  @type version :: String.t() | :latest | Version.t()
   @no_patch ~r/^(\d+)\.(\d+)($|\+.*$|-.*$)/
 
+  @spec from_requirement(requirement) :: t
+  def from_requirement(:latest), do: :caret
   def from_requirement(requirement) do
     case Version.Parser.lexer(requirement, []) do
       [:==, _] -> :exact
@@ -12,13 +16,14 @@ defmodule Wand.Mode do
     end
   end
 
+  @spec get_requirement!(t, version) :: requirement
   def get_requirement!(mode, version) do
     {:ok, requirement} = get_requirement(mode, version)
     requirement
   end
 
+  @spec get_requirement(t, version) :: {:ok, requirement}
   def get_requirement(mode, :latest), do: {:ok, {:latest, mode}}
-
   def get_requirement(mode, version) when is_binary(version) do
     case parse(version) do
       {:ok, version} -> {:ok, get_requirement(mode, version)}

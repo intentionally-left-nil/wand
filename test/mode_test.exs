@@ -160,6 +160,10 @@ defmodule ModeTest do
     test "custom with major new version having a minor" do
       assert Mode.from_requirement(">= 1.2.3 and < 2.3.0") == :custom
     end
+
+    test "latest defaults to caret" do
+      assert Mode.from_requirement(:latest) == :caret
+    end
   end
 
   describe "Round-trip tests" do
