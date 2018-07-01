@@ -3,7 +3,7 @@ defmodule CoreValidatorTest do
   alias Wand.CLI.CoreValidator
   alias Wand.Test.Helpers
   import Mox
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   describe "require_core" do
     test ":missing_core if the core is not available" do
@@ -37,12 +37,12 @@ defmodule CoreValidatorTest do
     end
 
     test ":wand_core_missing" do
-      assert CoreValidator.handle_error(:missing_core) == error(:wand_core_missing)
+      assert CoreValidator.handle_error(:missing_core) == Error.get(:wand_core_missing)
     end
 
     test ":bad_wand_core_version" do
       assert CoreValidator.handle_error({:version_mismatch, "0.4.3"}) ==
-               error(:bad_wand_core_version)
+               Error.get(:bad_wand_core_version)
     end
   end
 end

@@ -4,32 +4,37 @@ defmodule Wand.CLI.Commands.Init do
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
   alias Wand.CLI.WandFileWithHelp
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   @f WandCore.Interfaces.File.impl()
 
   @moduledoc """
+  # Init
   Convert an elixir project to use wand for dependencies.
 
-  ## Usage
+  ### Usage
   **wand** init [path] [flags]
 
   ## Examples
-  <pre>
-  **wand** init
-  **wand** init /path/to/project
-  **wand** init --overwrite
-  </pre>
+  ```
+  wand init
+  wand init /path/to/project
+  wand init --overwrite
+  ```
 
   ## Options
   By default, wand init will refuse to overwrite an existing wand.json file. It will also refuse to install the wand.core task without confirmation. This is controllable via flags.
-  <pre>
+
+
+  ```
   --overwrite           Ignore the presence of an existing wand.json file, and create a new one
-  </pre>
+  ```
   """
 
+  @doc false
   def help(:banner), do: Display.print(@moduledoc)
 
+  @doc false
   def help(:verbose) do
     """
     wand init walks through the current list of dependencies for a project, and transfers it to wand.json.
@@ -40,13 +45,16 @@ defmodule Wand.CLI.Commands.Init do
 
     ## Options
     By default, wand init will refuse to overwrite an existing wand.json file. This is controllable via flags.
-    <pre>
+
+
+    ```
     --overwrite           Ignore the presence of an existing wand.json file, and create a new one
-    </pre>
+    ```
     """
     |> Display.print()
   end
 
+  @doc false
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
@@ -56,6 +64,7 @@ defmodule Wand.CLI.Commands.Init do
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     flags = [
       overwrite: :boolean
@@ -69,6 +78,7 @@ defmodule Wand.CLI.Commands.Init do
     end
   end
 
+  @doc false
   def execute({path, switches}) do
     file = %WandFile{}
 
@@ -185,7 +195,7 @@ defmodule Wand.CLI.Commands.Init do
     """
     |> Display.error()
 
-    error(:file_already_exists)
+    Error.get(:file_already_exists)
   end
 
   defp handle_error(:get_deps, _reason) do
@@ -198,7 +208,7 @@ defmodule Wand.CLI.Commands.Init do
     """
     |> Display.error()
 
-    error(:wand_core_api_error)
+    Error.get(:wand_core_api_error)
   end
 
   defp handle_error(:unable_to_modify_mix, nil) do
@@ -210,6 +220,6 @@ defmodule Wand.CLI.Commands.Init do
     """
     |> Display.error()
 
-    error(:mix_file_not_updated)
+    Error.get(:mix_file_not_updated)
   end
 end

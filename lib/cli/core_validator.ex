@@ -1,6 +1,7 @@
 defmodule Wand.CLI.CoreValidator do
+  @moduledoc false
   alias Wand.CLI.Display
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   def require_core() do
     case Wand.CLI.Mix.core_version() do
@@ -26,7 +27,7 @@ defmodule Wand.CLI.CoreValidator do
     """
     |> Display.error()
 
-    error(:wand_core_missing)
+    Error.get(:wand_core_missing)
   end
 
   def handle_error({:version_mismatch, version}) do
@@ -46,6 +47,6 @@ defmodule Wand.CLI.CoreValidator do
     """
     |> Display.error()
 
-    error(:bad_wand_core_version)
+    Error.get(:bad_wand_core_version)
   end
 end

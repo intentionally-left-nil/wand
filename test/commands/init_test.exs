@@ -1,7 +1,7 @@
 defmodule InitTest do
   use ExUnit.Case, async: true
   import Mox
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   alias Wand.CLI.Commands.Init
   alias Wand.Test.Helpers
   alias WandCore.WandFile
@@ -65,7 +65,7 @@ defmodule InitTest do
 
     test ":file_already_exists when the file already exists" do
       stub_exists("wand.json", true)
-      assert Init.execute({"wand.json", []}) == error(:file_already_exists)
+      assert Init.execute({"wand.json", []}) == Error.get(:file_already_exists)
     end
 
     test ":file_write_error when saving the file" do
@@ -73,19 +73,19 @@ defmodule InitTest do
       Helpers.System.stub_get_deps()
       file = get_default_file()
       Helpers.WandFile.stub_cannot_save(file)
-      assert Init.execute({"wand.json", []}) == error(:file_write_error)
+      assert Init.execute({"wand.json", []}) == Error.get(:file_write_error)
     end
 
     test ":wand_core_api_error when get_deps fails" do
       stub_exists("wand.json", false)
       Helpers.System.stub_failed_get_deps()
-      assert Init.execute({"wand.json", []}) == error(:wand_core_api_error)
+      assert Init.execute({"wand.json", []}) == Error.get(:wand_core_api_error)
     end
 
     test ":wand_core_api_error when the dependency structure is bad" do
       stub_exists("wand.json", false)
       Helpers.System.stub_get_bad_deps()
-      assert Init.execute({"wand.json", []}) == error(:wand_core_api_error)
+      assert Init.execute({"wand.json", []}) == Error.get(:wand_core_api_error)
     end
 
     test ":mix_file_not_updated when the mix_file doesn't have deps" do
@@ -95,7 +95,7 @@ defmodule InitTest do
       Helpers.System.stub_get_deps()
       file = get_default_file()
       Helpers.WandFile.stub_save(file)
-      assert Init.execute({"wand.json", []}) == error(:mix_file_not_updated)
+      assert Init.execute({"wand.json", []}) == Error.get(:mix_file_not_updated)
     end
 
     test "Regression test: initialize a path with git" do
@@ -117,7 +117,7 @@ defmodule InitTest do
       }
       |> Helpers.WandFile.stub_save()
 
-      assert Init.execute({"wand.json", []}) == error(:mix_file_not_updated)
+      assert Init.execute({"wand.json", []}) == Error.get(:mix_file_not_updated)
     end
 
     defp stub_exists(path, exists) do
@@ -146,7 +146,7 @@ defmodule InitTest do
   test "Handle wand_core errors" do
     Helpers.System.stub_core_version_missing()
     Helpers.IO.stub_stderr()
-    assert Init.execute({"wand.json", []}) == error(:wand_core_missing)
+    assert Init.execute({"wand.json", []}) == Error.get(:wand_core_missing)
   end
 
   defp get_default_file() do

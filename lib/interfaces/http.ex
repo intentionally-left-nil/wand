@@ -1,4 +1,5 @@
 defmodule Wand.Interfaces.Http do
+  @moduledoc false
   alias HTTPoison.Response
   alias HTTPoison.Error
   @type headers :: [{atom, binary}]

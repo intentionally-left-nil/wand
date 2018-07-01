@@ -2,6 +2,8 @@ defmodule ModeTest do
   use ExUnit.Case, async: true
   alias Wand.Mode
 
+  doctest Mode
+
   describe "caret" do
     test "allows no updates for 0.0.1" do
       assert Mode.get_requirement(:caret, "0.0.1") == {:ok, ">= 0.0.1 and <= 0.0.1"}
@@ -159,6 +161,10 @@ defmodule ModeTest do
 
     test "custom with major new version having a minor" do
       assert Mode.from_requirement(">= 1.2.3 and < 2.3.0") == :custom
+    end
+
+    test "latest defaults to caret" do
+      assert Mode.from_requirement(:latest) == :caret
     end
   end
 

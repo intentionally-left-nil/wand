@@ -1,4 +1,5 @@
 defmodule Wand.CLI.Commands.Add.Validate do
+  @moduledoc false
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
 
   def validate(args) do

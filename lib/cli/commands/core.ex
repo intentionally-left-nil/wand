@@ -1,45 +1,57 @@
 defmodule Wand.CLI.Commands.Core do
   alias Wand.CLI.Display
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   @behaviour Wand.CLI.Command
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
-  Manage the related wand-core tasks
-  ## Usage
-  <pre>
-  **wand** core install [--force]
-  **wand** core --version
-  </pre>
+  # Core
+  Manage the related wand_core package
+  ### Usage
+  ```
+  wand core install
+  wand core version
+  ```
+
+
+
+  Wand comes in two parts, the CLI and the wand.core tasks.
+  In order to run mix deps.get, only the wand.core tasks are needed. For everything else, the CLI is needed.
+
+  Wand validates to make sure the CLI is using a compatible version of wand_core. If they get out of sync, you can type wand core upgrade to fix the issue.
   """
 
-  def help(:banner), do: Display.print(@moduledoc)
-
-  def help(:verbose) do
+  @doc false
+  def help(:banner) do
     """
-    Wand comes in two parts, the CLI and the wand.core tasks.
-    In order to run mix deps.get, only the wand.core tasks are needed. For everything else, the CLI is needed.
+    Manage the related wand_core package
+    ### Usage
 
-    Wand validates to make sure the CLI is using a compatible version of WandCore. If they get out of sync, you can type wand core upgrade to fix the issue.
-
-    ## Options
-    wand core install will install the archive globally.
+    ```
+    wand core install
+    wand core version
+    ```
     """
     |> Display.print()
   end
 
+  @doc false
+  def help(:verbose), do: Display.print(@moduledoc)
+
+  @doc false
   def help(:wrong_command) do
     """
     The command is invalid.
     The correct commands are:
     <pre>
     wand core install
-    wand core --version
+    wand core version
     </pre>
     See wand help core --verbose for more information
     """
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
 
@@ -49,6 +61,7 @@ defmodule Wand.CLI.Commands.Core do
     end
   end
 
+  @doc false
   def execute(:version) do
     case Wand.CLI.Mix.core_version() do
       {:ok, version} ->
@@ -62,6 +75,7 @@ defmodule Wand.CLI.Commands.Core do
     end
   end
 
+  @doc false
   def execute(:install) do
     case Wand.CLI.Mix.install_core() do
       :ok -> :ok
@@ -112,6 +126,6 @@ defmodule Wand.CLI.Commands.Core do
     """
     |> Display.error()
 
-    error(:wand_core_missing)
+    Error.get(:wand_core_missing)
   end
 end

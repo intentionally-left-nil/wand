@@ -1,4 +1,5 @@
 defmodule Wand.Interfaces.IO do
+  @moduledoc false
   @callback puts(message :: String.t()) :: :ok
   @callback puts(device :: IO.device(), message :: String.t()) :: :ok
 

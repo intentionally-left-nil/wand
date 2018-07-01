@@ -3,7 +3,7 @@ defmodule CliTest do
   alias Wand.CLI
   alias Wand.Test.Helpers
   import Mox
-  import Wand.CLI.Errors, only: [code: 1]
+  alias Wand.CLI.Error
   setup :verify_on_exit!
 
   test "help returns a status code of 1" do
@@ -13,7 +13,7 @@ defmodule CliTest do
   end
 
   test "add without a json file returns a status code of 64" do
-    stub_exit(code(:missing_wand_file))
+    stub_exit(Error.code(:missing_wand_file))
     Helpers.System.stub_core_version()
     Helpers.WandFile.stub_no_file()
     Helpers.IO.stub_stderr()

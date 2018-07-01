@@ -1,7 +1,7 @@
 defmodule WandFileWithHelpTest do
   use ExUnit.Case, async: true
   import Mox
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
   alias Wand.CLI.WandFileWithHelp
   alias WandCore.WandFile
   alias Wand.Test.Helpers
@@ -100,6 +100,6 @@ defmodule WandFileWithHelpTest do
   end
 
   defp validate_error_handling({:error, _key, reason}, code) do
-    assert WandFileWithHelp.handle_error(reason) == error(code)
+    assert WandFileWithHelp.handle_error(reason) == Error.get(code)
   end
 end

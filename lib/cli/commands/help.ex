@@ -2,32 +2,24 @@ defmodule Wand.CLI.Commands.Help do
   alias Wand.CLI.Display
   @behaviour Wand.CLI.Command
 
-  @moduledoc """
-  Displays detailed help documentation for wand
-  ## Usage
-  **wand** help [command]
+  @moduledoc Wand.banner()
 
-  ## Available commands
-  <pre>
-  add         Add dependencies to your project
-  help        Get detailed help
-  init        Initialize wand for a project
-  outdated    List packages that are out of date
-  remove      Remove dependencies from your project
-  upgrade     Upgrade a dependency in your project
-  version     Get the version of wand installed on the system
-  </pre>
-
-  ## Options
-  <pre>
-  --verbose   Detailed help for every command
-  --?         Same as --verbose
-  </pre>
-  """
-
+  @doc false
   def help(:banner), do: Display.print(Wand.banner())
-  def help(:verbose), do: Display.print(@moduledoc)
 
+  @doc false
+  def help(:verbose) do
+    help(:banner)
+
+    Wand.CLI.Command.routes()
+    |> List.delete("help")
+    |> Enum.each(fn name ->
+      Wand.CLI.Command.route(name, :help, [:banner])
+      "------------------------------------" |> Display.print()
+    end)
+  end
+
+  @doc false
   def help({:invalid_flag, flag}) do
     """
     # Error
@@ -39,6 +31,7 @@ defmodule Wand.CLI.Commands.Help do
     |> Display.print()
   end
 
+  @doc false
   def help({:unrecognized, command}) do
     """
     # Error
@@ -48,6 +41,7 @@ defmodule Wand.CLI.Commands.Help do
     |> Display.print()
   end
 
+  @doc false
   def validate(args) do
     flags = [
       verbose: :boolean,
@@ -62,6 +56,7 @@ defmodule Wand.CLI.Commands.Help do
     end
   end
 
+  @doc false
   def execute(_), do: help(:banner)
 
   defp parse(["help"], _verbose), do: {:error, :verbose}

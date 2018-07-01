@@ -3,19 +3,22 @@ defmodule Wand.CLI.Commands.Outdated do
   alias Wand.CLI.Display
 
   @moduledoc """
+  # Outdated
   List packages that are out of date.
-  ## Usage
+  ### Usage
   wand outdated
   """
 
+  @doc false
   def help(:wrong_command) do
     """
-    wand outdated takes no commands.
-    See wand help outdated
+    wand outdated takes no arguments.
+    Please enter just wand outdated
     """
     |> Display.print()
   end
 
+  @doc false
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
@@ -24,11 +27,15 @@ defmodule Wand.CLI.Commands.Outdated do
     |> Wand.CLI.Display.print()
   end
 
+  @doc false
   def help(_type), do: Display.print(@moduledoc)
 
+  @doc false
   def validate(["outdated"]), do: {:ok, []}
+  @doc false
   def validate(_args), do: {:error, :wrong_command}
 
+  @doc false
   def execute([]) do
     Wand.CLI.Mix.outdated()
     :ok

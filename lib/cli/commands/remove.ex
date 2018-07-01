@@ -2,15 +2,23 @@ defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias Wand.CLI.WandFileWithHelp
-  import Wand.CLI.Errors, only: [error: 1]
+  alias Wand.CLI.Error
 
   @behaviour Wand.CLI.Command
   @moduledoc """
+  # Remove
   Remove elixir packages from wand.json
 
-  ## Usage
+  ### Usage
   **wand** remove [package] [package]
+
+  ## Examples
+  ```
+  wand remove poison
+  wand remove poison ex_doc mox my_git_package
+  ```
   """
+  @doc false
   def help(:missing_package) do
     """
     wand remove must be called with at least one package name.
@@ -20,9 +28,12 @@ defmodule Wand.CLI.Commands.Remove do
     |> Display.print()
   end
 
+  @doc false
   def help(:banner), do: Display.print(@moduledoc)
+  @doc false
   def help(:verbose), do: help(:banner)
 
+  @doc false
   def validate(args) do
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
 
@@ -32,6 +43,7 @@ defmodule Wand.CLI.Commands.Remove do
     end
   end
 
+  @doc false
   def execute(names) do
     with :ok <- Wand.CLI.CoreValidator.require_core(),
          {:ok, file} <- WandFileWithHelp.load(),
@@ -72,6 +84,6 @@ defmodule Wand.CLI.Commands.Remove do
     """
     |> Display.error()
 
-    error(:install_deps_error)
+    Error.get(:install_deps_error)
   end
 end
