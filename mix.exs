@@ -26,7 +26,7 @@ defmodule Wand.MixProject do
       escript: [main_module: Wand.CLI],
       package: package(),
       preferred_cli_env: @cli_env,
-      source_url: "https://github.com/AnilRedshift/wand-core",
+      source_url: "https://github.com/AnilRedshift/wand",
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
       version: @version,

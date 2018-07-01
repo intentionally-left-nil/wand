@@ -76,7 +76,7 @@ defmodule Wand.CLI.Commands.Add do
   --test is shorthand for --env=test
   --prod is shorthand for --env=prod
 
-  --compile-env=ENVIRONMENT doesn't affect which environments the dependency is loaded from. Instead, it says "when compiling the dependency, which environment to use?". Defaults to --compile-env=prod
+  --compile-env=ENVIRONMENT doesnt affect which environments the dependency is loaded from. Instead, it says "when compiling the dependency, which environment to use?". Defaults to --compile-env=prod
 
   --optional will include the project for THIS project, but not reuire it should the main project be a dependency of another project.
   ```
@@ -86,7 +86,7 @@ defmodule Wand.CLI.Commands.Add do
   ### Dependency configuration
   These flags deal with what happens with the dependency once configured
   ```
-  --runtime determines whether to start the dependency's application. Defaults to true
+  --runtime determines whether to start the dependency. Defaults to true
   --read-app-file determines if the app file for the dependency is read. Defaults to true.
   --download determines if mix deps.get is run after adding the package to wand.json. Defaults to true. If set to false, this implies --compile=false as well.
   --compile determines if mix.compile is run after adding the package to wand.json.
@@ -94,6 +94,7 @@ defmodule Wand.CLI.Commands.Add do
   """
 
   defmodule Git do
+    @moduledoc false
     defstruct git: nil,
               ref: nil,
               sparse: nil,
@@ -101,17 +102,20 @@ defmodule Wand.CLI.Commands.Add do
   end
 
   defmodule Hex do
+    @moduledoc false
     defstruct hex: nil,
               organization: nil,
               repo: :hexpm
   end
 
   defmodule Path do
+    @moduledoc false
     defstruct path: nil,
               in_umbrella: false
   end
 
   defmodule Package do
+    @moduledoc false
     @default_requirement Wand.Mode.get_requirement!(:caret, :latest)
     defstruct compile: true,
               compile_env: :prod,
@@ -126,6 +130,7 @@ defmodule Wand.CLI.Commands.Add do
               runtime: true
   end
 
+  @doc false
   def moduledoc(), do: @moduledoc
   def help(type), do: Wand.CLI.Commands.Add.Help.help(type)
 
