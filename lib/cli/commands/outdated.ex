@@ -3,8 +3,9 @@ defmodule Wand.CLI.Commands.Outdated do
   alias Wand.CLI.Display
 
   @moduledoc """
+  # Outdated
   List packages that are out of date.
-  ## Usage
+  ### Usage
   wand outdated
   """
 

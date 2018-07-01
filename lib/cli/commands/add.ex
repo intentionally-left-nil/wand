@@ -1,9 +1,10 @@
 defmodule Wand.CLI.Commands.Add do
   @behaviour Wand.CLI.Command
   @moduledoc """
+  # Add
   Add elixir packages to wand.json
 
-  ## Usage
+  ### Usage
   **wand** add [package] [package] ... [flags]
 
   Wand can be used to add packages from three different places: hex, git, or the local filesystem. [package] can either be the name, or name@version.

@@ -30,7 +30,7 @@ You can verify this by typing in `mix escript` to see what path to add.
 ## Verify Installation
 You can verify that wand was properly installed by typing `wand --version` to make sure wand is installed, and `wand core --version` to make sure that [wand_core](http://github.com/anilredshift/wand-core) is installed
 
-## Usage
+### Usage
 Get started by navigating to an existing elixir project and type `wand init`. This will generate a _wand.json_ file. You should check this file into your source control. From now on, your dependencies are controlled by _wand.json_ in conjunction with your _mix.lock_ file. Let's take a quick look at an example wand.json file:
 ```
 {

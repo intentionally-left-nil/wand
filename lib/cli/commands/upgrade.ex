@@ -3,9 +3,10 @@ defmodule Wand.CLI.Commands.Upgrade do
   @behaviour Wand.CLI.Command
 
   @banner """
+  # Upgrade
   Upgrade dependencies in your wand.json file
 
-  ## Usage
+  ### Usage
   ```
   wand upgrade
   wand upgrade poison ex_doc --latest

@@ -14,10 +14,6 @@ defmodule Wand.CLI.Commands.Help do
     Wand.CLI.Command.routes()
     |> List.delete("help")
     |> Enum.each(fn name ->
-      """
-      # #{String.capitalize(name)}
-      """
-      |> Display.print()
       Wand.CLI.Command.route(name, :help, [:banner])
       "------------------------------------" |> Display.print()
     end)

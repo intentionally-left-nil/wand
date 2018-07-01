@@ -3,9 +3,10 @@ defmodule Wand.CLI.Commands.Version do
   @io Wand.Interfaces.IO.impl()
   @behaviour Wand.CLI.Command
   @moduledoc """
+  # Version
   Get the installed version of wand. To get the version of wand_core, use wand core version instead.
 
-  ## Usage
+  ### Usage
   **wand** version
   """
 

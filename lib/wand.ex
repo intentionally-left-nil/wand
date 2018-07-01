@@ -1,7 +1,7 @@
 defmodule Wand do
   @moduledoc """
   A CLI tool for managing Elixir dependencies
-  ## Usage
+  ### Usage
   **wand** [command] [flags]
 
   ## Available commands

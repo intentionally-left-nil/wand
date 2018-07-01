@@ -6,9 +6,10 @@ defmodule Wand.CLI.Commands.Remove do
 
   @behaviour Wand.CLI.Command
   @moduledoc """
+  # Remove
   Remove elixir packages from wand.json
 
-  ## Usage
+  ### Usage
   **wand** remove [package] [package]
 
   ## Examples

@@ -4,8 +4,9 @@ defmodule Wand.CLI.Commands.Core do
   @behaviour Wand.CLI.Command
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
+  # Core
   Manage the related wand_core package
-  ## Usage
+  ### Usage
   ```
   wand core install
   wand core version
@@ -23,7 +24,7 @@ defmodule Wand.CLI.Commands.Core do
   def help(:banner) do
     """
     Manage the related wand_core package
-    ## Usage
+    ### Usage
 
     ```
     wand core install

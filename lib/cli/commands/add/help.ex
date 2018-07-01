@@ -4,7 +4,7 @@ defmodule Wand.CLI.Commands.Add.Help do
     """
     Add elixir packages to wand.json
 
-    ## Usage
+    ### Usage
     **wand** add [package] [package] ... [flags]
 
     ## Examples

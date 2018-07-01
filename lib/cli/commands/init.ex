@@ -9,9 +9,10 @@ defmodule Wand.CLI.Commands.Init do
   @f WandCore.Interfaces.File.impl()
 
   @moduledoc """
+  # Init
   Convert an elixir project to use wand for dependencies.
 
-  ## Usage
+  ### Usage
   **wand** init [path] [flags]
 
   ## Examples
