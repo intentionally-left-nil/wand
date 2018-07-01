@@ -6,25 +6,25 @@ defmodule Wand.CLI.WandFileWithHelp do
   def load() do
     case WandFile.load() do
       {:ok, file} -> {:ok, file}
-      {:error, reason} -> {:error, :wand_file_load, reason}
+      {:error, reason} -> {:error, :wand_file, {:load, reason}}
     end
   end
 
   def save(file) do
     case WandFile.save(file) do
       :ok -> :ok
-      {:error, reason} -> {:error, :wand_file_save, reason}
+      {:error, reason} -> {:error, :wand_file, {:save, reason}}
     end
   end
 
   def save(file, path) do
     case WandFile.save(file, path) do
       :ok -> :ok
-      {:error, reason} -> {:error, :wand_file_save, reason}
+      {:error, reason} -> {:error, :wand_file, {:save, reason}}
     end
   end
 
-  def handle_error(:wand_file_load, :json_decode_error) do
+  def handle_error({:load, :json_decode_error}) do
     """
     # Error
     wand.json is not a valid JSON file.
@@ -35,7 +35,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     error(:invalid_wand_file)
   end
 
-  def handle_error(:wand_file_load, reason)
+  def handle_error({:load, reason})
       when reason in [:invalid_version, :missing_version, :version_mismatch] do
     """
     # Error
@@ -50,7 +50,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     error(:invalid_wand_file)
   end
 
-  def handle_error(:wand_file_load, {:file_read_error, :eaccess}) do
+  def handle_error({:load, {:file_read_error, :eaccess}}) do
     """
     # Error
     Permission error reading wand.json.
@@ -63,7 +63,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     error(:missing_wand_file)
   end
 
-  def handle_error(:wand_file_load, {:file_read_error, reason}) do
+  def handle_error({:load, {:file_read_error, reason}}) do
     """
     # Error
     Could not find wand.json in the current directory.
@@ -77,7 +77,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     error(:missing_wand_file)
   end
 
-  def handle_error(:wand_file_load, :invalid_dependencies) do
+  def handle_error({:load, :invalid_dependencies}) do
     """
     # Error
     The version field in wand.json is incorrect.
@@ -89,7 +89,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     error(:invalid_wand_file)
   end
 
-  def handle_error(:wand_file_load, {:invalid_dependency, name}) do
+  def handle_error({:load, {:invalid_dependency, name}}) do
     """
     # Error
     A dependency in wand.json is formatted incorrectly.
@@ -101,7 +101,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     error(:invalid_wand_file)
   end
 
-  def handle_error(:wand_file_save, reason) do
+  def handle_error({:save, reason}) do
     """
     # Error
     Could not write to wand.json

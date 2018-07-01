@@ -80,8 +80,8 @@ defmodule Wand.CLI.Commands.Init do
          :ok <- update_mix_file(path) do
       :ok
     else
-      {:error, :wand_file_save, reason} ->
-        WandFileWithHelp.handle_error(:wand_file_save, reason)
+      {:error, :wand_file, reason} ->
+        WandFileWithHelp.handle_error(reason)
 
       {:error, :require_core, reason} ->
         Wand.CLI.CoreValidator.handle_error(:require_core, reason)
