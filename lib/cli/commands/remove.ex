@@ -34,7 +34,10 @@ defmodule Wand.CLI.Commands.Remove do
   def help(:verbose), do: help(:banner)
 
   def options() do
-    [require_core: true]
+    [
+      require_core: true,
+      load_wand_file: true,
+    ]
   end
 
   @doc false
@@ -48,9 +51,8 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
-  def execute(names) do
-    with {:ok, file} <- WandFileWithHelp.load(),
-         file <- remove_names(file, names),
+  def execute(names, %{wand_file: file}) do
+    with file <- remove_names(file, names),
          :ok <- WandFileWithHelp.save(file),
          :ok <- cleanup() do
       :ok

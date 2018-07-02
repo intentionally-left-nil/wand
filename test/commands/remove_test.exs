@@ -43,27 +43,19 @@ defmodule RemoveTest do
   end
 
   describe "execute errors" do
-    test "Error reading the WandFile" do
-      Helpers.WandFile.stub_no_file()
-      Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == Error.get(:missing_wand_file)
-    end
-
     test "Error saving the wand file" do
       file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_cannot_save(file)
       Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == Error.get(:file_write_error)
+      assert Remove.execute(["poison"], %{wand_file: file}) == Error.get(:file_write_error)
     end
 
     test ":install_deps_error if cleaning the deps fails" do
       file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
       Helpers.System.stub_failed_cleanup_deps()
       Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == Error.get(:install_deps_error)
+      assert Remove.execute(["poison"], %{wand_file: file}) == Error.get(:install_deps_error)
     end
   end
 
@@ -75,9 +67,8 @@ defmodule RemoveTest do
 
     test "Does nothing if the dependency is not being used" do
       file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
-      assert Remove.execute(["poison"]) == :ok
+      assert Remove.execute(["poison"], %{wand_file: file}) == :ok
     end
 
     test "removes the dependency" do
@@ -87,9 +78,6 @@ defmodule RemoveTest do
           Helpers.WandFile.mox()
         ]
       }
-
-      Helpers.WandFile.stub_load(file)
-
       %WandFile{
         dependencies: [
           Helpers.WandFile.mox()
@@ -97,7 +85,7 @@ defmodule RemoveTest do
       }
       |> Helpers.WandFile.stub_save()
 
-      assert Remove.execute(["poison"]) == :ok
+      assert Remove.execute(["poison"], %{wand_file: file}) == :ok
     end
 
     test "removes multiple dependencies" do
@@ -108,9 +96,8 @@ defmodule RemoveTest do
         ]
       }
 
-      Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(%WandFile{})
-      assert Remove.execute(["mox", "poison", "not_present"]) == :ok
+      assert Remove.execute(["mox", "poison", "not_present"], %{wand_file: file}) == :ok
     end
   end
 end
