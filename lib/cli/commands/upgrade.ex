@@ -69,6 +69,10 @@ defmodule Wand.CLI.Commands.Upgrade do
     |> Display.print()
   end
 
+  def options() do
+    [require_core: true]
+  end
+
   @doc false
   def validate(args) do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))

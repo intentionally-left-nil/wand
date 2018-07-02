@@ -33,6 +33,10 @@ defmodule Wand.CLI.Commands.Remove do
   @doc false
   def help(:verbose), do: help(:banner)
 
+  def options() do
+    [require_core: true]
+  end
+
   @doc false
   def validate(args) do
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
@@ -45,8 +49,7 @@ defmodule Wand.CLI.Commands.Remove do
 
   @doc false
   def execute(names) do
-    with :ok <- Wand.CLI.CoreValidator.require_core(),
-         {:ok, file} <- WandFileWithHelp.load(),
+    with {:ok, file} <- WandFileWithHelp.load(),
          file <- remove_names(file, names),
          :ok <- WandFileWithHelp.save(file),
          :ok <- cleanup() do
@@ -54,9 +57,6 @@ defmodule Wand.CLI.Commands.Remove do
     else
       {:error, :wand_file, reason} ->
         WandFileWithHelp.handle_error(reason)
-
-      {:error, :require_core, reason} ->
-        Wand.CLI.CoreValidator.handle_error(reason)
 
       {:error, step, reason} ->
         handle_error(step, reason)
