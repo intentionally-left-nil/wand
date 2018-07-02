@@ -10,7 +10,7 @@ defmodule Wand.CLI.Command do
   """
 
   @callback options() :: keyword()
-  @callback execute(data :: any()) :: :ok | {:error, integer()}
+  @callback execute(data :: any(), extras :: map()) :: :ok | {:error, integer()}
   @callback help(type :: any()) :: any()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
 
