@@ -1,5 +1,6 @@
 defmodule Wand.CLI do
   alias Wand.CLI.Display
+  alias Wand.CLI.Executor
   @system Wand.Interfaces.System.impl()
   @moduledoc """
   The main entrypoint for the wand escript
@@ -12,7 +13,9 @@ defmodule Wand.CLI do
   end
 
   defp route({key, data}) do
-    case Wand.CLI.Command.route(key, :execute, [data]) do
+    module = Wand.CLI.Command.get_module(key)
+
+    case Executor.run(module, data) do
       :ok ->
         Display.success("Succeeded!")
         :ok
