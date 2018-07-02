@@ -137,6 +137,11 @@ defmodule Wand.CLI.Commands.Add do
   def help(type), do: Wand.CLI.Commands.Add.Help.help(type)
 
   @doc false
+  def options() do
+    [require_core: true]
+  end
+
+  @doc false
   def validate(args), do: Wand.CLI.Commands.Add.Validate.validate(args)
 
   @doc false

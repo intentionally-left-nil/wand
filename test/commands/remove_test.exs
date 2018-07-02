@@ -43,8 +43,6 @@ defmodule RemoveTest do
   end
 
   describe "execute errors" do
-    setup :stub_core_version
-
     test "Error reading the WandFile" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
@@ -70,8 +68,6 @@ defmodule RemoveTest do
   end
 
   describe "execute successfully" do
-    setup :stub_core_version
-
     setup do
       Helpers.System.stub_cleanup_deps()
       :ok
@@ -116,16 +112,5 @@ defmodule RemoveTest do
       Helpers.WandFile.stub_save(%WandFile{})
       assert Remove.execute(["mox", "poison", "not_present"]) == :ok
     end
-  end
-
-  test "Handle wand_core errors" do
-    Helpers.System.stub_core_version_missing()
-    Helpers.IO.stub_stderr()
-    assert Remove.execute(["poison"]) == Error.get(:wand_core_missing)
-  end
-
-  defp stub_core_version(_) do
-    Helpers.System.stub_core_version()
-    :ok
   end
 end

@@ -14,8 +14,6 @@ defmodule AddExecuteTest do
   @poison %Package{name: "poison"}
 
   describe "load/save errors" do
-    setup :stub_core_version
-
     test "Error loading the wand file" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
@@ -34,8 +32,6 @@ defmodule AddExecuteTest do
   end
 
   describe "hex api errors" do
-    setup :stub_core_version
-
     setup do
       Helpers.WandFile.stub_load()
       Helpers.IO.stub_stderr()
@@ -59,8 +55,6 @@ defmodule AddExecuteTest do
   end
 
   describe "dependency errors" do
-    setup :stub_core_version
-
     setup do
       Helpers.IO.stub_stderr()
       Helpers.Hex.stub_poison()
@@ -86,8 +80,6 @@ defmodule AddExecuteTest do
   end
 
   describe "download" do
-    setup :stub_core_version
-
     test ":install_deps_error when downloading fails" do
       Helpers.WandFile.stub_load()
       stub_file()
@@ -106,8 +98,6 @@ defmodule AddExecuteTest do
   end
 
   describe "compile" do
-    setup :stub_core_version
-
     test ":install_deps_error when compiling fails" do
       Helpers.WandFile.stub_load()
       stub_file()
@@ -128,8 +118,6 @@ defmodule AddExecuteTest do
   end
 
   describe "Successfully" do
-    setup :stub_core_version
-
     setup do
       Helpers.WandFile.stub_load()
       Helpers.System.stub_update_deps()
@@ -267,13 +255,6 @@ defmodule AddExecuteTest do
     end
   end
 
-  test "handles wand_core mismatch" do
-    Helpers.System.stub_core_version_missing()
-    Helpers.IO.stub_stderr()
-    package = get_package()
-    assert Add.execute([package]) == Error.get(:wand_core_missing)
-  end
-
   defp get_package(opts \\ []), do: get_named_package("poison", opts)
 
   def get_named_package(name, opts \\ []) do
@@ -302,10 +283,5 @@ defmodule AddExecuteTest do
   defp stub_file(opts \\ []) do
     get_file(opts)
     |> Helpers.WandFile.stub_save()
-  end
-
-  defp stub_core_version(_) do
-    Helpers.System.stub_core_version()
-    :ok
   end
 end

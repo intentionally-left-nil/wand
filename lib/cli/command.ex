@@ -9,9 +9,12 @@ defmodule Wand.CLI.Command do
   4. Update the help file in `Wand` with the appropriate text
   """
 
+  @callback options() :: keyword()
   @callback execute(data :: any()) :: :ok | {:error, integer()}
   @callback help(type :: any()) :: any()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
+
+  @optional_callbacks options: 0
 
   def routes() do
     [
@@ -26,6 +29,12 @@ defmodule Wand.CLI.Command do
     ]
   end
 
+  def get_module(name) when is_atom(name), do: get_module(to_string(name))
+
+  def get_module(name) do
+    Module.concat(Wand.CLI.Commands, String.capitalize(name))
+  end
+
   def route(key, name, args) do
     get_module(key)
     |> Kernel.apply(name, args)
@@ -37,9 +46,4 @@ defmodule Wand.CLI.Command do
     {:error, {:invalid_flag, flag}}
   end
 
-  defp get_module(name) when is_atom(name), do: get_module(to_string(name))
-
-  defp get_module(name) do
-    Module.concat(Wand.CLI.Commands, String.capitalize(name))
-  end
 end

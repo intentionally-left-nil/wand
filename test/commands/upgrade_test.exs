@@ -81,8 +81,6 @@ defmodule UpgradeTest do
   end
 
   describe "execute" do
-    setup :stub_core_version
-
     test ":missing_wand_file if cannot open wand file" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
@@ -124,8 +122,6 @@ defmodule UpgradeTest do
   end
 
   describe "execute poison successfully" do
-    setup :stub_core_version
-
     test "No-ops if on the latest version" do
       validate(">= 2.2.0 and < 3.0.0")
     end
@@ -205,8 +201,6 @@ defmodule UpgradeTest do
   end
 
   describe "execute with git dependencies" do
-    setup :stub_core_version
-
     test "No-ops if git without a requirement" do
       file = %WandFile{
         dependencies: [
@@ -221,8 +215,6 @@ defmodule UpgradeTest do
   end
 
   describe "execute with file dependencies" do
-    setup :stub_core_version
-
     test "No-ops" do
       file = %WandFile{
         dependencies: [
@@ -234,16 +226,5 @@ defmodule UpgradeTest do
       Helpers.WandFile.stub_save(file)
       assert Upgrade.execute({["poison"], %Options{}}) == :ok
     end
-  end
-
-  test "Handle wand_core errors" do
-    Helpers.System.stub_core_version_missing()
-    Helpers.IO.stub_stderr()
-    assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:wand_core_missing)
-  end
-
-  defp stub_core_version(_) do
-    Helpers.System.stub_core_version()
-    :ok
   end
 end
