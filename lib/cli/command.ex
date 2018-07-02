@@ -9,9 +9,12 @@ defmodule Wand.CLI.Command do
   4. Update the help file in `Wand` with the appropriate text
   """
 
+  @callback options() :: keyword()
   @callback execute(data :: any()) :: :ok | {:error, integer()}
   @callback help(type :: any()) :: any()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
+
+  @optional_callbacks options: 0
 
   def routes() do
     [
