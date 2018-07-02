@@ -26,6 +26,14 @@ defmodule ExecutorTest do
       Helpers.WandFile.stub_no_file()
       assert Executor.run(TestCommand, :hello) == Error.get(:missing_wand_file)
     end
+
+    test ":file_write_error when saving the file" do
+      file = %WandFile{}
+      stub_options()
+      Helpers.WandFile.stub_cannot_save(file)
+      expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, file} end)
+      assert Executor.run(TestCommand, :hello) == Error.get(:file_write_error)
+    end
   end
 
   test "execute calls the passed in module" do
@@ -46,6 +54,14 @@ defmodule ExecutorTest do
     stub_options([load_wand_file: true])
     stub_execute(%{wand_file: %WandFile{}})
     Helpers.WandFile.stub_load()
+    assert Executor.run(TestCommand, :hello) == :ok
+  end
+
+  test "Saves a wand_file that is returned" do
+    stub_options()
+    file = %WandFile{}
+    Helpers.WandFile.stub_save(file)
+    expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, file} end)
     assert Executor.run(TestCommand, :hello) == :ok
   end
 
