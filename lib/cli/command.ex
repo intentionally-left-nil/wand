@@ -14,6 +14,7 @@ defmodule Wand.CLI.Command do
   @callback options() :: keyword()
   @callback execute(data :: any(), extras :: map()) :: ok_or_exit
   @callback help(type :: any()) :: any()
+  @callback handle_error(type :: atom, data :: any()) :: :ok
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
 
   @optional_callbacks options: 0, after_save: 1

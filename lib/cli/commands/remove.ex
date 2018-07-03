@@ -1,7 +1,6 @@
 defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
   alias WandCore.WandFile
-  alias Wand.CLI.Error
 
   @behaviour Wand.CLI.Command
   @moduledoc """
@@ -59,15 +58,12 @@ defmodule Wand.CLI.Commands.Remove do
   def after_save(_data) do
     case Wand.CLI.Mix.cleanup_deps() do
       :ok -> :ok
-      {:error, _} -> cleanup_failed()
+      {:error, _} -> {:error, :install_deps_error, nil}
     end
   end
 
-  defp remove_names(file, names) do
-    Enum.reduce(names, file, &WandFile.remove(&2, &1))
-  end
-
-  defp cleanup_failed() do
+  @doc false
+  def handle_error(:install_deps_error, nil) do
     """
     # Partial Success
     Unable to run mix deps.unlock --unused
@@ -76,7 +72,9 @@ defmodule Wand.CLI.Commands.Remove do
     however, updating the mix.lock file failed
     """
     |> Display.error()
+  end
 
-    Error.get(:install_deps_error)
+  defp remove_names(file, names) do
+    Enum.reduce(names, file, &WandFile.remove(&2, &1))
   end
 end

@@ -84,8 +84,7 @@ defmodule RemoveTest do
 
     test ":install_deps_error if cleaning the deps fails" do
       Helpers.System.stub_failed_cleanup_deps()
-      Helpers.IO.stub_stderr()
-      assert Remove.after_save(["poison"]) == Error.get(:install_deps_error)
+      assert Remove.after_save(["poison"]) == {:error, :install_deps_error, :nil}
     end
   end
 end

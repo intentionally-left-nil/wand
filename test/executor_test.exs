@@ -39,7 +39,8 @@ defmodule ExecutorTest do
 
   test ":hex_api_error when returned by execute" do
     stub_options()
-    expect(TestCommand, :execute, fn(:hello, %{}) -> Error.get(:hex_api_error) end)
+    stub_handle_error(:hex_api_error)
+    expect(TestCommand, :execute, fn(:hello, %{}) -> {:error, :hex_api_error, nil} end)
       assert Executor.run(TestCommand, :hello) == Error.get(:hex_api_error)
   end
 
@@ -86,8 +87,9 @@ defmodule ExecutorTest do
     file = %WandFile{}
     Helpers.WandFile.stub_save(file)
     stub_execute_return_wandfile()
-    expect(TestCommand, :after_save, fn (:hello) -> {:error, 22} end)
-    assert Executor.run(TestCommand, :hello) == {:error, 22}
+    stub_handle_error(:wand_core_api_error)
+    expect(TestCommand, :after_save, fn (:hello) -> {:error, :wand_core_api_error, nil} end)
+    assert Executor.run(TestCommand, :hello) == Error.get(:wand_core_api_error)
   end
 
   defp stub_options(options \\ []) do
@@ -102,4 +104,7 @@ defmodule ExecutorTest do
     expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, %WandFile{}} end)
   end
 
+  defp stub_handle_error(exit_code) do
+    expect(TestCommand, :handle_error, fn(^exit_code, _data) -> :ok end)
+  end
 end
