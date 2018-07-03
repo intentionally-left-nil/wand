@@ -10,13 +10,13 @@ defmodule Wand.CLI.Command do
   """
 
   @type ok_or_exit :: :ok | {:error, integer()}
-  @callback after_save() :: ok_or_exit
+  @callback after_save(data :: any()) :: ok_or_exit
   @callback options() :: keyword()
   @callback execute(data :: any(), extras :: map()) :: ok_or_exit
   @callback help(type :: any()) :: any()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
 
-  @optional_callbacks options: 0, after_save: 0
+  @optional_callbacks options: 0, after_save: 1
 
   def routes() do
     [

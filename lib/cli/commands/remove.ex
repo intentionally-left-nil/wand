@@ -56,7 +56,7 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
-  def after_save() do
+  def after_save(_data) do
     case Wand.CLI.Mix.cleanup_deps() do
       :ok -> :ok
       {:error, _} -> cleanup_failed()

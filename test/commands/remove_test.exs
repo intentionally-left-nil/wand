@@ -79,13 +79,13 @@ defmodule RemoveTest do
   describe "after_save" do
     test "successfully cleans up dependencies" do
       Helpers.System.stub_cleanup_deps()
-      assert Remove.after_save() == :ok
+      assert Remove.after_save(["poison"]) == :ok
     end
 
     test ":install_deps_error if cleaning the deps fails" do
       Helpers.System.stub_failed_cleanup_deps()
       Helpers.IO.stub_stderr()
-      assert Remove.after_save() == Error.get(:install_deps_error)
+      assert Remove.after_save(["poison"]) == Error.get(:install_deps_error)
     end
   end
 end

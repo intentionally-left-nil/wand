@@ -77,7 +77,7 @@ defmodule ExecutorTest do
     file = %WandFile{}
     Helpers.WandFile.stub_save(file)
     stub_execute_return_wandfile()
-    expect(TestCommand, :after_save, fn () -> :ok end)
+    expect(TestCommand, :after_save, fn (:hello) -> :ok end)
     assert Executor.run(TestCommand, :hello) == :ok
   end
 
@@ -86,7 +86,7 @@ defmodule ExecutorTest do
     file = %WandFile{}
     Helpers.WandFile.stub_save(file)
     stub_execute_return_wandfile()
-    expect(TestCommand, :after_save, fn () -> {:error, 22} end)
+    expect(TestCommand, :after_save, fn (:hello) -> {:error, 22} end)
     assert Executor.run(TestCommand, :hello) == {:error, 22}
   end
 

@@ -8,7 +8,8 @@ defmodule Wand.CLI.Executor do
     with :ok <- ensure_core(options),
     {:ok, file} <- ensure_wand_file_loaded(options),
     extras <- get_extras(file),
-    :ok <- execute(module, data, extras)
+    {:ok, file_saved} <- execute(module, data, extras),
+    :ok <- after_save(file_saved, module, data)
     do
       :ok
     else
@@ -40,22 +41,23 @@ defmodule Wand.CLI.Executor do
 
   defp execute(module, data, extras) do
     case module.execute(data, extras) do
-      :ok -> :ok
-      {:ok, %WandFile{}=file} -> save_file_with_callbacks(module, file)
+      :ok -> {:ok, :file_not_saved}
+      {:ok, %WandFile{}=file} -> save_file(module, file)
       error -> error
     end
   end
 
-  defp save_file_with_callbacks(module, file) do
+  defp save_file(module, file) do
     case WandFileWithHelp.save(file) do
-      :ok -> after_save(module)
+      :ok -> {:ok, :file_saved}
       error -> error
     end
   end
 
-  defp after_save(module) do
-    if function_exported?(module, :after_save, 0) do
-      module.after_save()
+  defp after_save(:file_not_saved, _, _), do: :ok
+  defp after_save(:file_saved, module, data) do
+    if function_exported?(module, :after_save, 1) do
+      module.after_save(data)
     else
       :ok
     end
