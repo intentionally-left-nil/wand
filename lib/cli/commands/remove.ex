@@ -1,7 +1,6 @@
 defmodule Wand.CLI.Commands.Remove do
   alias Wand.CLI.Display
   alias WandCore.WandFile
-  alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.Error
 
   @behaviour Wand.CLI.Command
@@ -34,7 +33,10 @@ defmodule Wand.CLI.Commands.Remove do
   def help(:verbose), do: help(:banner)
 
   def options() do
-    [require_core: true]
+    [
+      require_core: true,
+      load_wand_file: true,
+    ]
   end
 
   @doc false
@@ -48,18 +50,16 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
-  def execute(names) do
-    with {:ok, file} <- WandFileWithHelp.load(),
-         file <- remove_names(file, names),
-         :ok <- WandFileWithHelp.save(file),
-         :ok <- cleanup() do
-      :ok
-    else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
+  def execute(names, %{wand_file: file}) do
+    file = remove_names(file, names)
+    {:ok, file}
+  end
 
-      {:error, step, reason} ->
-        handle_error(step, reason)
+  @doc false
+  def after_save() do
+    case Wand.CLI.Mix.cleanup_deps() do
+      :ok -> :ok
+      {:error, _} -> cleanup_failed()
     end
   end
 
@@ -67,14 +67,7 @@ defmodule Wand.CLI.Commands.Remove do
     Enum.reduce(names, file, &WandFile.remove(&2, &1))
   end
 
-  defp cleanup() do
-    case Wand.CLI.Mix.cleanup_deps() do
-      :ok -> :ok
-      {:error, reason} -> {:error, :cleanup_failed, reason}
-    end
-  end
-
-  defp handle_error(:cleanup_failed, _reason) do
+  defp cleanup_failed() do
     """
     # Partial Success
     Unable to run mix deps.unlock --unused
