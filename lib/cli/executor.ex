@@ -41,8 +41,23 @@ defmodule Wand.CLI.Executor do
   defp execute(module, data, extras) do
     case module.execute(data, extras) do
       :ok -> :ok
-      {:ok, %WandFile{}=file} -> WandFileWithHelp.save(file)
+      {:ok, %WandFile{}=file} -> save_file_with_callbacks(module, file)
       error -> error
+    end
+  end
+
+  defp save_file_with_callbacks(module, file) do
+    case WandFileWithHelp.save(file) do
+      :ok -> after_save(module)
+      error -> error
+    end
+  end
+
+  defp after_save(module) do
+    if function_exported?(module, :after_save, 0) do
+      module.after_save()
+    else
+      :ok
     end
   end
 
