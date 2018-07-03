@@ -64,15 +64,6 @@ defmodule ExecutorTest do
     assert Executor.run(TestCommand, :hello) == :ok
   end
 
-  test "Saves a wand_file that is returned, with no after_save defined" do
-    defmodule DummyCommand do
-      def execute(:hello, %{}), do: {:ok, %WandFile{}}
-    end
-
-    Helpers.WandFile.stub_save(%WandFile{})
-    assert Executor.run(DummyCommand, :hello) == :ok
-  end
-
   test "Saves a wand_file that is returned, and calls after_save" do
     stub_options()
     file = %WandFile{}

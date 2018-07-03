@@ -1,7 +1,6 @@
 defmodule RemoveTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.CLI.Error
   alias Wand.CLI.Commands.Remove
   alias Wand.Test.Helpers
   alias WandCore.WandFile

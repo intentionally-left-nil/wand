@@ -5,7 +5,7 @@ defmodule Wand.CLI.Executor do
   alias Wand.CLI.Error
 
   def run(module, data) do
-    options = get_options(module)
+    options = module.options()
     with :ok <- ensure_core(options),
     {:ok, file} <- ensure_wand_file_loaded(options),
     extras <- get_extras(file),
@@ -23,14 +23,6 @@ defmodule Wand.CLI.Executor do
       {:error, error_key, data} ->
         module.handle_error(error_key, data)
         Error.get(error_key)
-    end
-  end
-
-  defp get_options(module) do
-    if function_exported?(module, :options, 0) do
-      module.options()
-    else
-      []
     end
   end
 
@@ -58,13 +50,7 @@ defmodule Wand.CLI.Executor do
   end
 
   defp after_save(:file_not_saved, _, _), do: :ok
-  defp after_save(:file_saved, module, data) do
-    if function_exported?(module, :after_save, 1) do
-      module.after_save(data)
-    else
-      :ok
-    end
-  end
+  defp after_save(:file_saved, module, data), do: module.after_save(data)
 
   defp ensure_core(options) do
     case options[:require_core] do

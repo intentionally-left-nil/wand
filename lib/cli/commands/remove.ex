@@ -1,8 +1,8 @@
 defmodule Wand.CLI.Commands.Remove do
+  use Wand.CLI.Command
   alias Wand.CLI.Display
   alias WandCore.WandFile
 
-  @behaviour Wand.CLI.Command
   @moduledoc """
   # Remove
   Remove elixir packages from wand.json
