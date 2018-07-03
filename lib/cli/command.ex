@@ -15,7 +15,6 @@ defmodule Wand.CLI.Command do
   @callback handle_error(type :: atom, data :: any()) :: String.t()
   @callback help(type :: any()) :: any()
   @callback options() :: keyword()
-  @callback success() :: String.t()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
 
   defmacro __using__(_opts) do

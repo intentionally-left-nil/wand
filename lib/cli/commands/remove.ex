@@ -71,7 +71,6 @@ defmodule Wand.CLI.Commands.Remove do
     The wand.json file was successfully updated,
     however, updating the mix.lock file failed
     """
-    |> Display.error()
   end
 
   defp remove_names(file, names) do

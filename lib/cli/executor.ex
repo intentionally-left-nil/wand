@@ -3,6 +3,7 @@ defmodule Wand.CLI.Executor do
   alias Wand.CLI.CoreValidator
   alias WandCore.WandFile
   alias Wand.CLI.Error
+  alias Wand.CLI.Display
 
   def run(module, data) do
     options = module.options()
@@ -22,6 +23,7 @@ defmodule Wand.CLI.Executor do
 
       {:error, error_key, data} ->
         module.handle_error(error_key, data)
+        |> Display.error()
         Error.get(error_key)
     end
   end
