@@ -7,9 +7,8 @@ defmodule Wand.CLI.Commands.Add.Execute do
   alias Wand.CLI.Display
   alias Wand.CLI.Error
 
-  def execute(packages) do
-    with {:ok, file} <- WandFileWithHelp.load(),
-         {:ok, dependencies} <- get_dependencies(packages),
+  def execute(packages, %{wand_file: file}) do
+    with {:ok, dependencies} <- get_dependencies(packages),
          {:ok, file} <- add_dependencies(file, dependencies),
          :ok <- WandFileWithHelp.save(file),
          :ok <- download(packages),

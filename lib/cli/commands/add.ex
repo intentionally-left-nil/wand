@@ -138,12 +138,15 @@ defmodule Wand.CLI.Commands.Add do
 
   @doc false
   def options() do
-    [require_core: true]
+    [
+      require_core: true,
+      load_wand_file: true,
+    ]
   end
 
   @doc false
   def validate(args), do: Wand.CLI.Commands.Add.Validate.validate(args)
 
   @doc false
-  def execute(packages), do: Wand.CLI.Commands.Add.Execute.execute(packages)
+  def execute(packages, extras), do: Wand.CLI.Commands.Add.Execute.execute(packages, extras)
 end
