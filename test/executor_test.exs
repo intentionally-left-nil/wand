@@ -1,5 +1,6 @@
 defmodule ExecutorTest do
   alias Wand.CLI.Executor
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.Error
   alias Wand.Test.Helpers
   alias WandCore.WandFile
@@ -32,7 +33,7 @@ defmodule ExecutorTest do
       file = %WandFile{}
       stub_options()
       Helpers.WandFile.stub_cannot_save(file)
-      expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, file} end)
+      stub_execute_return_wandfile()
       assert Executor.run(TestCommand, :hello) == Error.get(:file_write_error)
     end
   end
@@ -90,11 +91,11 @@ defmodule ExecutorTest do
   end
 
   defp stub_execute(extras \\ %{}) do
-    expect(TestCommand, :execute, fn (:hello, ^extras) -> :ok end)
+    expect(TestCommand, :execute, fn (:hello, ^extras) -> {:ok, %Result{}} end)
   end
 
   defp stub_execute_return_wandfile() do
-    expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, %WandFile{}} end)
+    expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, %Result{wand_file: %WandFile{}}} end)
   end
 
   defp stub_handle_error(exit_code) do
