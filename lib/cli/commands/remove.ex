@@ -2,6 +2,7 @@ defmodule Wand.CLI.Commands.Remove do
   use Wand.CLI.Command
   alias Wand.CLI.Display
   alias WandCore.WandFile
+  alias Wand.CLI.Executor.Result
 
   @moduledoc """
   # Remove
@@ -51,7 +52,7 @@ defmodule Wand.CLI.Commands.Remove do
   @doc false
   def execute(names, %{wand_file: file}) do
     file = remove_names(file, names)
-    {:ok, file}
+    {:ok, %Result{wand_file: file}}
   end
 
   @doc false
