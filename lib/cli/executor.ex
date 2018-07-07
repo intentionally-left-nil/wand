@@ -14,6 +14,7 @@ defmodule Wand.CLI.Executor do
     :ok <- save_file(result),
     :ok <- after_save(result, module, data)
     do
+      Display.success(result.message)
       :ok
     else
       {:error, :require_core, reason} ->

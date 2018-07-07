@@ -46,35 +46,6 @@ defmodule ExecutorTest do
       assert Executor.run(TestCommand, :hello) == Error.get(:hex_api_error)
   end
 
-  test "execute calls the passed in module" do
-    stub_options()
-    stub_execute()
-    assert Executor.run(TestCommand, :hello) == :ok
-  end
-
-  test "Executes the command after the core is validated" do
-    stub_options([require_core: true])
-    stub_execute()
-    Helpers.System.stub_core_version()
-    assert Executor.run(TestCommand, :hello) == :ok
-  end
-
-  test "Passes in a wand_file" do
-    stub_options([load_wand_file: true])
-    stub_execute(%{wand_file: %WandFile{}})
-    Helpers.WandFile.stub_load()
-    assert Executor.run(TestCommand, :hello) == :ok
-  end
-
-  test "Saves a wand_file that is returned, and calls after_save" do
-    stub_options()
-    file = %WandFile{}
-    Helpers.WandFile.stub_save(file)
-    stub_execute_return_wandfile()
-    expect(TestCommand, :after_save, fn (:hello) -> :ok end)
-    assert Executor.run(TestCommand, :hello) == :ok
-  end
-
   test "Returns an error from after_save" do
     stub_options()
     file = %WandFile{}
@@ -84,6 +55,41 @@ defmodule ExecutorTest do
     Helpers.IO.stub_stderr()
     expect(TestCommand, :after_save, fn (:hello) -> {:error, :wand_core_api_error, nil} end)
     assert Executor.run(TestCommand, :hello) == Error.get(:wand_core_api_error)
+  end
+
+  describe "Successfully" do
+    setup do
+      Helpers.IO.stub_io()
+      :ok
+    end
+    test "execute calls the passed in module" do
+      stub_options()
+      stub_execute()
+      assert Executor.run(TestCommand, :hello) == :ok
+    end
+
+    test "Executes the command after the core is validated" do
+      stub_options([require_core: true])
+      stub_execute()
+      Helpers.System.stub_core_version()
+      assert Executor.run(TestCommand, :hello) == :ok
+    end
+
+    test "Passes in a wand_file" do
+      stub_options([load_wand_file: true])
+      stub_execute(%{wand_file: %WandFile{}})
+      Helpers.WandFile.stub_load()
+      assert Executor.run(TestCommand, :hello) == :ok
+    end
+
+    test "Saves a wand_file that is returned, and calls after_save" do
+      stub_options()
+      file = %WandFile{}
+      Helpers.WandFile.stub_save(file)
+      stub_execute_return_wandfile()
+      expect(TestCommand, :after_save, fn (:hello) -> :ok end)
+      assert Executor.run(TestCommand, :hello) == :ok
+    end
   end
 
   defp stub_options(options \\ []) do
