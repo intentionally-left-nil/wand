@@ -149,4 +149,7 @@ defmodule Wand.CLI.Commands.Add do
 
   @doc false
   def execute(packages, extras), do: Wand.CLI.Commands.Add.Execute.execute(packages, extras)
+
+  @doc false
+  def after_save(packages), do: Wand.CLI.Commands.Add.Execute.after_save(packages)
 end

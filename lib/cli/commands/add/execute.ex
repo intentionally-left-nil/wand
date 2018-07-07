@@ -10,9 +10,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
   def execute(packages, %{wand_file: file}) do
     with {:ok, dependencies} <- get_dependencies(packages),
          {:ok, file} <- add_dependencies(file, dependencies),
-         :ok <- WandFileWithHelp.save(file),
-         :ok <- download(packages),
-         :ok <- compile(packages) do
+         :ok <- WandFileWithHelp.save(file) do
       message =
         Enum.map(dependencies, fn %Dependency{name: name, requirement: requirement} ->
           "Succesfully added #{name}: #{requirement}"
@@ -26,6 +24,15 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
       {:error, step, reason} ->
         handle_error(step, reason)
+    end
+  end
+
+  def after_save(packages) do
+    with :ok <- download(packages),
+    :ok <- compile(packages) do
+      :ok
+    else
+      error -> error
     end
   end
 

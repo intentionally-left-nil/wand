@@ -58,47 +58,34 @@ defmodule AddExecuteTest do
     end
   end
 
-  describe "download" do
+  describe "after_save" do
     test ":install_deps_error when downloading fails" do
-      stub_file()
       Helpers.System.stub_failed_update_deps()
-      Helpers.IO.stub_stderr()
       package = get_package()
-      assert Add.execute([package], extras()) == Error.get(:install_deps_error)
+      assert Add.after_save([package]) == {:error, :download_failed, {1, "Could not find a Mix.Project, please ensure you are running Mix in a directory with a mix.exs file"}}
     end
 
     test "skips downloading if download: false is set" do
-      stub_file()
       package = get_package(download: false, compile: false)
-      assert Add.execute([package], extras()) |> elem(0) == :ok
+      assert Add.after_save([package]) == :ok
     end
-  end
 
-  describe "compile" do
     test ":install_deps_error when compiling fails" do
-      stub_file()
       Helpers.System.stub_update_deps()
       Helpers.System.stub_failed_compile()
-      Helpers.IO.stub_stderr()
       package = get_package(compile_env: :prod)
-      assert Add.execute([package], extras()) == Error.get(:install_deps_error)
+      assert Add.after_save([package]) == {:error, :compile_failed, {1, "** (SyntaxError) mix.exs:9"}}
     end
 
     test "skips compiling if compile: false is set" do
-      stub_file()
       Helpers.System.stub_update_deps()
       package = get_package(compile: false)
-      assert Add.execute([package], extras()) |> elem(0) == :ok
+      assert Add.after_save([package]) == :ok
     end
+
   end
 
   describe "Successfully" do
-    setup do
-      Helpers.System.stub_update_deps()
-      Helpers.System.stub_compile()
-      :ok
-    end
-
     test "adds a single package" do
       Helpers.Hex.stub_poison()
       stub_file(requirement: ">= 3.1.0 and < 4.0.0")
