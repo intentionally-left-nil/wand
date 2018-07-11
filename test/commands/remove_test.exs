@@ -1,6 +1,7 @@
 defmodule RemoveTest do
   use ExUnit.Case, async: true
   import Mox
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.Commands.Remove
   alias Wand.Test.Helpers
   alias WandCore.WandFile
@@ -44,7 +45,7 @@ defmodule RemoveTest do
   describe "execute" do
     test "Does nothing if the dependency is not being used" do
       file = %WandFile{}
-      assert Remove.execute(["poison"], %{wand_file: file}) == {:ok, file}
+      assert Remove.execute(["poison"], %{wand_file: file}) == {:ok, %Result{wand_file: file}}
     end
 
     test "removes the dependency" do
@@ -55,12 +56,12 @@ defmodule RemoveTest do
         ]
       }
 
-      expected = %WandFile{
+      expected_file = %WandFile{
         dependencies: [
           Helpers.WandFile.mox()
         ]
       }
-      assert Remove.execute(["poison"], %{wand_file: file}) == {:ok, expected}
+      assert Remove.execute(["poison"], %{wand_file: file}) == {:ok, %Result{wand_file: expected_file}}
     end
 
     test "removes multiple dependencies" do
@@ -71,7 +72,7 @@ defmodule RemoveTest do
         ]
       }
 
-      assert Remove.execute(["mox", "poison", "not_present"], %{wand_file: file}) == {:ok, %WandFile{}}
+      assert Remove.execute(["mox", "poison", "not_present"], %{wand_file: file}) == {:ok, %Result{wand_file: %WandFile{}}}
     end
   end
 

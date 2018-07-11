@@ -1,7 +1,7 @@
 defmodule Wand.CLI.Executor do
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.CoreValidator
-  alias WandCore.WandFile
   alias Wand.CLI.Error
   alias Wand.CLI.Display
 
@@ -10,9 +10,11 @@ defmodule Wand.CLI.Executor do
     with :ok <- ensure_core(options),
     {:ok, file} <- ensure_wand_file_loaded(options),
     extras <- get_extras(file),
-    {:ok, file_saved} <- execute(module, data, extras),
-    :ok <- after_save(file_saved, module, data)
+    {:ok, %Result{}=result} <- module.execute(data, extras),
+    :ok <- save_file(result),
+    :ok <- after_save(result, module, data)
     do
+      Display.success(result.message)
       :ok
     else
       {:error, :require_core, reason} ->
@@ -36,23 +38,13 @@ defmodule Wand.CLI.Executor do
     |> Enum.into(%{})
   end
 
-  defp execute(module, data, extras) do
-    case module.execute(data, extras) do
-      :ok -> {:ok, :file_not_saved}
-      {:ok, %WandFile{}=file} -> save_file(module, file)
-      error -> error
-    end
+  defp save_file(%Result{wand_file: nil}), do: :ok
+  defp save_file(%Result{wand_file: wand_file}) do
+    WandFileWithHelp.save(wand_file)
   end
 
-  defp save_file(module, file) do
-    case WandFileWithHelp.save(file) do
-      :ok -> {:ok, :file_saved}
-      error -> error
-    end
-  end
-
-  defp after_save(:file_not_saved, _, _), do: :ok
-  defp after_save(:file_saved, module, data), do: module.after_save(data)
+  defp after_save(%Result{wand_file: nil}, _module, _data), do: :ok
+  defp after_save(_result, module, data), do: module.after_save(data)
 
   defp ensure_core(options) do
     case options[:require_core] do
