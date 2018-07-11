@@ -92,6 +92,12 @@ defmodule ExecutorTest do
     end
   end
 
+  test "skips printing if the message is nil" do
+    stub_options()
+    expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, %Result{message: nil}} end)
+    assert Executor.run(TestCommand, :hello) == :ok
+  end
+
   defp stub_options(options \\ []) do
     expect(TestCommand, :options, fn() -> options end)
   end

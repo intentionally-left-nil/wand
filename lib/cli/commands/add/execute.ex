@@ -1,6 +1,6 @@
 defmodule Wand.CLI.Commands.Add.Execute do
   @moduledoc false
-  alias Wand.CLI.Executor.Result
+  use Wand.CLI.Command
   alias Wand.CLI.Commands.Add.Package
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency

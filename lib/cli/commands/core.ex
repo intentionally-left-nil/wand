@@ -1,7 +1,7 @@
 defmodule Wand.CLI.Commands.Core do
+  use Wand.CLI.Command
   alias Wand.CLI.Display
   alias Wand.CLI.Error
-  @behaviour Wand.CLI.Command
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
   # Core
@@ -62,25 +62,41 @@ defmodule Wand.CLI.Commands.Core do
   end
 
   @doc false
-  def execute(:version) do
+  def execute(:version, _extras) do
     case Wand.CLI.Mix.core_version() do
       {:ok, version} ->
         String.trim(version)
         |> @io.puts()
 
-        {:ok, :silent}
+        {:ok, %Result{message: nil}}
 
-      {:error, _} ->
-        missing_core()
+      {:error, _} -> {:error, :wand_core_missing, nil}
     end
   end
 
   @doc false
-  def execute(:install) do
+  def execute(:install, _extras) do
     case Wand.CLI.Mix.install_core() do
-      :ok -> :ok
-      {:error, _} -> cannot_install()
+      :ok -> {:ok, %Result{}}
+      {:error, _} -> {:error, :wand_core_api_error, nil}
     end
+  end
+
+  @doc false
+  def handle_error(:wand_core_api_error, _extra) do
+    """
+    # Error
+    Could not install the wand_core archive. Please check the error message and then run wand core install again.
+    """
+  end
+
+  @doc false
+  def handle_error(:wand_core_missing, _extra) do
+    """
+    # Error
+    Could not determine the version for wand_core.
+    You can try installing it with wand core install
+    """
   end
 
   defp parse([], switches) do
@@ -106,26 +122,5 @@ defmodule Wand.CLI.Commands.Core do
       [] -> [version: :boolean]
       _ -> []
     end
-  end
-
-  defp cannot_install() do
-    """
-    # Error
-    Could not install the wand_core archive. Please check the error message and then run wand core install again.
-    """
-    |> Display.error()
-
-    {:error, 1}
-  end
-
-  defp missing_core() do
-    """
-    # Error
-    Could not determine the version for wand_core.
-    You can try installing it with wand core install
-    """
-    |> Display.error()
-
-    Error.get(:wand_core_missing)
   end
 end

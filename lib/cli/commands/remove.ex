@@ -2,7 +2,6 @@ defmodule Wand.CLI.Commands.Remove do
   use Wand.CLI.Command
   alias Wand.CLI.Display
   alias WandCore.WandFile
-  alias Wand.CLI.Executor.Result
 
   @moduledoc """
   # Remove
