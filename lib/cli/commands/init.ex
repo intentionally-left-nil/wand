@@ -83,7 +83,7 @@ defmodule Wand.CLI.Commands.Init do
   end
 
   @doc false
-  def execute({path, switches}) do
+  def execute({path, switches}, %{}) do
     file = %WandFile{}
 
     with :ok <- can_write?(path, switches),

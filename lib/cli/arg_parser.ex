@@ -32,7 +32,8 @@ defmodule Wand.CLI.ArgParser do
   defp parse_main(_args, [command | _rest]), do: {:help, :help, {:unrecognized, command}}
 
   defp validate(key, args) do
-    case Command.route(key, :validate, [args]) do
+    module = Wand.CLI.Command.get_module(key)
+    case module.validate(args) do
       {:ok, response} -> {key, response}
       {:error, reason} -> {:help, key, reason}
       {:help, module, reason} -> {:help, module, reason}

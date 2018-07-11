@@ -1,7 +1,7 @@
 defmodule Wand.CLI.Commands.Version do
+  use Wand.CLI.Command
   alias Wand.CLI.Display
   @io Wand.Interfaces.IO.impl()
-  @behaviour Wand.CLI.Command
   @moduledoc """
   # Version
   Get the installed version of wand. To get the version of wand_core, use wand core version instead.
@@ -19,8 +19,8 @@ defmodule Wand.CLI.Commands.Version do
   def validate(_args), do: {:ok, []}
 
   @doc false
-  def execute(_args) do
+  def execute(_args, %{}) do
     @io.puts(Wand.version())
-    {:ok, :silent}
+    {:ok, %Result{message: nil}}
   end
 end

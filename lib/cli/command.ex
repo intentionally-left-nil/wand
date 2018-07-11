@@ -53,11 +53,6 @@ defmodule Wand.CLI.Command do
     Module.concat(Wand.CLI.Commands, String.capitalize(name))
   end
 
-  def route(key, name, args) do
-    get_module(key)
-    |> Kernel.apply(name, args)
-  end
-
   def parse_errors([]), do: :ok
 
   def parse_errors([{flag, _} | _rest]) do

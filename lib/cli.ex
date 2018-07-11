@@ -16,24 +16,14 @@ defmodule Wand.CLI do
     module = Wand.CLI.Command.get_module(key)
 
     case Executor.run(module, data) do
-      :ok ->
-        Display.success("Succeeded!")
-        :ok
-
-      {:ok, :silent} ->
-        :ok
-
-      {:ok, message} ->
-        Display.success(message)
-        :ok
-
-      {:error, code} ->
-        @system.halt(code)
+      :ok -> :ok
+      {:error, code} -> @system.halt(code)
     end
   end
 
   defp route({:help, key, data}) do
-    Wand.CLI.Command.route(key, :help, [data])
+    module = Wand.CLI.Command.get_module(key)
+    module.help(data)
     @system.halt(1)
   end
 end

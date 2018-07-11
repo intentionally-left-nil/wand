@@ -1,5 +1,5 @@
 defmodule Wand.CLI.Commands.Outdated do
-  @behaviour Wand.CLI.Command
+  use Wand.CLI.Command
   alias Wand.CLI.Display
 
   @moduledoc """
@@ -36,8 +36,8 @@ defmodule Wand.CLI.Commands.Outdated do
   def validate(_args), do: {:error, :wrong_command}
 
   @doc false
-  def execute([]) do
+  def execute([], %{}) do
     Wand.CLI.Mix.outdated()
-    :ok
+    {:ok, %Result{}}
   end
 end
