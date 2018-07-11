@@ -128,16 +128,13 @@ defmodule Wand.CLI.Commands.Init do
     end
 
     @doc false
-    def handle_error(:unable_to_modify_mix, nil) do
+    def handle_error(:mix_file_not_updated, nil) do
       """
       # Partial Success
       wand.json was successfully created with your dependencies, however your mix.exs file could not be updated to use it. To complete the process, you need to change your deps() in mix.exs to the following:
 
       deps: Mix.Tasks.WandCore.Deps.run([])
       """
-      |> Display.error()
-
-      Error.get(:mix_file_not_updated)
     end
 
   defp get_path([], switches), do: {:ok, {"wand.json", switches}}
@@ -222,7 +219,7 @@ defmodule Wand.CLI.Commands.Init do
          :ok <- @f.write(mix_file, new_contents) do
       :ok
     else
-      _ -> {:error, :unable_to_modify_mix, nil}
+      _ -> {:error, :mix_file_not_updated, nil}
     end
   end
 end
