@@ -105,7 +105,7 @@ defmodule InitTest do
       stub_exists("wand.json", false)
       Helpers.System.stub_get_deps()
       file = get_default_file()
-      assert Init.execute({"wand.json", []}) == {:ok, expected_result(file)}
+      assert Init.execute({"wand.json", []}, %{}) == {:ok, expected_result(file)}
     end
   end
 
@@ -124,16 +124,7 @@ defmodule InitTest do
 
       expect(WandCore.FileMock, :write, fn ("./mix.exs", ^mix_contents) -> :ok end)
 
-      assert Init.after_save({"wand.json", []}, %{}) == :ok
-    end
-    
-    test "initializes a file" do
-      Helpers.System.stub_get_deps()
-      file = get_default_file()
-      stub_all_writing("./mix.exs", "wand.json", file)
-
-      message = "Successfully initialized wand.json and copied your dependencies to it.\nType wand add [package] to add new packages, or wand upgrade to upgrade them\n"
-      assert Init.execute({"wand.json", []}, %{}) ==  {:ok, %Result{message: message}}
+      assert Init.after_save({"wand.json", []}) == :ok
     end
   end
 
