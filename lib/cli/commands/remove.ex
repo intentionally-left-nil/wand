@@ -17,6 +17,7 @@ defmodule Wand.CLI.Commands.Remove do
   ```
   """
   @doc false
+  @impl true
   def help(:missing_package) do
     """
     wand remove must be called with at least one package name.
@@ -27,10 +28,13 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
+  @impl true
   def help(:banner), do: Display.print(@moduledoc)
   @doc false
+  @impl true
   def help(:verbose), do: help(:banner)
 
+  @impl true
   def options() do
     [
       require_core: true,
@@ -39,6 +43,7 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
+  @impl true
   def validate(args) do
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
 
@@ -49,12 +54,14 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
+  @impl true
   def execute(names, %{wand_file: file}) do
     file = remove_names(file, names)
     {:ok, %Result{wand_file: file}}
   end
 
   @doc false
+  @impl true
   def after_save(_data) do
     case Wand.CLI.Mix.cleanup_deps() do
       :ok -> :ok
@@ -63,6 +70,7 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
+  @impl true
   def handle_error(:install_deps_error, nil) do
     """
     # Partial Success

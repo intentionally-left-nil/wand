@@ -1,5 +1,4 @@
 defmodule Wand.CLI do
-  alias Wand.CLI.Display
   alias Wand.CLI.Executor
   @system Wand.Interfaces.System.impl()
   @moduledoc """

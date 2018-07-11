@@ -1,12 +1,9 @@
 defmodule Wand.CLI.Commands.Add.Execute do
   @moduledoc false
-  use Wand.CLI.Command
   alias Wand.CLI.Commands.Add.Package
+  alias Wand.CLI.Executor.Result
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
-  alias Wand.CLI.WandFileWithHelp
-  alias Wand.CLI.Display
-  alias Wand.CLI.Error
 
   def execute(packages, %{wand_file: file}) do
     with {:ok, dependencies} <- get_dependencies(packages),

@@ -3,8 +3,6 @@ defmodule Wand.CLI.Commands.Init do
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
-  alias Wand.CLI.WandFileWithHelp
-  alias Wand.CLI.Error
 
   @f WandCore.Interfaces.File.impl()
 

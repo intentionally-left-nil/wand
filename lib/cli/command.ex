@@ -22,17 +22,23 @@ defmodule Wand.CLI.Command do
       alias Wand.CLI.Executor.Result
       @behaviour Wand.CLI.Command
       @impl true
-      def after_save(), do: :ok
+      def after_save(_data), do: :ok
 
       @impl true
       def options(), do: []
 
       @impl true
-      def success(), do: ""
+      def handle_error(key, _data) do
+        """
+        Error: An unexpected error has occured
+        The reason is: #{key}
+        """
+      end
+
+      defoverridable Wand.CLI.Command
     end
   end
 
-  @defoverridable Wand.CLI.Command
 
   def routes() do
     [

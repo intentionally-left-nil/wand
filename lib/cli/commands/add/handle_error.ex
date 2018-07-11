@@ -9,7 +9,7 @@ defmodule Wand.CLI.Commands.Add.Error do
     """
   end
 
-  def handle_error(:hex_api_error, reason) do
+  def handle_error(:hex_api_error, _reason) do
     """
     # Error
     Error getting package version from the remote repository.
@@ -47,6 +47,5 @@ defmodule Wand.CLI.Commands.Add.Error do
     The wand.json file was successfully updated,
     however mix compile failed.
     """
-    |> Display.error()
   end
 end

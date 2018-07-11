@@ -1,7 +1,6 @@
 defmodule Wand.CLI.Commands.Core do
   use Wand.CLI.Command
   alias Wand.CLI.Display
-  alias Wand.CLI.Error
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
   # Core

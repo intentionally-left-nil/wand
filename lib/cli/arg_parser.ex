@@ -1,6 +1,5 @@
 defmodule Wand.CLI.ArgParser do
   @moduledoc false
-  alias Wand.CLI.Command
 
   def parse(args) do
     global_flags = [
