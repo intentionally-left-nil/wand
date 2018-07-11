@@ -88,20 +88,14 @@ defmodule Wand.CLI.Commands.Init do
 
     with :ok <- can_write?(path, switches),
          {:ok, deps} <- get_dependencies(path),
-         {:ok, file} <- add_dependencies(file, deps),
-         :ok <- WandFileWithHelp.save(file, path) do
+         {:ok, file} <- add_dependencies(file, deps) do
       message = """
       Successfully initialized wand.json and copied your dependencies to it.
       Type wand add [package] to add new packages, or wand upgrade to upgrade them
       """
-
-      {:ok, message}
+      {:ok, %Result{wand_file: file, message: message}}
     else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
-
-      {:error, step, reason} ->
-        handle_error(step, reason)
+      error -> error
     end
   end
 

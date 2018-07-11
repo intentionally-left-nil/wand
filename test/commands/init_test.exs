@@ -1,11 +1,13 @@
 defmodule InitTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.CLI.Error
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.Commands.Init
   alias Wand.Test.Helpers
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
+
+  setup :verify_on_exit!
 
   describe "validate" do
     test "returns help if invalid flags are given" do
@@ -56,35 +58,21 @@ defmodule InitTest do
   end
 
   describe "execute fails" do
-
-    setup do
-      Helpers.IO.stub_stderr()
-      :ok
-    end
-
     test ":file_already_exists when the file already exists" do
       stub_exists("wand.json", true)
-      assert Init.execute({"wand.json", []}) == Error.get(:file_already_exists)
-    end
-
-    test ":file_write_error when saving the file" do
-      stub_exists("wand.json", false)
-      Helpers.System.stub_get_deps()
-      file = get_default_file()
-      Helpers.WandFile.stub_cannot_save(file)
-      assert Init.execute({"wand.json", []}) == Error.get(:file_write_error)
+      assert Init.execute({"wand.json", []}) == {:error, :file_exists, "wand.json"}
     end
 
     test ":wand_core_api_error when get_deps fails" do
       stub_exists("wand.json", false)
       Helpers.System.stub_failed_get_deps()
-      assert Init.execute({"wand.json", []}) == Error.get(:wand_core_api_error)
+      assert Init.execute({"wand.json", []}) == {:error, :get_deps, {1, ""}}
     end
 
     test ":wand_core_api_error when the dependency structure is bad" do
       stub_exists("wand.json", false)
       Helpers.System.stub_get_bad_deps()
-      assert Init.execute({"wand.json", []}) == Error.get(:wand_core_api_error)
+      assert Init.execute({"wand.json", []}) == {:error, :get_deps, :invalid_dependency}
     end
 
     test ":mix_file_not_updated when the mix_file doesn't have deps" do
@@ -95,14 +83,12 @@ defmodule InitTest do
 
     test "Regression test: initialize a path with git" do
       stub_exists("wand.json", false)
-      stub_exists("./mix.exs", false)
-
       [
         ["wand_core", [["git", "https://github.com/AnilRedshift/wand-core.git"]]]
       ]
       |> Helpers.System.stub_get_deps()
 
-      %WandFile{
+      file = %WandFile{
         dependencies: [
           %Dependency{
             name: "wand_core",
@@ -110,9 +96,8 @@ defmodule InitTest do
           }
         ]
       }
-      |> Helpers.WandFile.stub_save()
 
-      assert Init.execute({"wand.json", []}) |> elem(0) == :ok
+      assert Init.execute({"wand.json", []}) == {:ok, expected_result(file)}
     end
 
     defp stub_exists(path, exists) do
@@ -121,26 +106,26 @@ defmodule InitTest do
   end
 
   describe "execute successfully" do
-    setup do
-      stub_exists("wand.json", false)
-      stub_exists("./mix.exs", true)
-      stub_read_mix_exs("./mix.exs")
-      :ok
-    end
-
     test "initializes a file" do
+      stub_exists("wand.json", false)
       Helpers.System.stub_get_deps()
       file = get_default_file()
-      stub_all_writing("./mix.exs", "wand.json", file)
-      assert Init.execute({"wand.json", []}) |> elem(0) == :ok
+      assert Init.execute({"wand.json", []}) == {:ok, expected_result(file)}
     end
+  end
+
+  defp expected_result(file) do
+    %Result{
+      wand_file: file,
+      message: "Successfully initialized wand.json and copied your dependencies to it.\nType wand add [package] to add new packages, or wand upgrade to upgrade them\n"
+    }
   end
 
   defp get_default_file() do
     dependencies = [
-      %Dependency{name: "earmark", requirement: "~> 1.2"},
       %Dependency{name: "ex_doc", requirement: ">= 0.0.0", opts: %{only: :dev}},
-      %Dependency{name: "mox", requirement: "~> 0.3.2", opts: %{only: :test}}
+      %Dependency{name: "mox", requirement: "~> 0.3.2", opts: %{only: :test}},
+      %Dependency{name: "earmark", requirement: "~> 1.2"},
     ]
 
     %WandFile{dependencies: dependencies}
