@@ -75,11 +75,28 @@ defmodule Wand.CLI.Commands.Core do
   end
 
   @doc false
-  def execute(:install) do
+  def execute(:install, _extras) do
     case Wand.CLI.Mix.install_core() do
-      :ok -> :ok
-      {:error, _} -> cannot_install()
+      :ok -> {:ok, %Result{}}
+      {:error, _} -> {:error, :wand_core_api_error, nil}
     end
+  end
+
+  @doc false
+  def handle_error(:wand_core_api_error, _extra) do
+    """
+    # Error
+    Could not install the wand_core archive. Please check the error message and then run wand core install again.
+    """
+  end
+
+  @doc false
+  def handle_error(:wand_core_missing, _extra) do
+    """
+    # Error
+    Could not determine the version for wand_core.
+    You can try installing it with wand core install
+    """
   end
 
   defp parse([], switches) do
@@ -105,26 +122,5 @@ defmodule Wand.CLI.Commands.Core do
       [] -> [version: :boolean]
       _ -> []
     end
-  end
-
-  defp cannot_install() do
-    """
-    # Error
-    Could not install the wand_core archive. Please check the error message and then run wand core install again.
-    """
-    |> Display.error()
-
-    {:error, 1}
-  end
-
-  def handle_error(:wand_core_missing, _extra) do
-    """
-    # Error
-    Could not determine the version for wand_core.
-    You can try installing it with wand core install
-    """
-    |> Display.error()
-
-    Error.get(:wand_core_missing)
   end
 end

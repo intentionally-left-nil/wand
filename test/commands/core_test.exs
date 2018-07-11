@@ -2,8 +2,8 @@ defmodule CoreTest do
   use ExUnit.Case, async: true
   import Mox
   alias Wand.CLI.Commands.Core
+  alias Wand.CLI.Executor.Result
   alias Wand.Test.Helpers
-  alias Wand.CLI.Error
 
   describe "validate" do
     test "returns help if nothing is passed in" do
@@ -74,13 +74,12 @@ defmodule CoreTest do
   describe "execute install" do
     test "successfully installs the core" do
       Helpers.System.stub_install_core()
-      assert Core.execute(:install) == :ok
+      assert Core.execute(:install, %{}) == {:ok, %Result{}}
     end
 
     test "Returns an error if installing the core fails" do
       Helpers.System.stub_failed_install_core()
-      Helpers.IO.stub_stderr()
-      assert Core.execute(:install) == {:error, 1}
+      assert Core.execute(:install, %{}) == {:error, :wand_core_api_error, nil}
     end
   end
 end
