@@ -45,7 +45,7 @@ defmodule OutdatedTest do
 
     test "outsources to hex.outdated" do
       Helpers.System.stub_outdated()
-      assert Outdated.execute([]) == :ok
+      assert Outdated.execute([], %{}) == :ok
     end
   end
 end
