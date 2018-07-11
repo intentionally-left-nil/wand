@@ -14,7 +14,8 @@ defmodule Wand.CLI.Commands.Help do
     Wand.CLI.Command.routes()
     |> List.delete("help")
     |> Enum.each(fn name ->
-      Wand.CLI.Command.route(name, :help, [:banner])
+      module = Wand.CLI.Command.get_module(name)
+      module.help(:banner)
       "------------------------------------" |> Display.print()
     end)
   end

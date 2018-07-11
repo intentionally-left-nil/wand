@@ -33,7 +33,8 @@ defmodule Wand.CLI do
   end
 
   defp route({:help, key, data}) do
-    Wand.CLI.Command.route(key, :help, [data])
+    module = Wand.CLI.Command.get_module(key)
+    module.help(data)
     @system.halt(1)
   end
 end
