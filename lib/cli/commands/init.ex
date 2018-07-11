@@ -88,23 +88,54 @@ defmodule Wand.CLI.Commands.Init do
 
     with :ok <- can_write?(path, switches),
          {:ok, deps} <- get_dependencies(path),
-         {:ok, file} <- add_dependencies(file, deps),
-         :ok <- WandFileWithHelp.save(file, path),
-         :ok <- update_mix_file(path) do
+         {:ok, file} <- add_dependencies(file, deps) do
       message = """
       Successfully initialized wand.json and copied your dependencies to it.
       Type wand add [package] to add new packages, or wand upgrade to upgrade them
       """
-
-      {:ok, %Result{message: message}}
+      {:ok, %Result{wand_file: file, message: message}}
     else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
-
-      {:error, step, reason} ->
-        handle_error(step, reason)
+      error -> error
     end
   end
+
+  def after_save({path, _switches}) do
+    update_mix_file(path)
+  end
+
+
+    @doc false
+    def handle_error(:file_already_exists, path) do
+      """
+      # Error
+      File already exists
+
+      The file #{path} already exists.
+
+      If you want to override it, use the --overwrite flag
+      """
+    end
+
+    @doc false
+    def handle_error(:wand_core_api_error, _reason) do
+      """
+      # Error
+      Unable to read existing deps
+
+      mix wand.init did not return successfully.
+      Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
+      """
+    end
+
+    @doc false
+    def handle_error(:mix_file_not_updated, nil) do
+      """
+      # Partial Success
+      wand.json was successfully created with your dependencies, however your mix.exs file could not be updated to use it. To complete the process, you need to change your deps() in mix.exs to the following:
+
+      deps: Mix.Tasks.WandCore.Deps.run([])
+      """
+    end
 
   defp get_path([], switches), do: {:ok, {"wand.json", switches}}
 
@@ -123,7 +154,7 @@ defmodule Wand.CLI.Commands.Init do
   defp can_write?(path, switches) do
     cond do
       Keyword.get(switches, :overwrite) -> :ok
-      @f.exists?(path) -> {:error, :file_exists, path}
+      @f.exists?(path) -> {:error, :file_already_exists, path}
       true -> :ok
     end
   end
@@ -139,7 +170,7 @@ defmodule Wand.CLI.Commands.Init do
         |> validate_dependencies()
 
       {:error, reason} ->
-        {:error, :get_deps, reason}
+        {:error, :wand_core_api_error, reason}
     end
   end
 
@@ -150,7 +181,7 @@ defmodule Wand.CLI.Commands.Init do
         {:ok, dependencies}
 
       {:error, error} ->
-        {:error, :get_deps, error}
+        {:error, :wand_core_api_error, error}
     end
   end
 
@@ -160,13 +191,16 @@ defmodule Wand.CLI.Commands.Init do
     end)
   end
 
-  defp convert_dependency([name, opts]) when is_list(opts),
-    do: convert_dependency([name, nil, opts])
+  defp convert_dependency([name, opts]) when is_list(opts) do
+    opts = WandCore.Opts.decode(opts)
+    convert_dependency([name, nil, opts])
+  end
 
   defp convert_dependency([name, requirement]), do: convert_dependency([name, requirement, []])
 
   defp convert_dependency([name, requirement, opts]) do
-    opts = Enum.into(opts, %{}, fn [key, val] -> {String.to_atom(key), val} end)
+    opts = WandCore.Opts.decode(opts)
+      |> Enum.into(%{}, fn [key, val] -> {String.to_atom(key), val} end)
     {:ok, %Dependency{name: name, requirement: requirement, opts: opts}}
   end
 
@@ -185,46 +219,7 @@ defmodule Wand.CLI.Commands.Init do
          :ok <- @f.write(mix_file, new_contents) do
       :ok
     else
-      _ -> {:error, :unable_to_modify_mix, nil}
+      _ -> {:error, :mix_file_not_updated, nil}
     end
-  end
-
-  defp handle_error(:file_exists, path) do
-    """
-    # Error
-    File already exists
-
-    The file #{path} already exists.
-
-    If you want to override it, use the --overwrite flag
-    """
-    |> Display.error()
-
-    Error.get(:file_already_exists)
-  end
-
-  defp handle_error(:get_deps, _reason) do
-    """
-    # Error
-    Unable to read existing deps
-
-    mix wand.init did not return successfully.
-    Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
-    """
-    |> Display.error()
-
-    Error.get(:wand_core_api_error)
-  end
-
-  defp handle_error(:unable_to_modify_mix, nil) do
-    """
-    # Partial Success
-    wand.json was successfully created with your dependencies, however your mix.exs file could not be updated to use it. To complete the process, you need to change your deps() in mix.exs to the following:
-
-    deps: Mix.Tasks.WandCore.Deps.run([])
-    """
-    |> Display.error()
-
-    Error.get(:mix_file_not_updated)
   end
 end
