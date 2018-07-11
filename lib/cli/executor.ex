@@ -14,7 +14,7 @@ defmodule Wand.CLI.Executor do
     :ok <- save_file(result),
     :ok <- after_save(result, module, data)
     do
-      Display.success(result.message)
+      print_message(result.message)
       :ok
     else
       {:error, :require_core, reason} ->
@@ -59,4 +59,7 @@ defmodule Wand.CLI.Executor do
       _ -> {:ok, nil}
     end
   end
+
+  defp print_message(nil), do: nil
+  defp print_message(message), do: Display.success(message)
 end
