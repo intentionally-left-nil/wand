@@ -1,5 +1,5 @@
 defmodule Wand.CLI.Commands.Init do
-  @behaviour Wand.CLI.Command
+  use Wand.CLI.Command
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
@@ -96,7 +96,7 @@ defmodule Wand.CLI.Commands.Init do
       Type wand add [package] to add new packages, or wand upgrade to upgrade them
       """
 
-      {:ok, message}
+      {:ok, %Result{message: message}}
     else
       {:error, :wand_file, reason} ->
         WandFileWithHelp.handle_error(reason)

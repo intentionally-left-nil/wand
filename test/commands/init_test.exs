@@ -5,6 +5,7 @@ defmodule InitTest do
   alias Wand.CLI.Commands.Init
   alias Wand.Test.Helpers
   alias WandCore.WandFile
+  alias Wand.CLI.Executor.Result
   alias WandCore.WandFile.Dependency
 
   describe "validate" do
@@ -136,7 +137,9 @@ defmodule InitTest do
       Helpers.System.stub_get_deps()
       file = get_default_file()
       stub_all_writing("./mix.exs", "wand.json", file)
-      assert Init.execute({"wand.json", []}) |> elem(0) == :ok
+
+      message = "Successfully initialized wand.json and copied your dependencies to it.\nType wand add [package] to add new packages, or wand upgrade to upgrade them\n"
+      assert Init.execute({"wand.json", []}) ==  {:ok, %Result{message: message}}
     end
   end
 

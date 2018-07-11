@@ -3,6 +3,7 @@ defmodule OutdatedTest do
   import Mox
   alias Wand.CLI.Commands.Outdated
   alias Wand.Test.Helpers
+  alias Wand.CLI.Executor.Result
 
   describe "validate" do
     test "returns help when arguments are given" do
@@ -45,7 +46,7 @@ defmodule OutdatedTest do
 
     test "outsources to hex.outdated" do
       Helpers.System.stub_outdated()
-      assert Outdated.execute([], %{}) == :ok
+      assert Outdated.execute([], %{}) == {:ok, %Result{}}
     end
   end
 end

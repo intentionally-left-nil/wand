@@ -38,6 +38,6 @@ defmodule Wand.CLI.Commands.Outdated do
   @doc false
   def execute([], %{}) do
     Wand.CLI.Mix.outdated()
-    :ok
+    {:ok, %Result{}}
   end
 end

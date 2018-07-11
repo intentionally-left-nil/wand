@@ -1,6 +1,7 @@
 defmodule CLI.VersionTest do
   use ExUnit.Case, async: true
   import Mox
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.Commands.Version
 
   describe "validate" do
@@ -35,7 +36,7 @@ defmodule CLI.VersionTest do
     test "get the version" do
       message = get_version()
       expect(Wand.IOMock, :puts, fn ^message -> :ok end)
-      assert Version.execute([], %{}) == {:ok, :silent}
+      assert Version.execute([], %{}) == {:ok, %Result{message: nil}}
     end
 
     defp get_version() do

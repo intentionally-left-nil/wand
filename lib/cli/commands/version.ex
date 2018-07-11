@@ -21,6 +21,6 @@ defmodule Wand.CLI.Commands.Version do
   @doc false
   def execute(_args, %{}) do
     @io.puts(Wand.version())
-    {:ok, :silent}
+    {:ok, %Result{message: nil}}
   end
 end
