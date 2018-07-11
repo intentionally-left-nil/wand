@@ -1,5 +1,5 @@
 defmodule Wand.CLI.Commands.Init do
-  @behaviour Wand.CLI.Command
+  use Wand.CLI.Command
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
@@ -89,8 +89,7 @@ defmodule Wand.CLI.Commands.Init do
     with :ok <- can_write?(path, switches),
          {:ok, deps} <- get_dependencies(path),
          {:ok, file} <- add_dependencies(file, deps),
-         :ok <- WandFileWithHelp.save(file, path),
-         :ok <- update_mix_file(path) do
+         :ok <- WandFileWithHelp.save(file, path) do
       message = """
       Successfully initialized wand.json and copied your dependencies to it.
       Type wand add [package] to add new packages, or wand upgrade to upgrade them
@@ -104,6 +103,10 @@ defmodule Wand.CLI.Commands.Init do
       {:error, step, reason} ->
         handle_error(step, reason)
     end
+  end
+
+  def after_save({path, _switches}) do
+    update_mix_file(path)
   end
 
   defp get_path([], switches), do: {:ok, {"wand.json", switches}}

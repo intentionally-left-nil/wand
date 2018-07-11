@@ -88,13 +88,9 @@ defmodule InitTest do
     end
 
     test ":mix_file_not_updated when the mix_file doesn't have deps" do
-      stub_exists("wand.json", false)
       stub_exists("./mix.exs", true)
       expect(WandCore.FileMock, :read, fn "./mix.exs" -> {:ok, "deps: deps(:prod)"} end)
-      Helpers.System.stub_get_deps()
-      file = get_default_file()
-      Helpers.WandFile.stub_save(file)
-      assert Init.execute({"wand.json", []}) == Error.get(:mix_file_not_updated)
+      assert Init.after_save({"wand.json", []}) == {:error, :unable_to_modify_mix, nil}
     end
 
     test "Regression test: initialize a path with git" do
@@ -116,7 +112,7 @@ defmodule InitTest do
       }
       |> Helpers.WandFile.stub_save()
 
-      assert Init.execute({"wand.json", []}) == Error.get(:mix_file_not_updated)
+      assert Init.execute({"wand.json", []}) |> elem(0) == :ok
     end
 
     defp stub_exists(path, exists) do
