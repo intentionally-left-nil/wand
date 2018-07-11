@@ -56,7 +56,7 @@ defmodule HelpTest do
     end
 
     test "execute" do
-      Help.execute([])
+      Help.execute([], %{})
     end
 
     def stub_io(_) do

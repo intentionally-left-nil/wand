@@ -57,7 +57,7 @@ defmodule Wand.CLI.Commands.Help do
   end
 
   @doc false
-  def execute(_), do: help(:banner)
+  def execute(_commands, _extra), do: help(:banner)
 
   defp parse(["help"], _verbose), do: {:error, :verbose}
   defp parse([name], _verbose = true), do: {:help, String.to_atom(name), :verbose}
