@@ -67,8 +67,7 @@ defmodule CoreTest do
 
     test "fails to get the version" do
       Helpers.System.stub_core_version_missing()
-      Helpers.IO.stub_stderr()
-      assert Core.execute(:version, %{}) == Error.get(:wand_core_missing)
+      assert Core.execute(:version, %{}) == {:error, :wand_core_missing, nil}
     end
   end
 

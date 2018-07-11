@@ -70,8 +70,7 @@ defmodule Wand.CLI.Commands.Core do
 
         {:ok, %Result{message: nil}}
 
-      {:error, _} ->
-        missing_core()
+      {:error, _} -> {:error, :wand_core_missing, nil}
     end
   end
 
@@ -118,7 +117,7 @@ defmodule Wand.CLI.Commands.Core do
     {:error, 1}
   end
 
-  defp missing_core() do
+  def handle_error(:wand_core_missing, _extra) do
     """
     # Error
     Could not determine the version for wand_core.
