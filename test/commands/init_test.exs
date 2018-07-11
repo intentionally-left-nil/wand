@@ -60,7 +60,7 @@ defmodule InitTest do
   describe "execute fails" do
     test ":file_already_exists when the file already exists" do
       stub_exists("wand.json", true)
-      assert Init.execute({"wand.json", []}) == {:error, :file_exists, "wand.json"}
+      assert Init.execute({"wand.json", []}) == {:error, :file_already_exists, "wand.json"}
     end
 
     test ":wand_core_api_error when get_deps fails" do
@@ -129,19 +129,5 @@ defmodule InitTest do
     ]
 
     %WandFile{dependencies: dependencies}
-  end
-
-  defp stub_read_mix_exs(path) do
-    expect(WandCore.FileMock, :read, fn ^path -> {:ok, "deps: deps(), app: :test"} end)
-  end
-
-  defp stub_all_writing(mix_path, wand_path, wand_file) do
-    mix_contents = "deps: Mix.Tasks.WandCore.Deps.run([]), app: :test"
-    wand_contents = wand_file |> WandCore.Poison.encode!(pretty: true)
-
-    expect(WandCore.FileMock, :write, 2, fn
-      ^mix_path, ^mix_contents -> :ok
-      ^wand_path, ^wand_contents -> :ok
-    end)
   end
 end

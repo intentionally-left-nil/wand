@@ -105,7 +105,7 @@ defmodule Wand.CLI.Commands.Init do
 
 
     @doc false
-    def handle_error(:file_exists, path) do
+    def handle_error(:file_already_exists, path) do
       """
       # Error
       File already exists
@@ -114,9 +114,6 @@ defmodule Wand.CLI.Commands.Init do
 
       If you want to override it, use the --overwrite flag
       """
-      |> Display.error()
-
-      Error.get(:file_already_exists)
     end
 
     @doc false
@@ -163,7 +160,7 @@ defmodule Wand.CLI.Commands.Init do
   defp can_write?(path, switches) do
     cond do
       Keyword.get(switches, :overwrite) -> :ok
-      @f.exists?(path) -> {:error, :file_exists, path}
+      @f.exists?(path) -> {:error, :file_already_exists, path}
       true -> :ok
     end
   end
