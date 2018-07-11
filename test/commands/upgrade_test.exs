@@ -84,13 +84,13 @@ defmodule UpgradeTest do
     test ":missing_wand_file if cannot open wand file" do
       Helpers.WandFile.stub_no_file()
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:missing_wand_file)
+      assert Upgrade.execute({["poison"], %Options{}}, %{}) == Error.get(:missing_wand_file)
     end
 
     test ":package_not_found if the package is not in wand.json" do
       Helpers.WandFile.stub_load()
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:package_not_found)
+      assert Upgrade.execute({["poison"], %Options{}}, %{}) == Error.get(:package_not_found)
     end
 
     test ":hex_api_error if getting the package from hex fails" do
@@ -102,7 +102,7 @@ defmodule UpgradeTest do
       Helpers.IO.stub_stderr()
       Helpers.Hex.stub_not_found()
 
-      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:hex_api_error)
+      assert Upgrade.execute({["poison"], %Options{}}, %{}) == Error.get(:hex_api_error)
     end
 
     test "Error saving the wand file" do
@@ -110,14 +110,14 @@ defmodule UpgradeTest do
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_cannot_save(file)
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({:all, %Options{}}) == Error.get(:file_write_error)
+      assert Upgrade.execute({:all, %Options{}}, %{}) == Error.get(:file_write_error)
     end
 
     test "update all no-ops if the dependencies are empty" do
       file = %WandFile{}
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({:all, %Options{}}) == :ok
+      assert Upgrade.execute({:all, %Options{}}, %{}) == :ok
     end
   end
 
@@ -196,7 +196,7 @@ defmodule UpgradeTest do
       |> Helpers.WandFile.stub_save()
 
       Helpers.Hex.stub_poison()
-      assert Upgrade.execute({["poison"], options}) == :ok
+      assert Upgrade.execute({["poison"], options}, %{}) == :ok
     end
   end
 
@@ -210,7 +210,7 @@ defmodule UpgradeTest do
 
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{}) == :ok
     end
   end
 
@@ -224,7 +224,7 @@ defmodule UpgradeTest do
 
       Helpers.WandFile.stub_load(file)
       Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{}) == :ok
     end
   end
 end

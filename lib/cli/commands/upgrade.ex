@@ -1,6 +1,6 @@
 defmodule Wand.CLI.Commands.Upgrade do
+  use Wand.CLI.Command
   alias Wand.CLI.Display
-  @behaviour Wand.CLI.Command
 
   @banner """
   # Upgrade
@@ -84,7 +84,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   end
 
   @doc false
-  def execute(args), do: Wand.CLI.Commands.Upgrade.Execute.execute(args)
+  def execute(args, %{}), do: Wand.CLI.Commands.Upgrade.Execute.execute(args)
 
   defp parse(commands, switches) do
     download = Keyword.get(switches, :download, true)
