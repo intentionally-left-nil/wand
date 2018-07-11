@@ -1,7 +1,6 @@
 defmodule AddExecuteTest do
   use ExUnit.Case
   import Mox
-  alias Wand.CLI.Error
   alias Wand.CLI.Commands.Add
   alias Wand.CLI.Commands.Add.{Git, Hex, Package, Path}
   alias Wand.Test.Helpers
@@ -17,17 +16,17 @@ defmodule AddExecuteTest do
   describe "hex api errors" do
     test ":package_not_found when the package is not in hex" do
       Helpers.Hex.stub_not_found()
-      assert Add.execute([@poison], extras()) == {:error, :dependency, {:not_found, "poison"}}
+      assert Add.execute([@poison], extras()) == {:error, :package_not_found, "poison"}
     end
 
     test ":hex_api_error if there is no internet" do
       Helpers.Hex.stub_no_connection()
-      assert Add.execute([@poison], extras()) == {:error, :dependency, {:no_connection, "poison"}}
+      assert Add.execute([@poison], extras()) ==  {:error, :hex_api_error, :no_connection}
     end
 
     test ":hex_api_error if hex returns :bad_response" do
       Helpers.Hex.stub_bad_response()
-      assert Add.execute([@poison], extras()) == {:error, :dependency, {:bad_response, "poison"}}
+      assert Add.execute([@poison], extras()) == {:error, :hex_api_error, :bad_response}
     end
   end
 
@@ -44,12 +43,12 @@ defmodule AddExecuteTest do
         ]
       }
 
-      assert Add.execute([@poison], extras(file)) == {:error, :add_dependency, {:already_exists, "poison"}}
+      assert Add.execute([@poison], extras(file)) == {:error, :package_already_exists, "poison"}
     end
 
     test ":package_already_exists when trying to add the same package twice" do
       Helpers.Hex.stub_poison()
-      assert Add.execute([@poison, @poison], extras()) == {:error, :add_dependency, {:already_exists, "poison"}}
+      assert Add.execute([@poison, @poison], extras()) == {:error, :package_already_exists, "poison"}
     end
   end
 
@@ -57,7 +56,7 @@ defmodule AddExecuteTest do
     test ":install_deps_error when downloading fails" do
       Helpers.System.stub_failed_update_deps()
       package = get_package()
-      assert Add.after_save([package]) == {:error, :download_failed, {1, "Could not find a Mix.Project, please ensure you are running Mix in a directory with a mix.exs file"}}
+      assert Add.after_save([package]) == {:error, :install_deps_error, :download_failed}
     end
 
     test "skips downloading if download: false is set" do
@@ -69,7 +68,7 @@ defmodule AddExecuteTest do
       Helpers.System.stub_update_deps()
       Helpers.System.stub_failed_compile()
       package = get_package(compile_env: :prod)
-      assert Add.after_save([package]) == {:error, :compile_failed, {1, "** (SyntaxError) mix.exs:9"}}
+      assert Add.after_save([package]) ==  {:error, :install_deps_error, :compile_failed}
     end
 
     test "skips compiling if compile: false is set" do

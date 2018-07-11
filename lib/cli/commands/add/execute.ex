@@ -40,7 +40,8 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
     case Enum.find(dependencies, &(elem(&1, 0) == :error)) do
       nil -> {:ok, Enum.unzip(dependencies) |> elem(1)}
-      {:error, error} -> {:error, :dependency, error}
+      {:error, {:not_found, name}} -> {:error, :package_not_found, name}
+      {:error, {reason, _name}} -> {:error, :hex_api_error, reason}
     end
   end
 
@@ -75,7 +76,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     Enum.reduce_while(dependencies, {:ok, file}, fn dependency, {:ok, file} ->
       case WandFile.add(file, dependency) do
         {:ok, file} -> {:cont, {:ok, file}}
-        {:error, reason} -> {:halt, {:error, :add_dependency, reason}}
+        {:error, {:already_exists, name}} -> {:halt, {:error, :package_already_exists, name}}
       end
     end)
   end
@@ -121,7 +122,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp download(_) do
     case Wand.CLI.Mix.update_deps() do
       :ok -> :ok
-      {:error, reason} -> {:error, :download_failed, reason}
+      {:error, _reason} -> {:error, :install_deps_error, :download_failed}
     end
   end
 
@@ -130,7 +131,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp compile(_) do
     case Wand.CLI.Mix.compile() do
       :ok -> :ok
-      {:error, reason} -> {:error, :compile_failed, reason}
+      {:error, _reason} -> {:error, :install_deps_error, :compile_failed}
     end
   end
 end
