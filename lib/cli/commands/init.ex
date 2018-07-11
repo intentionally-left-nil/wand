@@ -91,6 +91,7 @@ defmodule Wand.CLI.Commands.Init do
       Successfully initialized wand.json and copied your dependencies to it.
       Type wand add [package] to add new packages, or wand upgrade to upgrade them
       """
+
       {:ok, %Result{wand_file: file, message: message}}
     else
       error -> error
@@ -101,39 +102,38 @@ defmodule Wand.CLI.Commands.Init do
     update_mix_file(path)
   end
 
+  @doc false
+  def handle_error(:file_already_exists, path) do
+    """
+    # Error
+    File already exists
 
-    @doc false
-    def handle_error(:file_already_exists, path) do
-      """
-      # Error
-      File already exists
+    The file #{path} already exists.
 
-      The file #{path} already exists.
+    If you want to override it, use the --overwrite flag
+    """
+  end
 
-      If you want to override it, use the --overwrite flag
-      """
-    end
+  @doc false
+  def handle_error(:wand_core_api_error, _reason) do
+    """
+    # Error
+    Unable to read existing deps
 
-    @doc false
-    def handle_error(:wand_core_api_error, _reason) do
-      """
-      # Error
-      Unable to read existing deps
+    mix wand.init did not return successfully.
+    Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
+    """
+  end
 
-      mix wand.init did not return successfully.
-      Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
-      """
-    end
+  @doc false
+  def handle_error(:mix_file_not_updated, nil) do
+    """
+    # Partial Success
+    wand.json was successfully created with your dependencies, however your mix.exs file could not be updated to use it. To complete the process, you need to change your deps() in mix.exs to the following:
 
-    @doc false
-    def handle_error(:mix_file_not_updated, nil) do
-      """
-      # Partial Success
-      wand.json was successfully created with your dependencies, however your mix.exs file could not be updated to use it. To complete the process, you need to change your deps() in mix.exs to the following:
-
-      deps: Mix.Tasks.WandCore.Deps.run([])
-      """
-    end
+    deps: Mix.Tasks.WandCore.Deps.run([])
+    """
+  end
 
   defp get_path([], switches), do: {:ok, {"wand.json", switches}}
 
@@ -197,8 +197,10 @@ defmodule Wand.CLI.Commands.Init do
   defp convert_dependency([name, requirement]), do: convert_dependency([name, requirement, []])
 
   defp convert_dependency([name, requirement, opts]) do
-    opts = WandCore.Opts.decode(opts)
+    opts =
+      WandCore.Opts.decode(opts)
       |> Enum.into(%{}, fn [key, val] -> {String.to_atom(key), val} end)
+
     {:ok, %Dependency{name: name, requirement: requirement, opts: opts}}
   end
 

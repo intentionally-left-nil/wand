@@ -32,6 +32,7 @@ defmodule Wand.CLI.ArgParser do
 
   defp validate(key, args) do
     module = Wand.CLI.Command.get_module(key)
+
     case module.validate(args) do
       {:ok, response} -> {key, response}
       {:error, reason} -> {:help, key, reason}

@@ -39,7 +39,6 @@ defmodule Wand.CLI.Command do
     end
   end
 
-
   def routes() do
     [
       "add",
@@ -64,5 +63,4 @@ defmodule Wand.CLI.Command do
   def parse_errors([{flag, _} | _rest]) do
     {:error, {:invalid_flag, flag}}
   end
-
 end

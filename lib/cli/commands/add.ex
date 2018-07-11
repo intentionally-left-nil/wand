@@ -1,5 +1,6 @@
 defmodule Wand.CLI.Commands.Add do
   use Wand.CLI.Command
+
   @moduledoc """
   # Add
   Add elixir packages to wand.json
@@ -143,7 +144,7 @@ defmodule Wand.CLI.Commands.Add do
   def options() do
     [
       require_core: true,
-      load_wand_file: true,
+      load_wand_file: true
     ]
   end
 

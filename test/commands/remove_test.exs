@@ -61,7 +61,9 @@ defmodule RemoveTest do
           Helpers.WandFile.mox()
         ]
       }
-      assert Remove.execute(["poison"], %{wand_file: file}) == {:ok, %Result{wand_file: expected_file}}
+
+      assert Remove.execute(["poison"], %{wand_file: file}) ==
+               {:ok, %Result{wand_file: expected_file}}
     end
 
     test "removes multiple dependencies" do
@@ -72,7 +74,8 @@ defmodule RemoveTest do
         ]
       }
 
-      assert Remove.execute(["mox", "poison", "not_present"], %{wand_file: file}) == {:ok, %Result{wand_file: %WandFile{}}}
+      assert Remove.execute(["mox", "poison", "not_present"], %{wand_file: file}) ==
+               {:ok, %Result{wand_file: %WandFile{}}}
     end
   end
 
@@ -84,7 +87,7 @@ defmodule RemoveTest do
 
     test ":install_deps_error if cleaning the deps fails" do
       Helpers.System.stub_failed_cleanup_deps()
-      assert Remove.after_save(["poison"]) == {:error, :install_deps_error, :nil}
+      assert Remove.after_save(["poison"]) == {:error, :install_deps_error, nil}
     end
   end
 end

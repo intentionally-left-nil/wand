@@ -73,11 +73,14 @@ defmodule InitTest do
     test ":wand_core_api_error when the dependency structure is bad" do
       stub_exists("wand.json", false)
       Helpers.System.stub_get_bad_deps()
-      assert Init.execute({"wand.json", []}, %{}) == {:error, :wand_core_api_error, :invalid_dependency}
+
+      assert Init.execute({"wand.json", []}, %{}) ==
+               {:error, :wand_core_api_error, :invalid_dependency}
     end
 
     test "Regression test: initialize a path with git" do
       stub_exists("wand.json", false)
+
       [
         ["wand_core", [["git", "https://github.com/AnilRedshift/wand-core.git"]]]
       ]
@@ -122,7 +125,7 @@ defmodule InitTest do
 
       mix_contents = "deps: Mix.Tasks.WandCore.Deps.run([])"
 
-      expect(WandCore.FileMock, :write, fn ("./mix.exs", ^mix_contents) -> :ok end)
+      expect(WandCore.FileMock, :write, fn "./mix.exs", ^mix_contents -> :ok end)
 
       assert Init.after_save({"wand.json", []}) == :ok
     end
@@ -131,7 +134,8 @@ defmodule InitTest do
   defp expected_result(file) do
     %Result{
       wand_file: file,
-      message: "Successfully initialized wand.json and copied your dependencies to it.\nType wand add [package] to add new packages, or wand upgrade to upgrade them\n"
+      message:
+        "Successfully initialized wand.json and copied your dependencies to it.\nType wand add [package] to add new packages, or wand upgrade to upgrade them\n"
     }
   end
 
@@ -139,7 +143,7 @@ defmodule InitTest do
     dependencies = [
       %Dependency{name: "ex_doc", requirement: ">= 0.0.0", opts: %{only: :dev}},
       %Dependency{name: "mox", requirement: "~> 0.3.2", opts: %{only: :test}},
-      %Dependency{name: "earmark", requirement: "~> 1.2"},
+      %Dependency{name: "earmark", requirement: "~> 1.2"}
     ]
 
     %WandFile{dependencies: dependencies}

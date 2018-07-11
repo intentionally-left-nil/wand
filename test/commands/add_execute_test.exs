@@ -21,7 +21,7 @@ defmodule AddExecuteTest do
 
     test ":hex_api_error if there is no internet" do
       Helpers.Hex.stub_no_connection()
-      assert Add.execute([@poison], extras()) ==  {:error, :hex_api_error, :no_connection}
+      assert Add.execute([@poison], extras()) == {:error, :hex_api_error, :no_connection}
     end
 
     test ":hex_api_error if hex returns :bad_response" do
@@ -48,7 +48,9 @@ defmodule AddExecuteTest do
 
     test ":package_already_exists when trying to add the same package twice" do
       Helpers.Hex.stub_poison()
-      assert Add.execute([@poison, @poison], extras()) == {:error, :package_already_exists, "poison"}
+
+      assert Add.execute([@poison, @poison], extras()) ==
+               {:error, :package_already_exists, "poison"}
     end
   end
 
@@ -68,7 +70,7 @@ defmodule AddExecuteTest do
       Helpers.System.stub_update_deps()
       Helpers.System.stub_failed_compile()
       package = get_package(compile_env: :prod)
-      assert Add.after_save([package]) ==  {:error, :install_deps_error, :compile_failed}
+      assert Add.after_save([package]) == {:error, :install_deps_error, :compile_failed}
     end
 
     test "skips compiling if compile: false is set" do
@@ -76,7 +78,6 @@ defmodule AddExecuteTest do
       package = get_package(compile: false)
       assert Add.after_save([package]) == :ok
     end
-
   end
 
   describe "Successfully" do
@@ -108,7 +109,9 @@ defmodule AddExecuteTest do
 
       packages = [get_package(), get_named_package("mox")]
       {:ok, result} = validate(packages, file)
-      assert result.message == "Succesfully added poison: >= 3.1.3 and < 4.0.0\nSuccesfully added mox: >= 3.1.3 and < 4.0.0"
+
+      assert result.message ==
+               "Succesfully added poison: >= 3.1.3 and < 4.0.0\nSuccesfully added mox: >= 3.1.3 and < 4.0.0"
     end
 
     test "add a package with the exact version" do
@@ -133,7 +136,9 @@ defmodule AddExecuteTest do
     end
 
     test "add the optional, override, and runtime flag if set" do
-      file = get_file(opts: %{optional: true, override: true, runtime: false, read_app_file: false})
+      file =
+        get_file(opts: %{optional: true, override: true, runtime: false, read_app_file: false})
+
       package = get_package(optional: true, override: true, runtime: false, read_app_file: false)
       validate([package], file)
     end
@@ -144,14 +149,15 @@ defmodule AddExecuteTest do
     end
 
     test "add a git package with all the fixings" do
-      file = get_file(
-        opts: %{
-          git: "https://github.com/devinus/poison.git",
-          ref: "master",
-          sparse: true,
-          submodules: "myfolder"
-        }
-      )
+      file =
+        get_file(
+          opts: %{
+            git: "https://github.com/devinus/poison.git",
+            ref: "master",
+            sparse: true,
+            submodules: "myfolder"
+          }
+        )
 
       package =
         get_package(
@@ -162,6 +168,7 @@ defmodule AddExecuteTest do
             submodules: "myfolder"
           }
         )
+
       validate([package], file)
     end
 
@@ -177,6 +184,7 @@ defmodule AddExecuteTest do
             submodules: false
           }
         )
+
       validate([package], file)
     end
 
@@ -200,6 +208,7 @@ defmodule AddExecuteTest do
 
       package =
         get_package(details: %Hex{hex: "mypoison", organization: "evilcorp", repo: "nothexpm"})
+
       validate([package], file)
     end
   end

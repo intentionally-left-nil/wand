@@ -22,7 +22,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
   def after_save(packages) do
     with :ok <- download(packages),
-    :ok <- compile(packages) do
+         :ok <- compile(packages) do
       :ok
     else
       error -> error

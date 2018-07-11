@@ -18,13 +18,13 @@ defmodule ExecutorTest do
     end
 
     test ":missing_core if the core is not available" do
-      stub_options([require_core: true])
+      stub_options(require_core: true)
       Helpers.System.stub_core_version_missing()
       assert Executor.run(TestCommand, :hello) == Error.get(:wand_core_missing)
     end
 
     test ":missing_wand_file when loading the file" do
-      stub_options([load_wand_file: true])
+      stub_options(load_wand_file: true)
       Helpers.WandFile.stub_no_file()
       assert Executor.run(TestCommand, :hello) == Error.get(:missing_wand_file)
     end
@@ -42,8 +42,8 @@ defmodule ExecutorTest do
     stub_options()
     stub_handle_error(:hex_api_error)
     Helpers.IO.stub_stderr()
-    expect(TestCommand, :execute, fn(:hello, %{}) -> {:error, :hex_api_error, nil} end)
-      assert Executor.run(TestCommand, :hello) == Error.get(:hex_api_error)
+    expect(TestCommand, :execute, fn :hello, %{} -> {:error, :hex_api_error, nil} end)
+    assert Executor.run(TestCommand, :hello) == Error.get(:hex_api_error)
   end
 
   test "Returns an error from after_save" do
@@ -53,7 +53,7 @@ defmodule ExecutorTest do
     stub_execute_return_wandfile()
     stub_handle_error(:wand_core_api_error)
     Helpers.IO.stub_stderr()
-    expect(TestCommand, :after_save, fn (:hello) -> {:error, :wand_core_api_error, nil} end)
+    expect(TestCommand, :after_save, fn :hello -> {:error, :wand_core_api_error, nil} end)
     assert Executor.run(TestCommand, :hello) == Error.get(:wand_core_api_error)
   end
 
@@ -62,6 +62,7 @@ defmodule ExecutorTest do
       Helpers.IO.stub_io()
       :ok
     end
+
     test "execute calls the passed in module" do
       stub_options()
       stub_execute()
@@ -69,14 +70,14 @@ defmodule ExecutorTest do
     end
 
     test "Executes the command after the core is validated" do
-      stub_options([require_core: true])
+      stub_options(require_core: true)
       stub_execute()
       Helpers.System.stub_core_version()
       assert Executor.run(TestCommand, :hello) == :ok
     end
 
     test "Passes in a wand_file" do
-      stub_options([load_wand_file: true])
+      stub_options(load_wand_file: true)
       stub_execute(%{wand_file: %WandFile{}})
       Helpers.WandFile.stub_load()
       assert Executor.run(TestCommand, :hello) == :ok
@@ -87,30 +88,30 @@ defmodule ExecutorTest do
       file = %WandFile{}
       Helpers.WandFile.stub_save(file)
       stub_execute_return_wandfile()
-      expect(TestCommand, :after_save, fn (:hello) -> :ok end)
+      expect(TestCommand, :after_save, fn :hello -> :ok end)
       assert Executor.run(TestCommand, :hello) == :ok
     end
   end
 
   test "skips printing if the message is nil" do
     stub_options()
-    expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, %Result{message: nil}} end)
+    expect(TestCommand, :execute, fn :hello, %{} -> {:ok, %Result{message: nil}} end)
     assert Executor.run(TestCommand, :hello) == :ok
   end
 
   defp stub_options(options \\ []) do
-    expect(TestCommand, :options, fn() -> options end)
+    expect(TestCommand, :options, fn -> options end)
   end
 
   defp stub_execute(extras \\ %{}) do
-    expect(TestCommand, :execute, fn (:hello, ^extras) -> {:ok, %Result{}} end)
+    expect(TestCommand, :execute, fn :hello, ^extras -> {:ok, %Result{}} end)
   end
 
   defp stub_execute_return_wandfile() do
-    expect(TestCommand, :execute, fn (:hello, %{}) -> {:ok, %Result{wand_file: %WandFile{}}} end)
+    expect(TestCommand, :execute, fn :hello, %{} -> {:ok, %Result{wand_file: %WandFile{}}} end)
   end
 
   defp stub_handle_error(exit_code) do
-    expect(TestCommand, :handle_error, fn(^exit_code, _data) -> "so sad" end)
+    expect(TestCommand, :handle_error, fn ^exit_code, _data -> "so sad" end)
   end
 end

@@ -69,7 +69,8 @@ defmodule Wand.CLI.Commands.Core do
 
         {:ok, %Result{message: nil}}
 
-      {:error, _} -> {:error, :wand_core_missing, nil}
+      {:error, _} ->
+        {:error, :wand_core_missing, nil}
     end
   end
 

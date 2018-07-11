@@ -7,13 +7,13 @@ defmodule Wand.CLI.Executor do
 
   def run(module, data) do
     options = module.options()
+
     with :ok <- ensure_core(options),
-    {:ok, file} <- ensure_wand_file_loaded(options),
-    extras <- get_extras(file),
-    {:ok, %Result{}=result} <- module.execute(data, extras),
-    :ok <- save_file(result),
-    :ok <- after_save(result, module, data)
-    do
+         {:ok, file} <- ensure_wand_file_loaded(options),
+         extras <- get_extras(file),
+         {:ok, %Result{} = result} <- module.execute(data, extras),
+         :ok <- save_file(result),
+         :ok <- after_save(result, module, data) do
       print_message(result.message)
       :ok
     else
@@ -26,6 +26,7 @@ defmodule Wand.CLI.Executor do
       {:error, error_key, data} ->
         module.handle_error(error_key, data)
         |> Display.error()
+
         Error.get(error_key)
     end
   end
@@ -39,6 +40,7 @@ defmodule Wand.CLI.Executor do
   end
 
   defp save_file(%Result{wand_file: nil}), do: :ok
+
   defp save_file(%Result{wand_file: wand_file}) do
     WandFileWithHelp.save(wand_file)
   end
