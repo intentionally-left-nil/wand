@@ -75,12 +75,6 @@ defmodule InitTest do
       assert Init.execute({"wand.json", []}) == {:error, :wand_core_api_error, :invalid_dependency}
     end
 
-    test ":mix_file_not_updated when the mix_file doesn't have deps" do
-      stub_exists("./mix.exs", true)
-      expect(WandCore.FileMock, :read, fn "./mix.exs" -> {:ok, "deps: deps(:prod)"} end)
-      assert Init.after_save({"wand.json", []}) == {:error, :unable_to_modify_mix, nil}
-    end
-
     test "Regression test: initialize a path with git" do
       stub_exists("wand.json", false)
       [
@@ -111,6 +105,25 @@ defmodule InitTest do
       Helpers.System.stub_get_deps()
       file = get_default_file()
       assert Init.execute({"wand.json", []}) == {:ok, expected_result(file)}
+    end
+  end
+
+  describe "after_save" do
+    test ":mix_file_not_updated when the mix_file doesn't have deps" do
+      stub_exists("./mix.exs", true)
+      expect(WandCore.FileMock, :read, fn "./mix.exs" -> {:ok, "deps: deps(:prod)"} end)
+      assert Init.after_save({"wand.json", []}) == {:error, :mix_file_not_updated, nil}
+    end
+
+    test "successfully updates the mix file" do
+      stub_exists("./mix.exs", true)
+      expect(WandCore.FileMock, :read, fn "./mix.exs" -> {:ok, "deps: deps()"} end)
+
+      mix_contents = "deps: Mix.Tasks.WandCore.Deps.run([])"
+
+      expect(WandCore.FileMock, :write, fn ("./mix.exs", ^mix_contents) -> :ok end)
+
+      assert Init.after_save({"wand.json", []}) == :ok
     end
   end
 
