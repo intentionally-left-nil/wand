@@ -117,7 +117,7 @@ defmodule Wand.CLI.Commands.Init do
     end
 
     @doc false
-    def handle_error(:get_deps, _reason) do
+    def handle_error(:wand_core_api_error, _reason) do
       """
       # Error
       Unable to read existing deps
@@ -125,9 +125,6 @@ defmodule Wand.CLI.Commands.Init do
       mix wand.init did not return successfully.
       Usually that means your mix.exs file is invalid. Please make sure your existing deps are correct, and then try again.
       """
-      |> Display.error()
-
-      Error.get(:wand_core_api_error)
     end
 
     @doc false
@@ -176,7 +173,7 @@ defmodule Wand.CLI.Commands.Init do
         |> validate_dependencies()
 
       {:error, reason} ->
-        {:error, :get_deps, reason}
+        {:error, :wand_core_api_error, reason}
     end
   end
 
@@ -187,7 +184,7 @@ defmodule Wand.CLI.Commands.Init do
         {:ok, dependencies}
 
       {:error, error} ->
-        {:error, :get_deps, error}
+        {:error, :wand_core_api_error, error}
     end
   end
 

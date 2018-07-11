@@ -66,13 +66,13 @@ defmodule InitTest do
     test ":wand_core_api_error when get_deps fails" do
       stub_exists("wand.json", false)
       Helpers.System.stub_failed_get_deps()
-      assert Init.execute({"wand.json", []}) == {:error, :get_deps, {1, ""}}
+      assert Init.execute({"wand.json", []}) == {:error, :wand_core_api_error, {1, ""}}
     end
 
     test ":wand_core_api_error when the dependency structure is bad" do
       stub_exists("wand.json", false)
       Helpers.System.stub_get_bad_deps()
-      assert Init.execute({"wand.json", []}) == {:error, :get_deps, :invalid_dependency}
+      assert Init.execute({"wand.json", []}) == {:error, :wand_core_api_error, :invalid_dependency}
     end
 
     test ":mix_file_not_updated when the mix_file doesn't have deps" do
