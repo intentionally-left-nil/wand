@@ -163,13 +163,16 @@ defmodule Wand.CLI.Commands.Init do
     end)
   end
 
-  defp convert_dependency([name, opts]) when is_list(opts),
-    do: convert_dependency([name, nil, opts])
+  defp convert_dependency([name, opts]) when is_list(opts) do
+    opts = WandCore.Opts.decode(opts)
+    convert_dependency([name, nil, opts])
+  end
 
   defp convert_dependency([name, requirement]), do: convert_dependency([name, requirement, []])
 
   defp convert_dependency([name, requirement, opts]) do
-    opts = Enum.into(opts, %{}, fn [key, val] -> {String.to_atom(key), val} end)
+    opts = WandCore.Opts.decode(opts)
+      |> Enum.into(%{}, fn [key, val] -> {String.to_atom(key), val} end)
     {:ok, %Dependency{name: name, requirement: requirement, opts: opts}}
   end
 
