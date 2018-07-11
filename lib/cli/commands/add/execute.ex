@@ -1,5 +1,6 @@
 defmodule Wand.CLI.Commands.Add.Execute do
   @moduledoc false
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.Commands.Add.Package
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
@@ -9,21 +10,16 @@ defmodule Wand.CLI.Commands.Add.Execute do
 
   def execute(packages, %{wand_file: file}) do
     with {:ok, dependencies} <- get_dependencies(packages),
-         {:ok, file} <- add_dependencies(file, dependencies),
-         :ok <- WandFileWithHelp.save(file) do
+         {:ok, file} <- add_dependencies(file, dependencies) do
       message =
         Enum.map(dependencies, fn %Dependency{name: name, requirement: requirement} ->
           "Succesfully added #{name}: #{requirement}"
         end)
         |> Enum.join("\n")
 
-      {:ok, message}
+      {:ok, %Result{wand_file: file, message: message}}
     else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
-
-      {:error, step, reason} ->
-        handle_error(step, reason)
+      error -> error
     end
   end
 
@@ -102,7 +98,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
     |> get_changed(package, %Package{})
   end
 
-  def get_detail_opts(details) do
+  defp get_detail_opts(details) do
     default =
       Map.fetch!(details, :__struct__)
       |> struct()
@@ -136,71 +132,5 @@ defmodule Wand.CLI.Commands.Add.Execute do
       :ok -> :ok
       {:error, reason} -> {:error, :compile_failed, reason}
     end
-  end
-
-  defp handle_error(:dependency, {:not_found, name}) do
-    """
-    # Error
-    Package does not exist in remote repository
-
-    The remote server (hex.pm unless overridden), does not contain #{name}
-    Please check the spelling and try again.
-    """
-    |> Display.error()
-
-    Error.get(:package_not_found)
-  end
-
-  defp handle_error(:dependency, {reason, _name})
-       when reason in [:no_connection, :bad_response] do
-    """
-    # Error
-    Error getting package version from the remote repository.
-
-    Talking to the remote repository (hex.pm unless overridden) failed.
-    Please check your network connection and try again.
-    """
-    |> Display.error()
-
-    Error.get(:hex_api_error)
-  end
-
-  defp handle_error(:add_dependency, {:already_exists, name}) do
-    """
-    # Error
-    Dependency already exists in wand.json
-
-    Attempted to add #{name} to wand.json, but that package already exists.
-    Did you mean to type wand upgrade #{name} instead?
-    """
-    |> Display.error()
-
-    Error.get(:package_already_exists)
-  end
-
-  defp handle_error(:download_failed, _reason) do
-    """
-    # Partial Success
-    Unable to run mix deps.get
-
-    The wand.json file was successfully updated,
-    however mix deps.get failed.
-    """
-    |> Display.error()
-
-    Error.get(:install_deps_error)
-  end
-
-  defp handle_error(:compile_failed, _reason) do
-    """
-    # Partial Success
-    Unable to run mix compile
-
-    The wand.json file was successfully updated,
-    however mix compile failed.
-    """
-    |> Display.error()
-
-    Error.get(:install_deps_error)
   end
 end
