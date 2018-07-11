@@ -19,6 +19,7 @@ defmodule Wand.CLI.Command do
 
   defmacro __using__(_opts) do
     quote do
+      alias Wand.CLI.Executor.Result
       @behaviour Wand.CLI.Command
       @impl true
       def after_save(), do: :ok

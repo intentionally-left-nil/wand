@@ -62,13 +62,13 @@ defmodule CoreTest do
       Helpers.System.stub_core_version(version)
       expect(Wand.IOMock, :puts, fn ^version -> :ok end)
       Sys
-      assert Core.execute(:version) == {:ok, :silent}
+      assert Core.execute(:version, %{}) == {:ok, %Wand.CLI.Executor.Result{message: nil}}
     end
 
     test "fails to get the version" do
       Helpers.System.stub_core_version_missing()
       Helpers.IO.stub_stderr()
-      assert Core.execute(:version) == Error.get(:wand_core_missing)
+      assert Core.execute(:version, %{}) == Error.get(:wand_core_missing)
     end
   end
 
