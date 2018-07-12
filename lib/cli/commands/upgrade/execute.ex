@@ -17,26 +17,20 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     end
   end
 
-  def handle_error(:get_dependencies, name) do
+  def handle_error(:package_not_found, name) do
     """
     # Error
     Could not find #{name} in wand.json
     Did you mean to type wand add #{name} instead?
     """
-    |> Display.error()
-
-    Error.get(:package_not_found)
   end
 
-  def handle_error(:update_dependencies, {reason, name}) do
+  def handle_error(:hex_api_error, {reason, name}) do
     """
     # Error
     There was a problem finding the latest version for #{name}.
     The exact reason was #{reason}
     """
-    |> Display.error()
-
-    Error.get(:hex_api_error)
   end
 
 
@@ -45,7 +39,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   defp get_dependencies(%WandFile{dependencies: dependencies}, names) do
     Enum.reduce_while(names, {:ok, []}, fn name, {:ok, filtered} ->
       case Enum.find(dependencies, &(&1.name == name)) do
-        nil -> {:halt, {:error, :get_dependencies, name}}
+        nil -> {:halt, {:error, :package_not_found, name}}
         item -> {:cont, {:ok, [item | filtered]}}
       end
     end)
@@ -55,7 +49,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
       case update_dependency(dependency, options) do
         {:ok, dependency} -> {:cont, {:ok, [dependency | filtered]}}
-        {:error, reason} -> {:halt, {:error, :update_dependencies, reason}}
+        {:error, reason} -> {:halt, {:error, :hex_api_error, reason}}
       end
     end)
     |> case do

@@ -86,20 +86,15 @@ defmodule UpgradeTest do
   describe "execute" do
     test ":package_not_found if the package is not in wand.json" do
       extras = %{wand_file: %WandFile{}}
-      Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}, extras) == Error.get(:package_not_found)
+      assert Upgrade.execute({["poison"], %Options{}}, extras) ==  {:error, :package_not_found, "poison"}
     end
 
     test ":hex_api_error if getting the package from hex fails" do
       file = %WandFile{
         dependencies: [Helpers.WandFile.poison()]
       }
-
-      Helpers.WandFile.stub_load(file)
-      Helpers.IO.stub_stderr()
       Helpers.Hex.stub_not_found()
-
-      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == Error.get(:hex_api_error)
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:error, :hex_api_error, {:not_found, "poison"}}
     end
   end
 
