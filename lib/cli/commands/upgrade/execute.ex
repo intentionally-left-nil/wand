@@ -1,11 +1,9 @@
 defmodule Wand.CLI.Commands.Upgrade.Execute do
   @moduledoc false
   alias Wand.Mode
-  alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
   alias Wand.CLI.Commands.Upgrade.Options
-  alias Wand.CLI.Error
   alias Wand.CLI.Executor.Result
 
   def execute({names, %Options{} = options}, %{wand_file: file}) do
