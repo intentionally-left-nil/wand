@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Upgrade do
   use Wand.CLI.Command
   alias Wand.CLI.Display
+  alias Wand.CLI.Commands.Upgrade
 
   @banner """
   # Upgrade
@@ -74,7 +75,10 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   @impl true
   def options() do
-    [require_core: true]
+    [
+      require_core: true,
+      load_wand_file: true,
+    ]
   end
 
   @doc false
@@ -90,7 +94,11 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   @doc false
   @impl true
-  def execute(args, %{}), do: Wand.CLI.Commands.Upgrade.Execute.execute(args)
+  def execute(args, extras), do: Upgrade.Execute.execute(args, extras)
+
+  @doc false
+  @impl true
+  def handle_error(key, data), do: Upgrade.Execute.handle_error(key, data)
 
   defp parse(commands, switches) do
     download = Keyword.get(switches, :download, true)
