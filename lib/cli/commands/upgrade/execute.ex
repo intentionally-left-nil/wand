@@ -4,24 +4,41 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
-  alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.Commands.Upgrade.Options
   alias Wand.CLI.Error
+  alias Wand.CLI.Executor.Result
 
-  def execute({names, %Options{} = options}) do
-    with {:ok, file} <- WandFileWithHelp.load(),
-         {:ok, dependencies} <- get_dependencies(file, names),
-         {:ok, file} <- update_dependencies(file, dependencies, options),
-         :ok <- WandFileWithHelp.save(file) do
-      :ok
+  def execute({names, %Options{} = options}, %{wand_file: file}) do
+    with {:ok, dependencies} <- get_dependencies(file, names),
+         {:ok, file} <- update_dependencies(file, dependencies, options) do
+           {:ok, %Result{wand_file: file}}
     else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
-
-      {:error, step, reason} ->
-        handle_error(step, reason)
+      error -> error
     end
   end
+
+  def handle_error(:get_dependencies, name) do
+    """
+    # Error
+    Could not find #{name} in wand.json
+    Did you mean to type wand add #{name} instead?
+    """
+    |> Display.error()
+
+    Error.get(:package_not_found)
+  end
+
+  def handle_error(:update_dependencies, {reason, name}) do
+    """
+    # Error
+    There was a problem finding the latest version for #{name}.
+    The exact reason was #{reason}
+    """
+    |> Display.error()
+
+    Error.get(:hex_api_error)
+  end
+
 
   defp get_dependencies(%WandFile{dependencies: dependencies}, :all), do: {:ok, dependencies}
 
@@ -107,27 +124,5 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
         _ -> true
       end
     end)
-  end
-
-  defp handle_error(:get_dependencies, name) do
-    """
-    # Error
-    Could not find #{name} in wand.json
-    Did you mean to type wand add #{name} instead?
-    """
-    |> Display.error()
-
-    Error.get(:package_not_found)
-  end
-
-  defp handle_error(:update_dependencies, {reason, name}) do
-    """
-    # Error
-    There was a problem finding the latest version for #{name}.
-    The exact reason was #{reason}
-    """
-    |> Display.error()
-
-    Error.get(:hex_api_error)
   end
 end

@@ -7,6 +7,9 @@ defmodule UpgradeTest do
   alias Wand.CLI.Commands.Upgrade.Options
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
+  alias Wand.CLI.Executor.Result
+
+  setup :verify_on_exit!
 
   describe "validate" do
     test "returns help if invalid flags are given" do
@@ -81,16 +84,10 @@ defmodule UpgradeTest do
   end
 
   describe "execute" do
-    test ":missing_wand_file if cannot open wand file" do
-      Helpers.WandFile.stub_no_file()
-      Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}, %{}) == Error.get(:missing_wand_file)
-    end
-
     test ":package_not_found if the package is not in wand.json" do
-      Helpers.WandFile.stub_load()
+      extras = %{wand_file: %WandFile{}}
       Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}, %{}) == Error.get(:package_not_found)
+      assert Upgrade.execute({["poison"], %Options{}}, extras) == Error.get(:package_not_found)
     end
 
     test ":hex_api_error if getting the package from hex fails" do
@@ -102,22 +99,7 @@ defmodule UpgradeTest do
       Helpers.IO.stub_stderr()
       Helpers.Hex.stub_not_found()
 
-      assert Upgrade.execute({["poison"], %Options{}}, %{}) == Error.get(:hex_api_error)
-    end
-
-    test "Error saving the wand file" do
-      file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_cannot_save(file)
-      Helpers.IO.stub_stderr()
-      assert Upgrade.execute({:all, %Options{}}, %{}) == Error.get(:file_write_error)
-    end
-
-    test "update all no-ops if the dependencies are empty" do
-      file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({:all, %Options{}}, %{}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == Error.get(:hex_api_error)
     end
   end
 
@@ -181,22 +163,19 @@ defmodule UpgradeTest do
     defp validate(requirement, expected), do: validate(requirement, expected, %Options{})
 
     defp validate(requirement, expected, options) do
-      %WandFile{
+      file = %WandFile{
         dependencies: [
           %Dependency{name: "poison", requirement: requirement}
         ]
       }
-      |> Helpers.WandFile.stub_load()
 
-      %WandFile{
+      expected = %WandFile{
         dependencies: [
           %Dependency{name: "poison", requirement: expected}
         ]
       }
-      |> Helpers.WandFile.stub_save()
-
       Helpers.Hex.stub_poison()
-      assert Upgrade.execute({["poison"], options}, %{}) == :ok
+      assert Upgrade.execute({["poison"], options}, %{wand_file: file}) == {:ok, %Result{wand_file: expected}}
     end
   end
 
@@ -208,9 +187,7 @@ defmodule UpgradeTest do
         ]
       }
 
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({["poison"], %Options{}}, %{}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
     end
   end
 
@@ -221,10 +198,7 @@ defmodule UpgradeTest do
           %Dependency{name: "poison", opts: %{path: "../poison"}}
         ]
       }
-
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({["poison"], %Options{}}, %{}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
     end
   end
 end
