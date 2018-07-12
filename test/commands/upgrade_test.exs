@@ -1,7 +1,6 @@
 defmodule UpgradeTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.CLI.Error
   alias Wand.Test.Helpers
   alias Wand.CLI.Commands.Upgrade
   alias Wand.CLI.Commands.Upgrade.Options
@@ -108,11 +107,11 @@ defmodule UpgradeTest do
     end
 
     test "No-ops a custom environment" do
-      validate("== 3.2.0 or ==3.2.0--dev")
+      validate("== 3.2.0 or ==3.2.0--dev", no_hex: true)
     end
 
     test "No-ops an exact match" do
-      validate("== 3.2.0")
+      validate("== 3.2.0", no_hex: true)
     end
 
     test "Updates a tilde match" do
@@ -151,13 +150,14 @@ defmodule UpgradeTest do
     end
 
     defp validate(requirement), do: validate(requirement, requirement, %Options{})
+    defp validate(requirement, [no_hex: true]), do: validate(requirement, requirement, %Options{}, [no_hex: true])
 
     defp validate(requirement, %Options{} = options),
       do: validate(requirement, requirement, options)
 
     defp validate(requirement, expected), do: validate(requirement, expected, %Options{})
 
-    defp validate(requirement, expected, options) do
+    defp validate(requirement, expected, options, test_flags \\ []) do
       file = %WandFile{
         dependencies: [
           %Dependency{name: "poison", requirement: requirement}
@@ -169,7 +169,11 @@ defmodule UpgradeTest do
           %Dependency{name: "poison", requirement: expected}
         ]
       }
-      Helpers.Hex.stub_poison()
+
+      unless test_flags[:no_hex] do
+        Helpers.Hex.stub_poison()
+      end
+
       assert Upgrade.execute({["poison"], options}, %{wand_file: file}) == {:ok, %Result{wand_file: expected}}
     end
   end
