@@ -41,8 +41,11 @@ defmodule Wand.CLI.Executor do
 
   defp save_file(%Result{wand_file: nil}), do: :ok
 
-  defp save_file(%Result{wand_file: wand_file}) do
-    WandFileWithHelp.save(wand_file)
+  defp save_file(%Result{wand_file: wand_file, wand_path: wand_path}) do
+    case wand_path do
+      nil -> WandFileWithHelp.save(wand_file)
+      wand_path -> WandFileWithHelp.save(wand_file, wand_path)
+    end
   end
 
   defp after_save(%Result{wand_file: nil}, _module, _data), do: :ok

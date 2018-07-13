@@ -9,9 +9,9 @@ defmodule Wand.Test.Helpers.WandFile do
     |> stub_read()
   end
 
-  def stub_save(file) do
+  def stub_save(file, path \\ "wand.json") do
     contents = file |> WandCore.Poison.encode!(pretty: true)
-    expect(WandCore.FileMock, :write, fn _path, ^contents -> :ok end)
+    expect(WandCore.FileMock, :write, fn ^path, ^contents -> :ok end)
   end
 
   def poison() do

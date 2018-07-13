@@ -18,6 +18,13 @@ defmodule Wand.CLI.WandFileWithHelp do
     end
   end
 
+  def save(file, path) do
+    case WandFile.save(file, path) do
+      :ok -> :ok
+      {:error, reason} -> {:error, :wand_file, {:save, reason}}
+    end
+  end
+
   def handle_error({:load, :json_decode_error}) do
     """
     # Error

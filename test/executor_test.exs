@@ -91,6 +91,15 @@ defmodule ExecutorTest do
       expect(TestCommand, :after_save, fn :hello -> :ok end)
       assert Executor.run(TestCommand, :hello) == :ok
     end
+
+    test "saves a wand_file to a custom path" do
+      stub_options()
+      file = %WandFile{}
+      Helpers.WandFile.stub_save(file, "/tmp/wand.json")
+      expect(TestCommand, :execute, fn :hello, %{} -> {:ok, %Result{wand_file: %WandFile{}, wand_path: "/tmp/wand.json"}} end)
+      expect(TestCommand, :after_save, fn :hello -> :ok end)
+      assert Executor.run(TestCommand, :hello) == :ok
+    end
   end
 
   test "skips printing if the message is nil" do
