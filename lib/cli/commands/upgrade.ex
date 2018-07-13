@@ -77,7 +77,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   def options() do
     [
       require_core: true,
-      load_wand_file: true,
+      load_wand_file: true
     ]
   end
 

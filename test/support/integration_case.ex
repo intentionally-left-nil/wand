@@ -5,7 +5,7 @@ defmodule Wand.Test.IntegrationCase do
     quote do
       @moduletag :external
       alias Wand.Test.IntegrationRunner
-      import  IntegrationRunner, only: [wand: 1, in_dir: 1, execute: 1, execute: 2]
+      import IntegrationRunner, only: [wand: 1, in_dir: 1, execute: 1, execute: 2]
 
       setup_all do
         :ok = IntegrationRunner.ensure_binary()

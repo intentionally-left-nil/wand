@@ -6,11 +6,15 @@ defmodule Wand.CLI.CoreValidator do
   def core_version() do
     case Wand.CLI.Mix.core_version() do
       {:ok, version} ->
-        version = String.trim(version)
-        |> String.split("\n")
-        |> List.last()
+        version =
+          String.trim(version)
+          |> String.split("\n")
+          |> List.last()
+
         {:ok, version}
-      error -> error
+
+      error ->
+        error
     end
   end
 

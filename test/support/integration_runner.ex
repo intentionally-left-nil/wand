@@ -15,7 +15,9 @@ defmodule Wand.Test.IntegrationRunner do
       nil ->
         state = compile_binary()
         {state, state}
-      state -> {state, state}
+
+      state ->
+        {state, state}
     end)
   end
 
@@ -25,15 +27,19 @@ defmodule Wand.Test.IntegrationRunner do
       nil ->
         state = compile_archive()
         {state, state}
-      state -> {state, state}
+
+      state ->
+        {state, state}
     end)
   end
 
   def wand(command) do
-    path = case File.exists?("./wand") do
-      true -> Path.expand("./wand")
-      false -> Path.expand("../../wand")
-    end
+    path =
+      case File.exists?("./wand") do
+        true -> Path.expand("./wand")
+        false -> Path.expand("../../wand")
+      end
+
     execute(path <> " " <> command, print?())
   end
 
@@ -49,11 +55,14 @@ defmodule Wand.Test.IntegrationRunner do
 
       #{message}
       ------------------------------------
-      """ |> IO.puts()
+      """
+      |> IO.puts()
     end
 
     case status do
-      0 -> :ok
+      0 ->
+        :ok
+
       _ ->
         {:error, status}
     end
@@ -61,6 +70,7 @@ defmodule Wand.Test.IntegrationRunner do
 
   def in_dir(fun) do
     folder = create_folder()
+
     try do
       File.cd!(folder, fun)
     after
@@ -81,20 +91,32 @@ defmodule Wand.Test.IntegrationRunner do
   defp compile_binary() do
     IO.puts("Compiling wand binary")
     {_message, status} = System.cmd("mix", ["build"], stderr_to_stdout: true)
+
     case status do
       0 ->
         IO.puts("Finished compiling wand binary")
-      _ -> :error
+
+      _ ->
+        :error
     end
   end
 
   defp compile_archive() do
     IO.puts("Installing wand.core from hex.pm")
-    {_message, status} = System.cmd("mix", ["archive.install", "hex", "wand_core", "--force"], stderr_to_stdout: true)
+
+    {_message, status} =
+      System.cmd(
+        "mix",
+        ["archive.install", "hex", "wand_core", "--force"],
+        stderr_to_stdout: true
+      )
+
     case status do
       0 ->
         IO.puts("Finished installing archive")
-      _ -> :error
+
+      _ ->
+        :error
     end
   end
 

@@ -9,7 +9,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   def execute({names, %Options{} = options}, %{wand_file: file}) do
     with {:ok, dependencies} <- get_dependencies(file, names),
          {:ok, file} <- update_dependencies(file, dependencies, options) do
-           {:ok, %Result{wand_file: file}}
+      {:ok, %Result{wand_file: file}}
     else
       error -> error
     end
@@ -30,7 +30,6 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     The exact reason was #{reason}
     """
   end
-
 
   defp get_dependencies(%WandFile{dependencies: dependencies}, :all), do: {:ok, dependencies}
 

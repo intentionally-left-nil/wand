@@ -65,11 +65,13 @@ defmodule Wand.CLI.Commands.Help do
   end
 
   defp parse(["help"], _verbose), do: {:error, :verbose}
+
   defp parse([name], verbose) do
-    flag = case verbose do
-      true -> :verbose
-      false -> :banner
-    end
+    flag =
+      case verbose do
+        true -> :verbose
+        false -> :banner
+      end
 
     case Enum.member?(Command.routes(), name) do
       true -> {:help, String.to_atom(name), flag}

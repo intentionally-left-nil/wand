@@ -34,7 +34,8 @@ defmodule HelpTest do
     end
 
     test "help wrong_command" do
-      assert Help.validate(["help", "wrong_command"]) == {:error, {:unrecognized, "wrong_command"}}
+      assert Help.validate(["help", "wrong_command"]) ==
+               {:error, {:unrecognized, "wrong_command"}}
     end
   end
 

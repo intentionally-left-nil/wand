@@ -36,6 +36,6 @@ defmodule Wand.Integration.InitTest do
   end
 
   defp assert_wandfile(file \\ %WandFile{}) do
-      assert WandFile.load() == {:ok, file}
+    assert WandFile.load() == {:ok, file}
   end
 end
