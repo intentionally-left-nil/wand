@@ -11,6 +11,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   ```
   wand upgrade
   wand upgrade poison ex_doc --latest
+  wand upgrade --skip=cowboy --skip=mox
   ```
 
 
