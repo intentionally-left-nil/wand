@@ -140,6 +140,7 @@ defmodule InitTest do
   defp expected_result(file) do
     %Result{
       wand_file: file,
+      wand_path: "wand.json",
       message:
         "Successfully initialized wand.json and copied your dependencies to it.\nType wand add [package] to add new packages, or wand upgrade to upgrade them\n"
     }

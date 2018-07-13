@@ -92,7 +92,7 @@ defmodule Wand.CLI.Commands.Init do
       Type wand add [package] to add new packages, or wand upgrade to upgrade them
       """
 
-      {:ok, %Result{wand_file: file, message: message}}
+      {:ok, %Result{wand_file: file, wand_path: path, message: message}}
     else
       error -> error
     end
