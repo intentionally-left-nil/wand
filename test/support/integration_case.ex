@@ -4,10 +4,10 @@ defmodule Wand.Test.IntegrationCase do
   using do
     quote do
       @moduletag :external
-      alias Wand.Test.IntegrationRunner
+      import  Wand.Test.IntegrationRunner, only: [wand: 1]
 
       setup_all do
-        IntegrationRunner.ensure_binary()
+         Wand.Test.IntegrationRunner.ensure_binary()
         :ok
       end
     end

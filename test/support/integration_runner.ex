@@ -11,10 +11,39 @@ defmodule Wand.Test.IntegrationRunner do
     end)
   end
 
+  def wand(command) do
+    {message, status} = System.cmd("wand", OptionParser.split(command), stderr_to_stdout: true)
+
+    if print?() do
+      """
+      ****
+      wand #{command}
+      ****
+
+      #{message}
+      ------------------------------------
+      """ |> IO.puts()
+    end
+
+    case status do
+      0 -> :ok
+      _ -> {:error, status}
+    end
+  end
+
+  defp print?() do
+    OptionParser.parse(System.argv(), switches: [include: :keep])
+    |> elem(0)
+    |> Enum.find(&(&1 == {:include, "print"}))
+    |> case do
+      nil -> false
+      _ -> true
+    end
+  end
 
   defp compile_binary() do
     IO.puts("Compiling wand binary")
-    {message, status} = System.cmd("mix", ["build"], stderr_to_stdout: true)
+    {_message, status} = System.cmd("mix", ["build"], stderr_to_stdout: true)
     case status do
       0 ->
         IO.puts("Finished compiling wand binary")
