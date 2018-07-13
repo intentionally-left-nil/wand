@@ -29,8 +29,13 @@ defmodule Wand.Test.IntegrationRunner do
     end)
   end
 
-  def wand(command, wand_path \\ Path.expand("./wand")) do
-    {message, status} = System.cmd(wand_path, OptionParser.split(command), stderr_to_stdout: true)
+  def wand(command) do
+    path = case File.exists?("./wand") do
+      true -> Path.expand("./wand")
+      false -> Path.expand("../../wand")
+    end
+
+    {message, status} = System.cmd(path, OptionParser.split(command), stderr_to_stdout: true)
 
     if print?() do
       """
@@ -50,7 +55,7 @@ defmodule Wand.Test.IntegrationRunner do
   end
 
   def create_project() do
-    {message, status} = System.cmd("mix", ["new", "."], stderr_to_stdout: true)
+    {_message, status} = System.cmd("mix", ["new", "."], stderr_to_stdout: true)
     case status do
       0 -> :ok
       _ -> {:error, status}
@@ -59,11 +64,8 @@ defmodule Wand.Test.IntegrationRunner do
 
   def in_dir(fun) do
     folder = create_folder()
-    wand_path = Path.expand("./wand")
-    wand_wrapper = fn(command) -> wand(command, wand_path) end
-
     try do
-      File.cd!(folder, fn -> fun.(wand_wrapper) end)
+      File.cd!(folder, fun)
     after
       File.rm_rf!(folder)
     end
