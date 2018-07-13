@@ -78,10 +78,11 @@ You need to have the wand_core archive added to your image before running mix de
 `- run: mix archive.install hex wand_core --force`
 
 ## Local development
-1. `git clone git@github.com:AnilRedshift/wand.git`
-2. `cd wand`
-3. `mix deps.get`
-4. `mix test`
+1. `mix archive.install hex wand_core --force`
+2. `git clone git@github.com:AnilRedshift/wand.git`
+3. `cd wand`
+4. `mix deps.get`
+5. `mix test`
 
 ## Integration tests
 Wand also has tests which run the wand binary against real mix projects to verify their behavior. You can run these with `mix test --include external`
