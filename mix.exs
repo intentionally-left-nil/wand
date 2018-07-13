@@ -14,7 +14,7 @@ defmodule Wand.MixProject do
     [
       aliases: aliases(),
       app: :wand,
-      deps: deps(),
+      deps: Mix.Tasks.WandCore.Deps.run([]),
       description: @description,
       docs: [
         source_ref: "v#{@version}",
@@ -48,19 +48,6 @@ defmodule Wand.MixProject do
   defp build_cli(_) do
     Mix.Tasks.Compile.run([])
     Mix.Tasks.Escript.Build.run([])
-  end
-
-  defp deps do
-    [
-      {:earmark, "~> 1.2"},
-      {:httpoison, "~> 1.2"},
-      {:wand_core, "~> 0.3"},
-      {:excoveralls, "~> 0.9.1", only: :test},
-      {:modglobal, "~> 0.2.4", only: :test},
-      {:mox, "~> 0.4.0", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev},
-      {:junit_formatter, "~> 2.2", only: :test}
-    ]
   end
 
   defp elixirc_paths(:test), do: ["test/support", "lib"]

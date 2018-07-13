@@ -3,8 +3,7 @@ defmodule Wand.CLI.Commands.Init do
   alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
-
-  @f WandCore.Interfaces.File.impl()
+  alias WandCore.Interfaces.File
 
   @moduledoc """
   # Init
@@ -152,7 +151,7 @@ defmodule Wand.CLI.Commands.Init do
   defp can_write?(path, switches) do
     cond do
       Keyword.get(switches, :overwrite) -> :ok
-      @f.exists?(path) -> {:error, :file_already_exists, path}
+      File.impl().exists?(path) -> {:error, :file_already_exists, path}
       true -> :ok
     end
   end
@@ -211,12 +210,12 @@ defmodule Wand.CLI.Commands.Init do
       Path.dirname(path)
       |> Path.join("mix.exs")
 
-    with true <- @f.exists?(mix_file),
-         {:ok, contents} <- @f.read(mix_file),
+    with true <- File.impl().exists?(mix_file),
+         {:ok, contents} <- File.impl().read(mix_file),
          true <- String.contains?(contents, "deps: deps()"),
          new_contents <-
            String.replace(contents, "deps: deps()", "deps: Mix.Tasks.WandCore.Deps.run([])"),
-         :ok <- @f.write(mix_file, new_contents) do
+         :ok <- File.impl().write(mix_file, new_contents) do
       :ok
     else
       _ -> {:error, :mix_file_not_updated, nil}
