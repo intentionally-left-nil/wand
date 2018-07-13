@@ -19,6 +19,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   --compile           Run mix compile after adding (default: **true**)
   --download          Run mix deps.get after adding (default: **true**)
   --latest            Upgrade to the latest version, ignoring wand.json restrictions
+  --skip              Do not upgrade the following package
   ```
 
 
@@ -52,7 +53,8 @@ defmodule Wand.CLI.Commands.Upgrade do
     defstruct mode: :caret,
               download: true,
               compile: true,
-              latest: false
+              latest: false,
+              skip: []
   end
 
   @doc false
@@ -112,7 +114,8 @@ defmodule Wand.CLI.Commands.Upgrade do
       download: download,
       compile: compile,
       latest: Keyword.get(switches, :latest, false),
-      mode: get_mode(switches)
+      mode: get_mode(switches),
+      skip: Keyword.get_values(switches, :skip)
     }
 
     {get_packages(commands), options}
@@ -133,7 +136,8 @@ defmodule Wand.CLI.Commands.Upgrade do
     base_flags = [
       compile: :boolean,
       download: :boolean,
-      latest: :boolean
+      latest: :boolean,
+      skip: :keep,
     ]
 
     latest_flags = [

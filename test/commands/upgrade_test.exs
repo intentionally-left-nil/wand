@@ -45,6 +45,10 @@ defmodule UpgradeTest do
                {:ok, {["poison", "ex_doc"], %Options{}}}
     end
 
+    test "upgrade all except" do
+      assert Upgrade.validate(["upgrade", "--skip=poison", "--skip=cowboy"]) == {:ok, {:all, %Options{skip: ["poison", "cowboy"]}}}
+    end
+
     test "upgrade all packages if none passed in" do
       assert Upgrade.validate(["upgrade"]) == {:ok, {:all, %Options{}}}
     end
@@ -83,21 +87,14 @@ defmodule UpgradeTest do
   end
 
   describe "execute" do
-    test ":package_not_found if the package is not in wand.json" do
-      extras = %{wand_file: %WandFile{}}
-
-      assert Upgrade.execute({["poison"], %Options{}}, extras) ==
-               {:error, :package_not_found, "poison"}
-    end
-
     test ":hex_api_error if getting the package from hex fails" do
       file = %WandFile{
-        dependencies: [Helpers.WandFile.poison()]
+        dependencies: [Helpers.WandFile.mox(), Helpers.WandFile.poison()]
       }
 
       Helpers.Hex.stub_not_found()
 
-      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) ==
+      assert Upgrade.execute({["poison"], %Options{skip: ["mox"]}}, %{wand_file: file}) ==
                {:error, :hex_api_error, {:not_found, "poison"}}
     end
   end
@@ -117,6 +114,10 @@ defmodule UpgradeTest do
 
     test "No-ops an exact match" do
       validate("== 3.2.0", no_hex: true)
+    end
+
+    test "No-ops if the package is skipped" do
+        validate("~> 1.5.0", "~> 1.5.0", %Options{skip: ["poison"]}, no_hex: true)
     end
 
     test "Updates a tilde match" do
@@ -230,7 +231,6 @@ defmodule UpgradeTest do
   end
 
   test "handle_error" do
-    Upgrade.handle_error(:package_not_found, "poison")
     Upgrade.handle_error(:hex_api_error, {:not_found, "poison"})
   end
 end
