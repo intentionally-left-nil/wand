@@ -83,6 +83,11 @@ You need to have the wand_core archive added to your image before running mix de
 3. `mix deps.get`
 4. `mix test`
 
+## Integration tests
+Wand also has tests which run the wand binary against real mix projects to verify their behavior. You can run these with `mix test --include external`
+
+Additionally, you can see the CLI output of each command with `mix test --include external --include print`
+
 
 # Build status
 [![Coverage Status](https://coveralls.io/repos/github/AnilRedshift/wand/badge.svg?branch=master)](https://coveralls.io/github/AnilRedshift/wand?branch=master)[![CircleCI branch](https://img.shields.io/circleci/project/github/AnilRedshift/wand/master.svg)](circle)
