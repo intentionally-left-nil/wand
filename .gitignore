@@ -24,3 +24,6 @@ wand-*.tar
 
 # Ignore the locally built escript
 /wand
+
+# Ignore files made by integration tests
+/tmp
