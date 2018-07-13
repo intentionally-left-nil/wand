@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Help do
   use Wand.CLI.Command
   alias Wand.CLI.Display
+  alias Wand.CLI.Command
 
   @moduledoc Wand.banner()
 
@@ -11,10 +12,10 @@ defmodule Wand.CLI.Commands.Help do
   def help(:verbose) do
     help(:banner)
 
-    Wand.CLI.Command.routes()
+    Command.routes()
     |> List.delete("help")
     |> Enum.each(fn name ->
-      module = Wand.CLI.Command.get_module(name)
+      module = Command.get_module(name)
       module.help(:banner)
       "------------------------------------" |> Display.print()
     end)
@@ -51,7 +52,7 @@ defmodule Wand.CLI.Commands.Help do
 
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: flags)
 
-    case Wand.CLI.Command.parse_errors(errors) do
+    case Command.parse_errors(errors) do
       :ok -> parse(commands, verbose?(switches))
       error -> error
     end
@@ -64,8 +65,18 @@ defmodule Wand.CLI.Commands.Help do
   end
 
   defp parse(["help"], _verbose), do: {:error, :verbose}
-  defp parse([name], _verbose = true), do: {:help, String.to_atom(name), :verbose}
-  defp parse([name], _verbose = false), do: {:help, String.to_atom(name), :banner}
+  defp parse([name], verbose) do
+    flag = case verbose do
+      true -> :verbose
+      false -> :banner
+    end
+
+    case Enum.member?(Command.routes(), name) do
+      true -> {:help, String.to_atom(name), flag}
+      false -> {:error, {:unrecognized, name}}
+    end
+  end
+
   defp parse(_commands, _verbose = true), do: {:error, :verbose}
   defp parse(_commands, _verbose = false), do: {:error, :banner}
 

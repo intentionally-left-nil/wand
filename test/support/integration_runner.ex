@@ -12,7 +12,8 @@ defmodule Wand.Test.IntegrationRunner do
   end
 
   def wand(command) do
-    {message, status} = System.cmd("wand", OptionParser.split(command), stderr_to_stdout: true)
+    {message, status} = Path.expand("./wand")
+    |> System.cmd(OptionParser.split(command), stderr_to_stdout: true)
 
     if print?() do
       """
