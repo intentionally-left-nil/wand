@@ -7,7 +7,8 @@ defmodule Wand.Test.IntegrationCase do
       import  Wand.Test.IntegrationRunner, only: [wand: 1]
 
       setup_all do
-         Wand.Test.IntegrationRunner.ensure_binary()
+        :ok = Wand.Test.IntegrationRunner.ensure_binary()
+        :ok = Wand.Test.IntegrationRunner.ensure_archive()
         :ok
       end
     end

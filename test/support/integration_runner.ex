@@ -2,10 +2,20 @@ defmodule Wand.Test.IntegrationRunner do
   use Modglobal
 
   def ensure_binary() do
-    get_agent()
+    get_agent(:binary)
     |> Agent.get_and_update(fn
       nil ->
         state = compile_binary()
+        {state, state}
+      state -> {state, state}
+    end)
+  end
+
+  def ensure_archive() do
+    get_agent(:archive)
+    |> Agent.get_and_update(fn
+      nil ->
+        state = compile_archive()
         {state, state}
       state -> {state, state}
     end)
@@ -52,14 +62,24 @@ defmodule Wand.Test.IntegrationRunner do
     end
   end
 
-  defp get_agent() do
-    if get_global(:agent) == nil do
+  defp compile_archive() do
+    IO.puts("Installing wand.core from hex.pm")
+    {_message, status} = System.cmd("mix", ["archive.install", "hex", "wand_core", "--force"], stderr_to_stdout: true)
+    case status do
+      0 ->
+        IO.puts("Finished installing archive")
+      _ -> :error
+    end
+  end
+
+  defp get_agent(name) do
+    if get_global(name) == nil do
       {:ok, pid} = Agent.start_link(fn -> nil end)
       # Worst case we create a bunch of empty agents
       # in between this race condition. However, it's not worth solving that
       # for tests cases. Importantly, only one compile_binary() will be called.
-      set_global(:agent, pid)
+      set_global(name, pid)
     end
-    get_global(:agent)
+    get_global(name)
   end
 end
