@@ -85,15 +85,20 @@ defmodule UpgradeTest do
   describe "execute" do
     test ":package_not_found if the package is not in wand.json" do
       extras = %{wand_file: %WandFile{}}
-      assert Upgrade.execute({["poison"], %Options{}}, extras) ==  {:error, :package_not_found, "poison"}
+
+      assert Upgrade.execute({["poison"], %Options{}}, extras) ==
+               {:error, :package_not_found, "poison"}
     end
 
     test ":hex_api_error if getting the package from hex fails" do
       file = %WandFile{
         dependencies: [Helpers.WandFile.poison()]
       }
+
       Helpers.Hex.stub_not_found()
-      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:error, :hex_api_error, {:not_found, "poison"}}
+
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) ==
+               {:error, :hex_api_error, {:not_found, "poison"}}
     end
   end
 
@@ -150,7 +155,9 @@ defmodule UpgradeTest do
     end
 
     defp validate(requirement), do: validate(requirement, requirement, %Options{})
-    defp validate(requirement, [no_hex: true]), do: validate(requirement, requirement, %Options{}, [no_hex: true])
+
+    defp validate(requirement, no_hex: true),
+      do: validate(requirement, requirement, %Options{}, no_hex: true)
 
     defp validate(requirement, %Options{} = options),
       do: validate(requirement, requirement, options)
@@ -174,7 +181,8 @@ defmodule UpgradeTest do
         Helpers.Hex.stub_poison()
       end
 
-      assert Upgrade.execute({["poison"], options}, %{wand_file: file}) == {:ok, %Result{wand_file: expected}}
+      assert Upgrade.execute({["poison"], options}, %{wand_file: file}) ==
+               {:ok, %Result{wand_file: expected}}
     end
   end
 
@@ -186,7 +194,8 @@ defmodule UpgradeTest do
         ]
       }
 
-      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) ==
+               {:ok, %Result{wand_file: file}}
     end
   end
 
@@ -197,7 +206,9 @@ defmodule UpgradeTest do
           %Dependency{name: "poison", opts: %{path: "../poison"}}
         ]
       }
-      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
+
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) ==
+               {:ok, %Result{wand_file: file}}
     end
   end
 

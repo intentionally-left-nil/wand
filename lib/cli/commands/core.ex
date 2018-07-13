@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Core do
   use Wand.CLI.Command
   alias Wand.CLI.Display
+  alias Wand.CLI.CoreValidator
   @io Wand.Interfaces.IO.impl()
   @moduledoc """
   # Core
@@ -62,11 +63,9 @@ defmodule Wand.CLI.Commands.Core do
 
   @doc false
   def execute(:version, _extras) do
-    case Wand.CLI.Mix.core_version() do
+    case CoreValidator.core_version() do
       {:ok, version} ->
-        String.trim(version)
-        |> @io.puts()
-
+        @io.puts(version)
         {:ok, %Result{message: nil}}
 
       {:error, _} ->

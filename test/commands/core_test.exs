@@ -65,6 +65,14 @@ defmodule CoreTest do
       assert Core.execute(:version, %{}) == {:ok, %Wand.CLI.Executor.Result{message: nil}}
     end
 
+    test "gets the version even if there are warnings in the project" do
+      version = "warning: function deps/0 is unused\n  mix.exs:22\n\n3.2.1"
+      Helpers.System.stub_core_version(version)
+      expect(Wand.IOMock, :puts, fn "3.2.1" -> :ok end)
+      Sys
+      assert Core.execute(:version, %{}) == {:ok, %Wand.CLI.Executor.Result{message: nil}}
+    end
+
     test "fails to get the version" do
       Helpers.System.stub_core_version_missing()
       assert Core.execute(:version, %{}) == {:error, :wand_core_missing, nil}
