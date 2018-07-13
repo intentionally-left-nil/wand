@@ -56,7 +56,7 @@ defmodule Wand.MixProject do
       {:httpoison, "~> 1.2"},
       {:wand_core, "~> 0.3"},
       {:excoveralls, "~> 0.9.1", only: :test},
-      {:modglobal, "~> 0.2.3", only: :test},
+      {:modglobal, "~> 0.2.4", only: :test},
       {:mox, "~> 0.4.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:junit_formatter, "~> 2.2", only: :test}

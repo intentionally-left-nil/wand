@@ -44,6 +44,7 @@ jobs:
 
       - run: mix test
       - run: mix coveralls.circle
+      - run: MIX_ENV=prod mix compile
       - run: mix test --only external
 
       - store_test_results:

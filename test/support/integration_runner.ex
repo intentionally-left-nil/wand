@@ -90,7 +90,9 @@ defmodule Wand.Test.IntegrationRunner do
 
   defp compile_binary() do
     IO.puts("Compiling wand binary")
-    {_message, status} = System.cmd("mix", ["build"], stderr_to_stdout: true)
+
+    {_message, status} =
+      System.cmd("mix", ["build"], stderr_to_stdout: true, env: [{"MIX_ENV", "prod"}])
 
     case status do
       0 ->
@@ -108,7 +110,8 @@ defmodule Wand.Test.IntegrationRunner do
       System.cmd(
         "mix",
         ["archive.install", "hex", "wand_core", "--force"],
-        stderr_to_stdout: true
+        stderr_to_stdout: true,
+        env: [{"MIX_ENV", "prod"}]
       )
 
     case status do

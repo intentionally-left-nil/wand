@@ -27,11 +27,11 @@ defmodule Wand.Integration.InitTest do
 
       # Now update so the version is changed
       assert wand("upgrade modglobal --latest --exact") == :ok
-      assert_wandfile(%WandFile{dependencies: [modglobal("== 0.2.3")]})
+      assert_wandfile(%WandFile{dependencies: [modglobal("== 0.2.4")]})
     end)
   end
 
-  defp modglobal(requirement \\ ">= 0.2.3 and < 0.3.0") do
+  defp modglobal(requirement \\ ">= 0.2.4 and < 0.3.0") do
     %Dependency{name: "modglobal", requirement: requirement}
   end
 
