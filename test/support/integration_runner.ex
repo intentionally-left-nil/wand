@@ -34,10 +34,14 @@ defmodule Wand.Test.IntegrationRunner do
       true -> Path.expand("./wand")
       false -> Path.expand("../../wand")
     end
+    execute(path <> " " <> command, print?())
+  end
 
-    {message, status} = System.cmd(path, OptionParser.split(command), stderr_to_stdout: true)
+  def execute(command, print \\ false) do
+    [command | args] = OptionParser.split(command)
+    {message, status} = System.cmd(command, args, stderr_to_stdout: true)
 
-    if print?() do
+    if print do
       """
       ****
       wand #{command}
@@ -48,14 +52,6 @@ defmodule Wand.Test.IntegrationRunner do
       """ |> IO.puts()
     end
 
-    case status do
-      0 -> :ok
-      _ -> {:error, status}
-    end
-  end
-
-  def create_project() do
-    {_message, status} = System.cmd("mix", ["new", "."], stderr_to_stdout: true)
     case status do
       0 -> :ok
       _ -> {:error, status}
