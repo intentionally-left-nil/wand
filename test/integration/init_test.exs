@@ -5,15 +5,37 @@ defmodule Wand.Integration.InitTest do
 
   test "Initialize, and modify the wand file" do
     in_dir(fn ->
-      execute("mix new .")
+      assert execute("mix new .") == :ok
       assert wand("init") == :ok
-      assert WandFile.load() == {:ok, %WandFile{}}
+      assert_wandfile()
       assert wand("add modglobal") == :ok
-      assert WandFile.load() == {:ok, %WandFile{dependencies: [modglobal()]}}
+      assert_wandfile(%WandFile{dependencies: [modglobal()]})
+      assert execute("mix deps.get") == :ok
+      assert wand("remove modglobal") == :ok
+      assert_wandfile()
     end)
   end
 
-  defp modglobal() do
-    %Dependency{name: "modglobal", opts: %{}, requirement: ">= 0.2.3 and < 0.3.0"}
+  test "Upgrade a dependency" do
+    in_dir(fn ->
+      assert execute("mix new .") == :ok
+      assert wand("init") == :ok
+      assert wand("add modglobal@0.1") == :ok
+      assert_wandfile(%WandFile{dependencies: [modglobal(">= 0.1.0 and < 0.2.0")]})
+      assert wand("upgrade modglobal") == :ok
+      assert_wandfile(%WandFile{dependencies: [modglobal(">= 0.1.0 and < 0.2.0")]})
+
+      # Now update so the version is changed
+      assert wand("upgrade modglobal --latest --exact") == :ok
+      assert_wandfile(%WandFile{dependencies: [modglobal("== 0.2.3")]})
+    end)
+  end
+
+  defp modglobal(requirement \\ ">= 0.2.3 and < 0.3.0") do
+    %Dependency{name: "modglobal", requirement: requirement}
+  end
+
+  defp assert_wandfile(file \\ %WandFile{}) do
+      assert WandFile.load() == {:ok, file}
   end
 end
