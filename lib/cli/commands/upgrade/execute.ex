@@ -5,11 +5,21 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   alias WandCore.WandFile.Dependency
   alias Wand.CLI.Commands.Upgrade.Options
   alias Wand.CLI.Executor.Result
+  alias Wand.CLI.DependencyDownloader
 
   def execute({names, %Options{} = options}, %{wand_file: file}) do
     with {:ok, dependencies} <- get_dependencies(file, names),
          {:ok, file} <- update_dependencies(file, dependencies, options) do
       {:ok, %Result{wand_file: file}}
+    else
+      error -> error
+    end
+  end
+
+  def after_save({_names, %Options{} = options}) do
+    with :ok <- download(options),
+         :ok <- compile(options) do
+      :ok
     else
       error -> error
     end
@@ -116,4 +126,11 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
       end
     end)
   end
+
+  defp download(%Options{download: false}), do: :ok
+  defp download(_), do: DependencyDownloader.download()
+
+
+  defp compile(%Options{compile: false}), do: :ok
+  defp compile(_), do: DependencyDownloader.compile()
 end

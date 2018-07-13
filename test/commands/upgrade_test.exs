@@ -212,6 +212,23 @@ defmodule UpgradeTest do
     end
   end
 
+  describe "after_save" do
+    test "skips downloading if download: false is set" do
+      assert Upgrade.after_save({["poison"], %Options{download: false, compile: false}}) == :ok
+    end
+
+    test "skips compiling if compile: false is set" do
+      Helpers.System.stub_update_deps()
+        assert Upgrade.after_save({["poison"], %Options{compile: false}}) == :ok
+    end
+
+    test "downloads and compiles" do
+      Helpers.System.stub_update_deps()
+      Helpers.System.stub_compile()
+        assert Upgrade.after_save({["poison"], %Options{}}) == :ok
+    end
+  end
+
   test "handle_error" do
     Upgrade.handle_error(:package_not_found, "poison")
     Upgrade.handle_error(:hex_api_error, {:not_found, "poison"})

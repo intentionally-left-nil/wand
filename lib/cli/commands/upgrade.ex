@@ -98,6 +98,10 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   @doc false
   @impl true
+  def after_save(args), do: Upgrade.Execute.after_save(args)
+
+  @doc false
+  @impl true
   def handle_error(key, data), do: Upgrade.Execute.handle_error(key, data)
 
   defp parse(commands, switches) do
