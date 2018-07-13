@@ -28,24 +28,4 @@ defmodule Wand.CLI.Commands.Add.Error do
     Did you mean to type wand upgrade #{name} instead?
     """
   end
-
-  def handle_error(:install_deps_error, :download_failed) do
-    """
-    # Partial Success
-    Unable to run mix deps.get
-
-    The wand.json file was successfully updated,
-    however mix deps.get failed.
-    """
-  end
-
-  def handle_error(:install_deps_error, :compile_failed) do
-    """
-    # Partial Success
-    Unable to run mix compile
-
-    The wand.json file was successfully updated,
-    however mix compile failed.
-    """
-  end
 end

@@ -4,6 +4,7 @@ defmodule Wand.CLI.Commands.Add.Execute do
   alias Wand.CLI.Executor.Result
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
+  alias Wand.CLI.DependencyDownloader
 
   def execute(packages, %{wand_file: file}) do
     with {:ok, dependencies} <- get_dependencies(packages),
@@ -115,20 +116,9 @@ defmodule Wand.CLI.Commands.Add.Execute do
   end
 
   defp download([%Package{download: download} | _]) when not download, do: :ok
+  defp download(_), do: DependencyDownloader.download()
 
-  defp download(_) do
-    case Wand.CLI.Mix.update_deps() do
-      :ok -> :ok
-      {:error, _reason} -> {:error, :install_deps_error, :download_failed}
-    end
-  end
 
   defp compile([%Package{compile: compile} | _]) when not compile, do: :ok
-
-  defp compile(_) do
-    case Wand.CLI.Mix.compile() do
-      :ok -> :ok
-      {:error, _reason} -> {:error, :install_deps_error, :compile_failed}
-    end
-  end
+  defp compile(_), do: DependencyDownloader.compile()
 end

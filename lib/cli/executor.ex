@@ -4,6 +4,7 @@ defmodule Wand.CLI.Executor do
   alias Wand.CLI.CoreValidator
   alias Wand.CLI.Error
   alias Wand.CLI.Display
+  alias Wand.CLI.DependencyDownloader
 
   def run(module, data) do
     options = module.options()
@@ -22,6 +23,13 @@ defmodule Wand.CLI.Executor do
 
       {:error, :wand_file, reason} ->
         WandFileWithHelp.handle_error(reason)
+
+      {:error, :install_deps_error, reason} ->
+        DependencyDownloader.handle_error(:install_deps_error, reason)
+        |> Display.error()
+
+        Error.get(:install_deps_error)
+
 
       {:error, error_key, data} ->
         module.handle_error(error_key, data)

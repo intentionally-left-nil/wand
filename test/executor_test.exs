@@ -36,6 +36,14 @@ defmodule ExecutorTest do
       stub_execute_return_wandfile()
       assert Executor.run(TestCommand, :hello) == Error.get(:file_write_error)
     end
+
+    test ":install_deps_error when downloading dependencies" do
+      stub_options()
+      stub_execute_return_wandfile()
+      Helpers.WandFile.stub_save(%WandFile{})
+      expect(TestCommand, :after_save, fn :hello -> {:error, :install_deps_error, :compile_failed} end)
+      assert Executor.run(TestCommand, :hello) == Error.get(:install_deps_error)
+    end
   end
 
   test ":hex_api_error when returned by execute" do
