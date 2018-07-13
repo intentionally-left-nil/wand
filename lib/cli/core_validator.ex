@@ -3,8 +3,19 @@ defmodule Wand.CLI.CoreValidator do
   alias Wand.CLI.Display
   alias Wand.CLI.Error
 
-  def require_core() do
+  def core_version() do
     case Wand.CLI.Mix.core_version() do
+      {:ok, version} ->
+        version = String.trim(version)
+        |> String.split("\n")
+        |> List.last()
+        {:ok, version}
+      error -> error
+    end
+  end
+
+  def require_core() do
+    case core_version() do
       {:ok, version} -> validate_version(version)
       {:error, _} -> {:error, :require_core, :missing_core}
     end

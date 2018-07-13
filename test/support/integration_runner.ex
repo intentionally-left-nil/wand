@@ -54,7 +54,8 @@ defmodule Wand.Test.IntegrationRunner do
 
     case status do
       0 -> :ok
-      _ -> {:error, status}
+      _ ->
+        {:error, status}
     end
   end
 
