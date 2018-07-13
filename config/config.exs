@@ -5,6 +5,4 @@ if Mix.env() == :test do
     http: Wand.HttpMock,
     io: Wand.IOMock,
     system: Wand.SystemMock
-
-  config :wand_core, file: WandCore.FileMock
 end

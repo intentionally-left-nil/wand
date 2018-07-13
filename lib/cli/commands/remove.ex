@@ -1,10 +1,8 @@
 defmodule Wand.CLI.Commands.Remove do
+  use Wand.CLI.Command
   alias Wand.CLI.Display
   alias WandCore.WandFile
-  alias Wand.CLI.WandFileWithHelp
-  alias Wand.CLI.Error
 
-  @behaviour Wand.CLI.Command
   @moduledoc """
   # Remove
   Remove elixir packages from wand.json
@@ -19,6 +17,7 @@ defmodule Wand.CLI.Commands.Remove do
   ```
   """
   @doc false
+  @impl true
   def help(:missing_package) do
     """
     wand remove must be called with at least one package name.
@@ -29,11 +28,22 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
+  @impl true
   def help(:banner), do: Display.print(@moduledoc)
   @doc false
+  @impl true
   def help(:verbose), do: help(:banner)
 
+  @impl true
+  def options() do
+    [
+      require_core: true,
+      load_wand_file: true
+    ]
+  end
+
   @doc false
+  @impl true
   def validate(args) do
     {_switches, [_ | commands], _errors} = OptionParser.parse(args)
 
@@ -44,37 +54,24 @@ defmodule Wand.CLI.Commands.Remove do
   end
 
   @doc false
-  def execute(names) do
-    with :ok <- Wand.CLI.CoreValidator.require_core(),
-         {:ok, file} <- WandFileWithHelp.load(),
-         file <- remove_names(file, names),
-         :ok <- WandFileWithHelp.save(file),
-         :ok <- cleanup() do
-      :ok
-    else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
-
-      {:error, :require_core, reason} ->
-        Wand.CLI.CoreValidator.handle_error(reason)
-
-      {:error, step, reason} ->
-        handle_error(step, reason)
-    end
+  @impl true
+  def execute(names, %{wand_file: file}) do
+    file = remove_names(file, names)
+    {:ok, %Result{wand_file: file}}
   end
 
-  defp remove_names(file, names) do
-    Enum.reduce(names, file, &WandFile.remove(&2, &1))
-  end
-
-  defp cleanup() do
+  @doc false
+  @impl true
+  def after_save(_data) do
     case Wand.CLI.Mix.cleanup_deps() do
       :ok -> :ok
-      {:error, reason} -> {:error, :cleanup_failed, reason}
+      {:error, _} -> {:error, :install_deps_error, nil}
     end
   end
 
-  defp handle_error(:cleanup_failed, _reason) do
+  @doc false
+  @impl true
+  def handle_error(:install_deps_error, nil) do
     """
     # Partial Success
     Unable to run mix deps.unlock --unused
@@ -82,8 +79,9 @@ defmodule Wand.CLI.Commands.Remove do
     The wand.json file was successfully updated,
     however, updating the mix.lock file failed
     """
-    |> Display.error()
+  end
 
-    Error.get(:install_deps_error)
+  defp remove_names(file, names) do
+    Enum.reduce(names, file, &WandFile.remove(&2, &1))
   end
 end

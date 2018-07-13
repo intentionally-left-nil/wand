@@ -1,5 +1,6 @@
 defmodule Wand.CLI.Commands.Add do
-  @behaviour Wand.CLI.Command
+  use Wand.CLI.Command
+
   @moduledoc """
   # Add
   Add elixir packages to wand.json
@@ -133,12 +134,33 @@ defmodule Wand.CLI.Commands.Add do
 
   @doc false
   def moduledoc(), do: @moduledoc
+
   @doc false
+  @impl true
   def help(type), do: Wand.CLI.Commands.Add.Help.help(type)
 
   @doc false
+  @impl true
+  def options() do
+    [
+      require_core: true,
+      load_wand_file: true
+    ]
+  end
+
+  @doc false
+  @impl true
   def validate(args), do: Wand.CLI.Commands.Add.Validate.validate(args)
 
   @doc false
-  def execute(packages), do: Wand.CLI.Commands.Add.Execute.execute(packages)
+  @impl true
+  def execute(packages, extras), do: Wand.CLI.Commands.Add.Execute.execute(packages, extras)
+
+  @doc false
+  @impl true
+  def after_save(packages), do: Wand.CLI.Commands.Add.Execute.after_save(packages)
+
+  @doc false
+  @impl true
+  def handle_error(key, data), do: Wand.CLI.Commands.Add.Error.handle_error(key, data)
 end

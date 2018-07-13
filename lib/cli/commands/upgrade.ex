@@ -1,6 +1,7 @@
 defmodule Wand.CLI.Commands.Upgrade do
+  use Wand.CLI.Command
   alias Wand.CLI.Display
-  @behaviour Wand.CLI.Command
+  alias Wand.CLI.Commands.Upgrade
 
   @banner """
   # Upgrade
@@ -10,6 +11,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   ```
   wand upgrade
   wand upgrade poison ex_doc --latest
+  wand upgrade --skip=cowboy --skip=mox
   ```
 
 
@@ -18,6 +20,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   --compile           Run mix compile after adding (default: **true**)
   --download          Run mix deps.get after adding (default: **true**)
   --latest            Upgrade to the latest version, ignoring wand.json restrictions
+  --skip              Do not upgrade the following package
   ```
 
 
@@ -51,15 +54,19 @@ defmodule Wand.CLI.Commands.Upgrade do
     defstruct mode: :caret,
               download: true,
               compile: true,
-              latest: false
+              latest: false,
+              skip: []
   end
 
   @doc false
+  @impl true
   def help(:banner), do: Display.print(@banner)
   @doc false
+  @impl true
   def help(:verbose), do: Display.print(@moduledoc)
 
   @doc false
+  @impl true
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
@@ -69,7 +76,16 @@ defmodule Wand.CLI.Commands.Upgrade do
     |> Display.print()
   end
 
+  @impl true
+  def options() do
+    [
+      require_core: true,
+      load_wand_file: true
+    ]
+  end
+
   @doc false
+  @impl true
   def validate(args) do
     {switches, [_ | commands], errors} = OptionParser.parse(args, strict: get_flags(args))
 
@@ -80,7 +96,16 @@ defmodule Wand.CLI.Commands.Upgrade do
   end
 
   @doc false
-  def execute(args), do: Wand.CLI.Commands.Upgrade.Execute.execute(args)
+  @impl true
+  def execute(args, extras), do: Upgrade.Execute.execute(args, extras)
+
+  @doc false
+  @impl true
+  def after_save(args), do: Upgrade.Execute.after_save(args)
+
+  @doc false
+  @impl true
+  def handle_error(key, data), do: Upgrade.Execute.handle_error(key, data)
 
   defp parse(commands, switches) do
     download = Keyword.get(switches, :download, true)
@@ -90,7 +115,8 @@ defmodule Wand.CLI.Commands.Upgrade do
       download: download,
       compile: compile,
       latest: Keyword.get(switches, :latest, false),
-      mode: get_mode(switches)
+      mode: get_mode(switches),
+      skip: Keyword.get_values(switches, :skip)
     }
 
     {get_packages(commands), options}
@@ -111,7 +137,8 @@ defmodule Wand.CLI.Commands.Upgrade do
     base_flags = [
       compile: :boolean,
       download: :boolean,
-      latest: :boolean
+      latest: :boolean,
+      skip: :keep,
     ]
 
     latest_flags = [

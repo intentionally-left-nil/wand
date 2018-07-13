@@ -31,17 +31,6 @@ defmodule CliTest do
     CLI.main(["core", "install"])
   end
 
-  test "print a custom message" do
-    stub_io()
-    Helpers.System.stub_core_version()
-    Helpers.System.stub_get_deps()
-    expect(WandCore.FileMock, :exists?, fn _ -> true end)
-    expect(WandCore.FileMock, :read, fn _ -> {:ok, "deps: deps(), app: :test"} end)
-
-    expect(WandCore.FileMock, :write, 2, fn _, _ -> :ok end)
-    CLI.main(["init", "--overwrite"])
-  end
-
   defp stub_exit(status) do
     expect(Wand.SystemMock, :halt, fn ^status -> :ok end)
   end

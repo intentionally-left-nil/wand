@@ -1,57 +1,65 @@
 defmodule Wand.CLI.Commands.Upgrade.Execute do
   @moduledoc false
   alias Wand.Mode
-  alias Wand.CLI.Display
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
-  alias Wand.CLI.WandFileWithHelp
   alias Wand.CLI.Commands.Upgrade.Options
-  alias Wand.CLI.Error
+  alias Wand.CLI.Executor.Result
+  alias Wand.CLI.DependencyDownloader
 
-  def execute({names, %Options{} = options}) do
-    with :ok <- Wand.CLI.CoreValidator.require_core(),
-         {:ok, file} <- WandFileWithHelp.load(),
-         {:ok, dependencies} <- get_dependencies(file, names),
-         {:ok, file} <- update_dependencies(file, dependencies, options),
-         :ok <- WandFileWithHelp.save(file) do
-      :ok
+  def execute({names, %Options{} = options}, %{wand_file: file}) do
+    with names <- parse_names(names, file, options),
+         {:ok, file} <- update_dependencies(file, names, options) do
+      {:ok, %Result{wand_file: file}}
     else
-      {:error, :wand_file, reason} ->
-        WandFileWithHelp.handle_error(reason)
-
-      {:error, :require_core, reason} ->
-        Wand.CLI.CoreValidator.handle_error(reason)
-
-      {:error, step, reason} ->
-        handle_error(step, reason)
+      error -> error
     end
   end
 
-  defp get_dependencies(%WandFile{dependencies: dependencies}, :all), do: {:ok, dependencies}
-
-  defp get_dependencies(%WandFile{dependencies: dependencies}, names) do
-    Enum.reduce_while(names, {:ok, []}, fn name, {:ok, filtered} ->
-      case Enum.find(dependencies, &(&1.name == name)) do
-        nil -> {:halt, {:error, :get_dependencies, name}}
-        item -> {:cont, {:ok, [item | filtered]}}
-      end
-    end)
+  def after_save({_names, %Options{} = options}) do
+    with :ok <- download(options),
+         :ok <- compile(options) do
+      :ok
+    else
+      error -> error
+    end
   end
 
-  defp update_dependencies(file, dependencies, options) do
-    Enum.reduce_while(dependencies, {:ok, []}, fn dependency, {:ok, filtered} ->
-      case update_dependency(dependency, options) do
-        {:ok, dependency} -> {:cont, {:ok, [dependency | filtered]}}
-        {:error, reason} -> {:halt, {:error, :update_dependencies, reason}}
-      end
+  def handle_error(:hex_api_error, {reason, name}) do
+    """
+    # Error
+    There was a problem finding the latest version for #{name}.
+    The exact reason was #{reason}
+    """
+  end
+
+  defp parse_names(:all, %WandFile{dependencies: dependencies}, options) do
+    Enum.map(dependencies, &(&1.name))
+    |> remove_skips(options)
+  end
+
+  defp parse_names(names, _dependencies, options), do: remove_skips(names, options)
+
+  defp remove_skips(dependencies, %Options{skip: skip}) do
+    Enum.reject(dependencies, &Enum.member?(skip, &1))
+  end
+
+  defp update_dependencies(%WandFile{dependencies: dependencies} = file, names, options) do
+    Enum.map_reduce(dependencies, :ok, fn
+      dependency, :ok ->
+        case Enum.member?(names, dependency.name) do
+          true -> update_dependency(dependency, options)
+          false -> {:ok, dependency}
+        end
+        |> case do
+          {:ok, dependency} -> {dependency, :ok}
+          {:error, error} -> {:error, {:error, error}}
+        end
+      _dependency, error -> {:error, error}
     end)
     |> case do
-      {:ok, dependencies} ->
-        file = %WandFile{file | dependencies: dependencies}
-        {:ok, file}
-
-      error ->
-        error
+      {dependencies, :ok} -> {:ok, %WandFile{file | dependencies: dependencies}}
+      {_dependencies, {:error, reason}} -> {:error, :hex_api_error, reason}
     end
   end
 
@@ -113,25 +121,10 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     end)
   end
 
-  defp handle_error(:get_dependencies, name) do
-    """
-    # Error
-    Could not find #{name} in wand.json
-    Did you mean to type wand add #{name} instead?
-    """
-    |> Display.error()
+  defp download(%Options{download: false}), do: :ok
+  defp download(_), do: DependencyDownloader.download()
 
-    Error.get(:package_not_found)
-  end
 
-  defp handle_error(:update_dependencies, {reason, name}) do
-    """
-    # Error
-    There was a problem finding the latest version for #{name}.
-    The exact reason was #{reason}
-    """
-    |> Display.error()
-
-    Error.get(:hex_api_error)
-  end
+  defp compile(%Options{compile: false}), do: :ok
+  defp compile(_), do: DependencyDownloader.compile()
 end

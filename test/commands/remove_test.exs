@@ -1,7 +1,7 @@
 defmodule RemoveTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.CLI.Error
+  alias Wand.CLI.Executor.Result
   alias Wand.CLI.Commands.Remove
   alias Wand.Test.Helpers
   alias WandCore.WandFile
@@ -42,46 +42,10 @@ defmodule RemoveTest do
     end
   end
 
-  describe "execute errors" do
-    setup :stub_core_version
-
-    test "Error reading the WandFile" do
-      Helpers.WandFile.stub_no_file()
-      Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == Error.get(:missing_wand_file)
-    end
-
-    test "Error saving the wand file" do
-      file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_cannot_save(file)
-      Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == Error.get(:file_write_error)
-    end
-
-    test ":install_deps_error if cleaning the deps fails" do
-      file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      Helpers.System.stub_failed_cleanup_deps()
-      Helpers.IO.stub_stderr()
-      assert Remove.execute(["poison"]) == Error.get(:install_deps_error)
-    end
-  end
-
-  describe "execute successfully" do
-    setup :stub_core_version
-
-    setup do
-      Helpers.System.stub_cleanup_deps()
-      :ok
-    end
-
+  describe "execute" do
     test "Does nothing if the dependency is not being used" do
       file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Remove.execute(["poison"]) == :ok
+      assert Remove.execute(["poison"], %{wand_file: file}) == {:ok, %Result{wand_file: file}}
     end
 
     test "removes the dependency" do
@@ -92,16 +56,14 @@ defmodule RemoveTest do
         ]
       }
 
-      Helpers.WandFile.stub_load(file)
-
-      %WandFile{
+      expected_file = %WandFile{
         dependencies: [
           Helpers.WandFile.mox()
         ]
       }
-      |> Helpers.WandFile.stub_save()
 
-      assert Remove.execute(["poison"]) == :ok
+      assert Remove.execute(["poison"], %{wand_file: file}) ==
+               {:ok, %Result{wand_file: expected_file}}
     end
 
     test "removes multiple dependencies" do
@@ -112,20 +74,20 @@ defmodule RemoveTest do
         ]
       }
 
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(%WandFile{})
-      assert Remove.execute(["mox", "poison", "not_present"]) == :ok
+      assert Remove.execute(["mox", "poison", "not_present"], %{wand_file: file}) ==
+               {:ok, %Result{wand_file: %WandFile{}}}
     end
   end
 
-  test "Handle wand_core errors" do
-    Helpers.System.stub_core_version_missing()
-    Helpers.IO.stub_stderr()
-    assert Remove.execute(["poison"]) == Error.get(:wand_core_missing)
-  end
+  describe "after_save" do
+    test "successfully cleans up dependencies" do
+      Helpers.System.stub_cleanup_deps()
+      assert Remove.after_save(["poison"]) == :ok
+    end
 
-  defp stub_core_version(_) do
-    Helpers.System.stub_core_version()
-    :ok
+    test ":install_deps_error if cleaning the deps fails" do
+      Helpers.System.stub_failed_cleanup_deps()
+      assert Remove.after_save(["poison"]) == {:error, :install_deps_error, nil}
+    end
   end
 end

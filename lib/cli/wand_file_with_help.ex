@@ -11,14 +11,7 @@ defmodule Wand.CLI.WandFileWithHelp do
     end
   end
 
-  def save(file) do
-    case WandFile.save(file) do
-      :ok -> :ok
-      {:error, reason} -> {:error, :wand_file, {:save, reason}}
-    end
-  end
-
-  def save(file, path) do
+  def save(file, path \\ "wand.json") do
     case WandFile.save(file, path) do
       :ok -> :ok
       {:error, reason} -> {:error, :wand_file, {:save, reason}}

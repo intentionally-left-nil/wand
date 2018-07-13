@@ -9,9 +9,35 @@ defmodule Wand.CLI.Command do
   4. Update the help file in `Wand` with the appropriate text
   """
 
-  @callback execute(data :: any()) :: :ok | {:error, integer()}
+  @type ok_or_exit :: :ok | {:error, integer()}
+  @callback after_save(data :: any()) :: ok_or_exit
+  @callback execute(data :: any(), extras :: map()) :: ok_or_exit
+  @callback handle_error(type :: atom, data :: any()) :: String.t()
   @callback help(type :: any()) :: any()
+  @callback options() :: keyword()
   @callback validate(args :: list) :: {:ok, any()} | {:error, any()}
+
+  defmacro __using__(_opts) do
+    quote do
+      alias Wand.CLI.Executor.Result
+      @behaviour Wand.CLI.Command
+      @impl true
+      def after_save(_data), do: :ok
+
+      @impl true
+      def options(), do: []
+
+      @impl true
+      def handle_error(key, _data) do
+        """
+        Error: An unexpected error has occured
+        The reason is: #{key}
+        """
+      end
+
+      defoverridable Wand.CLI.Command
+    end
+  end
 
   def routes() do
     [
@@ -26,20 +52,15 @@ defmodule Wand.CLI.Command do
     ]
   end
 
-  def route(key, name, args) do
-    get_module(key)
-    |> Kernel.apply(name, args)
+  def get_module(name) when is_atom(name), do: get_module(to_string(name))
+
+  def get_module(name) do
+    Module.concat(Wand.CLI.Commands, String.capitalize(name))
   end
 
   def parse_errors([]), do: :ok
 
   def parse_errors([{flag, _} | _rest]) do
     {:error, {:invalid_flag, flag}}
-  end
-
-  defp get_module(name) when is_atom(name), do: get_module(to_string(name))
-
-  defp get_module(name) do
-    Module.concat(Wand.CLI.Commands, String.capitalize(name))
   end
 end

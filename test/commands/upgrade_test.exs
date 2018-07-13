@@ -1,12 +1,14 @@
 defmodule UpgradeTest do
   use ExUnit.Case, async: true
   import Mox
-  alias Wand.CLI.Error
   alias Wand.Test.Helpers
   alias Wand.CLI.Commands.Upgrade
   alias Wand.CLI.Commands.Upgrade.Options
   alias WandCore.WandFile
   alias WandCore.WandFile.Dependency
+  alias Wand.CLI.Executor.Result
+
+  setup :verify_on_exit!
 
   describe "validate" do
     test "returns help if invalid flags are given" do
@@ -41,6 +43,10 @@ defmodule UpgradeTest do
     test "upgrade multiple packages" do
       assert Upgrade.validate(["upgrade", "poison", "ex_doc"]) ==
                {:ok, {["poison", "ex_doc"], %Options{}}}
+    end
+
+    test "upgrade all except" do
+      assert Upgrade.validate(["upgrade", "--skip=poison", "--skip=cowboy"]) == {:ok, {:all, %Options{skip: ["poison", "cowboy"]}}}
     end
 
     test "upgrade all packages if none passed in" do
@@ -81,51 +87,19 @@ defmodule UpgradeTest do
   end
 
   describe "execute" do
-    setup :stub_core_version
-
-    test ":missing_wand_file if cannot open wand file" do
-      Helpers.WandFile.stub_no_file()
-      Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:missing_wand_file)
-    end
-
-    test ":package_not_found if the package is not in wand.json" do
-      Helpers.WandFile.stub_load()
-      Helpers.IO.stub_stderr()
-      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:package_not_found)
-    end
-
     test ":hex_api_error if getting the package from hex fails" do
       file = %WandFile{
-        dependencies: [Helpers.WandFile.poison()]
+        dependencies: [Helpers.WandFile.mox(), Helpers.WandFile.poison()]
       }
 
-      Helpers.WandFile.stub_load(file)
-      Helpers.IO.stub_stderr()
       Helpers.Hex.stub_not_found()
 
-      assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:hex_api_error)
-    end
-
-    test "Error saving the wand file" do
-      file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_cannot_save(file)
-      Helpers.IO.stub_stderr()
-      assert Upgrade.execute({:all, %Options{}}) == Error.get(:file_write_error)
-    end
-
-    test "update all no-ops if the dependencies are empty" do
-      file = %WandFile{}
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({:all, %Options{}}) == :ok
+      assert Upgrade.execute({["poison"], %Options{skip: ["mox"]}}, %{wand_file: file}) ==
+               {:error, :hex_api_error, {:not_found, "poison"}}
     end
   end
 
   describe "execute poison successfully" do
-    setup :stub_core_version
-
     test "No-ops if on the latest version" do
       validate(">= 2.2.0 and < 3.0.0")
     end
@@ -135,11 +109,15 @@ defmodule UpgradeTest do
     end
 
     test "No-ops a custom environment" do
-      validate("== 3.2.0 or ==3.2.0--dev")
+      validate("== 3.2.0 or ==3.2.0--dev", no_hex: true)
     end
 
     test "No-ops an exact match" do
-      validate("== 3.2.0")
+      validate("== 3.2.0", no_hex: true)
+    end
+
+    test "No-ops if the package is skipped" do
+        validate("~> 1.5.0", "~> 1.5.0", %Options{skip: ["poison"]}, no_hex: true)
     end
 
     test "Updates a tilde match" do
@@ -179,34 +157,37 @@ defmodule UpgradeTest do
 
     defp validate(requirement), do: validate(requirement, requirement, %Options{})
 
+    defp validate(requirement, no_hex: true),
+      do: validate(requirement, requirement, %Options{}, no_hex: true)
+
     defp validate(requirement, %Options{} = options),
       do: validate(requirement, requirement, options)
 
     defp validate(requirement, expected), do: validate(requirement, expected, %Options{})
 
-    defp validate(requirement, expected, options) do
-      %WandFile{
+    defp validate(requirement, expected, options, test_flags \\ []) do
+      file = %WandFile{
         dependencies: [
           %Dependency{name: "poison", requirement: requirement}
         ]
       }
-      |> Helpers.WandFile.stub_load()
 
-      %WandFile{
+      expected = %WandFile{
         dependencies: [
           %Dependency{name: "poison", requirement: expected}
         ]
       }
-      |> Helpers.WandFile.stub_save()
 
-      Helpers.Hex.stub_poison()
-      assert Upgrade.execute({["poison"], options}) == :ok
+      unless test_flags[:no_hex] do
+        Helpers.Hex.stub_poison()
+      end
+
+      assert Upgrade.execute({["poison"], options}, %{wand_file: file}) ==
+               {:ok, %Result{wand_file: expected}}
     end
   end
 
   describe "execute with git dependencies" do
-    setup :stub_core_version
-
     test "No-ops if git without a requirement" do
       file = %WandFile{
         dependencies: [
@@ -214,15 +195,12 @@ defmodule UpgradeTest do
         ]
       }
 
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) ==
+               {:ok, %Result{wand_file: file}}
     end
   end
 
   describe "execute with file dependencies" do
-    setup :stub_core_version
-
     test "No-ops" do
       file = %WandFile{
         dependencies: [
@@ -230,20 +208,42 @@ defmodule UpgradeTest do
         ]
       }
 
-      Helpers.WandFile.stub_load(file)
-      Helpers.WandFile.stub_save(file)
-      assert Upgrade.execute({["poison"], %Options{}}) == :ok
+      assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) ==
+               {:ok, %Result{wand_file: file}}
     end
   end
 
-  test "Handle wand_core errors" do
-    Helpers.System.stub_core_version_missing()
-    Helpers.IO.stub_stderr()
-    assert Upgrade.execute({["poison"], %Options{}}) == Error.get(:wand_core_missing)
+  test "upgrade all, except" do
+    file = %WandFile{
+      dependencies: [Helpers.WandFile.mox(), Helpers.WandFile.poison()]
+    }
+    Helpers.Hex.stub_poison()
+    assert Upgrade.execute({:all, %Options{skip: ["mox"]}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
   end
 
-  defp stub_core_version(_) do
-    Helpers.System.stub_core_version()
-    :ok
+  describe "after_save" do
+    test "skips downloading if download: false is set" do
+      assert Upgrade.after_save({["poison"], %Options{download: false, compile: false}}) == :ok
+    end
+
+    test ":install_deps_error when downloading fails" do
+      Helpers.System.stub_failed_update_deps()
+      assert Upgrade.after_save({["poison"], %Options{}}) == {:error, :install_deps_error, :download_failed}
+    end
+
+    test "skips compiling if compile: false is set" do
+      Helpers.System.stub_update_deps()
+        assert Upgrade.after_save({["poison"], %Options{compile: false}}) == :ok
+    end
+
+    test "downloads and compiles" do
+      Helpers.System.stub_update_deps()
+      Helpers.System.stub_compile()
+        assert Upgrade.after_save({["poison"], %Options{}}) == :ok
+    end
+  end
+
+  test "handle_error" do
+    Upgrade.handle_error(:hex_api_error, {:not_found, "poison"})
   end
 end

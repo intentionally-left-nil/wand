@@ -289,4 +289,10 @@ defmodule AddTest do
       :ok
     end
   end
+
+  test "handle_error" do
+    Add.handle_error(:package_not_found, "poison")
+    Add.handle_error(:hex_api_error, nil)
+    Add.handle_error(:package_already_exists, nil)
+  end
 end

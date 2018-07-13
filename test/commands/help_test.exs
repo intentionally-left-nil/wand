@@ -2,6 +2,7 @@ defmodule HelpTest do
   use ExUnit.Case, async: true
   import Mox
   alias Wand.CLI.Commands.Help
+  alias Wand.CLI.Executor.Result
 
   describe "validate" do
     test "the argument of help is given" do
@@ -31,6 +32,11 @@ defmodule HelpTest do
     test "help add --verbose" do
       assert Help.validate(["help", "add", "--verbose"]) == {:help, :add, :verbose}
     end
+
+    test "help wrong_command" do
+      assert Help.validate(["help", "wrong_command"]) ==
+               {:error, {:unrecognized, "wrong_command"}}
+    end
   end
 
   describe "help" do
@@ -56,7 +62,7 @@ defmodule HelpTest do
     end
 
     test "execute" do
-      Help.execute([])
+      assert Help.execute([], %{}) == {:ok, %Result{message: nil}}
     end
 
     def stub_io(_) do
