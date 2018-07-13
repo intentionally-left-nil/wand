@@ -200,4 +200,9 @@ defmodule UpgradeTest do
       assert Upgrade.execute({["poison"], %Options{}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
     end
   end
+
+  test "handle_error" do
+    Upgrade.handle_error(:package_not_found, "poison")
+    Upgrade.handle_error(:hex_api_error, {:not_found, "poison"})
+  end
 end

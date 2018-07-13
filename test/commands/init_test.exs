@@ -131,6 +131,12 @@ defmodule InitTest do
     end
   end
 
+  test "handle_error" do
+    Init.handle_error(:file_already_exists, "./wand.json")
+    Init.handle_error(:wand_core_api_error, :missing)
+    Init.handle_error(:mix_file_not_updated, nil)
+  end
+
   defp expected_result(file) do
     %Result{
       wand_file: file,
