@@ -3,7 +3,7 @@
 **wand** is a dependency manager that uses a _wand.json_ file to replace your deps() in mix.exs. This allows you to add, remove, and upgrade packages easily using the wand cli.
 
 ## Quickstart
-To install: `mix escript.install hex wand --force && mix archive.install hex wand_core --force`
+To install, paste into a terminal: `mix archive.install hex wand_core --force && mix escript.install hex wand --force`
 
 To use wand in a project: `wand init`
 
@@ -15,17 +15,20 @@ Upgrade a dependency: `wand upgrade poison --latest`
 
 help: `wand --?`
 
+## How it works
+Wand works by removing your dependencies from mix.exs and storing them instead in `wand.json`. This is necessary because `mix.exs` is a _code_ file - it's regular elixir. This makes programatically updating dependencies hard because of the complex mix.exs files folks can have. Instead, by saving the dependencies in `wand.json`, wand can easily add, remove, and upgrade your dependencies.
+
 # Installing wand
 
 ## Prerequisites
 Wand requires [elixir](https://elixir-lang.org/install.html) before installing. You also need to have hex installed by running `mix local.hex`
 
 ## Installation
-`mix escript.install hex wand --force && mix archive.install hex wand_core --force`
+To install, we need to add wand_core, wand, and then make sure the binary is on your path.
+Adding wand and wand_core is simple. Just open a terminal and paste the following line in:
+`mix archive.install hex wand_core --force && mix escript.install hex wand --force`
 
-After installation, you need to add the escript directory to your `PATH`. This is usually `~/.mix/escripts`
-
-You can verify this by typing in `mix escript` to see what path to add.
+Once that is done, then wand is successfully installed on your system to `~/.mix/escripts`. You can verify that by running `~/.mix/escripts/wand` in the terminal. If successful, it should display the wand help information. It's a pain to type the full path every time, so it is suggested you add the directory to your path. Edit your `.bashrc` (or similar config file) to look something like this: `export PATH=$HOME/.mix/escripts:$PATH`. Then, restart your terminal, and run `which wand`. If that points to `~/.mix/escripts/wand`, then you're all set!
 
 ## Verify Installation
 You can verify that wand was properly installed by typing `wand --version` to make sure wand is installed, and `wand core --version` to make sure that [wand_core](http://github.com/anilredshift/wand-core) is installed
@@ -76,6 +79,19 @@ Detailed help is available by typing wand help [command] or by clicking on the l
 ## CircleCI and other CI.
 You need to have the wand_core archive added to your image before running mix deps.get. The command for CircleCI would be:
 `- run: mix archive.install hex wand_core --force`
+
+## Publishing packages
+You need to make sure that wand.json is uploaded to hex when publishing packages. This is accomplished by modifying the `package` key in your `mix.exs` file as follows:
+```elixir
+def project do
+  [
+    package: [
+      files: ["mix.exs", "wand.json", "lib"] # etc add more files as needed
+    ]
+  ]
+end
+```
+This will ensure that wand.json is uploaded along with your other files
 
 ## Local development
 1. `mix archive.install hex wand_core --force`

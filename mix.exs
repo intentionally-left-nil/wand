@@ -56,7 +56,7 @@ defmodule Wand.MixProject do
   defp package do
     [
       name: :wand,
-      files: ["lib", "mix.exs"],
+      files: ["lib", "mix.exs", "wand.json", "README.md", "LICENSE"],
       maintainers: ["Anil Kulkarni"],
       licenses: ["BSD-3"],
       links: %{"Github" => "https://github.com/AnilRedshift/wand"}
