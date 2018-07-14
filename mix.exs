@@ -1,7 +1,7 @@
 defmodule Wand.MixProject do
   use Mix.Project
 
-  @version "0.3.1"
+  @version "0.3.2"
   @description "A CLI tool to manage package dependencies"
   @cli_env [
     coveralls: :test,
