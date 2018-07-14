@@ -19,16 +19,6 @@ defmodule MixTest do
                "Could not find a Mix.Project, please ensure you are running Mix in a directory with a mix.exs file"}}
   end
 
-  test "compile dependencies" do
-    Helpers.System.stub_compile()
-    assert Wand.CLI.Mix.compile() == :ok
-  end
-
-  test "compile fails" do
-    Helpers.System.stub_failed_compile()
-    assert Wand.CLI.Mix.compile() == {:error, {1, "** (SyntaxError) mix.exs:9"}}
-  end
-
   test "cleanup_deps" do
     Helpers.System.stub_cleanup_deps()
     assert Wand.CLI.Mix.cleanup_deps() == :ok

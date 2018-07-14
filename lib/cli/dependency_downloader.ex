@@ -6,13 +6,6 @@ defmodule Wand.CLI.DependencyDownloader do
     end
   end
 
-  def compile() do
-    case Wand.CLI.Mix.compile() do
-      :ok -> :ok
-      {:error, _reason} -> {:error, :install_deps_error, :compile_failed}
-    end
-  end
-
   def handle_error(:install_deps_error, :download_failed) do
     """
     # Error
@@ -20,16 +13,6 @@ defmodule Wand.CLI.DependencyDownloader do
 
     The wand.json file was successfully updated,
     however mix deps.get failed.
-    """
-  end
-
-  def handle_error(:install_deps_error, :compile_failed) do
-    """
-    # Error
-    Unable to run mix compile
-
-    The wand.json file was successfully updated,
-    however mix compile failed.
     """
   end
 end

@@ -21,20 +21,4 @@ defmodule DependencyDownloaderTest do
       DependencyDownloader.handle_error(:install_deps_error, :download_failed)
     end
   end
-
-  describe "compile" do
-    test ":install_deps_error when compiling fails" do
-      Helpers.System.stub_failed_compile()
-      assert DependencyDownloader.compile() == {:error, :install_deps_error, :compile_failed}
-    end
-
-    test ":ok when compiling succeeds" do
-      Helpers.System.stub_compile()
-      assert DependencyDownloader.compile() == :ok
-    end
-
-    test "handle_error" do
-      DependencyDownloader.handle_error(:install_deps_error, :compile_failed)
-    end
-  end
 end

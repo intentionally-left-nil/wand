@@ -17,7 +17,6 @@ defmodule Wand.CLI.Commands.Add.Help do
     ## Options
     The available flags depend on if wand is being used to add a single package, or multiple packages. Flags that can only be used in single-package-mode are denoted with (s).
     ```
-    --compile           Run mix compile after adding (default: **true**)
     --compile-env   (s) The environment for the dependency (default: **prod**)
     --dev               Include the dependency in the dev environment
     --download          Run mix deps.get after adding (default: **true**)

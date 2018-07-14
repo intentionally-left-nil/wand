@@ -42,10 +42,8 @@ defmodule Wand.CLI.Commands.Add.Validate do
 
   defp get_base_package(switches) do
     download = get_flag(switches, :download)
-    compile = download and get_flag(switches, :compile)
 
     %Package{
-      compile: compile,
       compile_env: get_flag(switches, :compile_env),
       download: download,
       only: get_environments(switches),
@@ -216,7 +214,6 @@ defmodule Wand.CLI.Commands.Add.Validate do
         read_app_file: :boolean
       ],
       multi_package: [
-        compile: :boolean,
         dev: :boolean,
         download: :boolean,
         env: :keep,
