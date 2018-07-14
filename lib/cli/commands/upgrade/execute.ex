@@ -100,8 +100,8 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     end
   end
 
-  defp update_hex_requirement(requirement, releases, %Options{latest: false}, mode) do
-    Enum.find(releases, &Version.match?(&1, requirement))
+  defp update_hex_requirement(requirement, releases, %Options{latest: false, pre: pre}, mode) do
+    Enum.find(releases, &Version.match?(&1, requirement, allow_pre: pre))
     |> case do
       nil -> requirement
       version -> Mode.get_requirement!(mode, version)

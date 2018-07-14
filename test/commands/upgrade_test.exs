@@ -30,6 +30,11 @@ defmodule UpgradeTest do
                {:ok, {["poison"], %Options{latest: true}}}
     end
 
+    test "Upgrade to the latest prerelease version" do
+      assert Upgrade.validate(["upgrade", "poison", "--latest", "--pre"]) ==
+               {:ok, {["poison"], %Options{latest: true, pre: true}}}
+    end
+
     test "Latest, using the exact version" do
       assert Upgrade.validate(["upgrade", "poison", "--exact", "--latest"]) ==
                {:ok, {["poison"], %Options{latest: true, mode: :exact}}}
@@ -146,6 +151,14 @@ defmodule UpgradeTest do
 
     test "Updates to the latest caret with --latest" do
       validate("~> 1.2.0", ">= 3.1.0 and < 4.0.0", %Options{latest: true, mode: :caret})
+    end
+
+    test "Does not update to a beta version" do
+      validate("~> 1.4.0", "~> 1.4.1")
+    end
+
+    test "Updates to a pre version" do
+      validate("~> 1.4.0", "~> 1.4.2-dev2", %Options{pre: true})
     end
 
     test "Updates a custom to the latest caret with --latest" do

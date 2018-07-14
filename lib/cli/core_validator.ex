@@ -29,7 +29,7 @@ defmodule Wand.CLI.CoreValidator do
     version = String.trim(version)
     requirement = Wand.Mode.get_requirement!(:caret, Wand.version())
 
-    case Version.match?(version, requirement) do
+    case Version.match?(version, requirement, allow_pre: false) do
       true -> :ok
       false -> {:error, :require_core, {:version_mismatch, version}}
     end
