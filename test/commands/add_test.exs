@@ -38,14 +38,9 @@ defmodule AddTest do
       assert Add.validate(["add", "poison"]) == {:ok, [%Package{name: "poison"}]}
     end
 
-    test "skip compiling" do
-      assert Add.validate(["add", "poison", "--compile=false"]) ==
-               {:ok, [%Package{name: "poison", compile: false}]}
-    end
-
     test "skip downloading" do
       assert Add.validate(["add", "poison", "--download=false"]) ==
-               {:ok, [%Package{name: "poison", download: false, compile: false}]}
+               {:ok, [%Package{name: "poison", download: false}]}
     end
 
     test "with an organization, repo, and custom name" do

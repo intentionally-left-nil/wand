@@ -56,7 +56,7 @@ defmodule AddExecuteTest do
 
   describe "after_save" do
     test "skips downloading if download: false is set" do
-      package = get_package(download: false, compile: false)
+      package = get_package(download: false)
       assert Add.after_save([package]) == :ok
     end
 
@@ -66,16 +66,9 @@ defmodule AddExecuteTest do
       assert Add.after_save([package]) == {:error, :install_deps_error, :download_failed}
     end
 
-    test "skips compiling if compile: false is set" do
+    test "downloads successfully" do
       Helpers.System.stub_update_deps()
-      package = get_package(compile: false)
-      assert Add.after_save([package]) == :ok
-    end
-
-    test "downloads and compiles" do
-      Helpers.System.stub_update_deps()
-      Helpers.System.stub_compile()
-      package = get_package(download: true, compile: true)
+      package = get_package(download: true)
       assert Add.after_save([package]) == :ok
     end
   end

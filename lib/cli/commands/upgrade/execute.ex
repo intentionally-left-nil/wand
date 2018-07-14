@@ -16,14 +16,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
     end
   end
 
-  def after_save({_names, %Options{} = options}) do
-    with :ok <- download(options),
-         :ok <- compile(options) do
-      :ok
-    else
-      error -> error
-    end
-  end
+  def after_save({_names, %Options{} = options}), do: download(options)
 
   def handle_error(:hex_api_error, {reason, name}) do
     """
@@ -125,7 +118,4 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
 
   defp download(%Options{download: false}), do: :ok
   defp download(_), do: DependencyDownloader.download()
-
-  defp compile(%Options{compile: false}), do: :ok
-  defp compile(_), do: DependencyDownloader.compile()
 end

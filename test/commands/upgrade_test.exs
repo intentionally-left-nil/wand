@@ -59,14 +59,9 @@ defmodule UpgradeTest do
       assert Upgrade.validate(["upgrade"]) == {:ok, {:all, %Options{}}}
     end
 
-    test "skip compiling" do
-      assert Upgrade.validate(["upgrade", "poison", "--compile=false"]) ==
-               {:ok, {["poison"], %Options{compile: false}}}
-    end
-
     test "skip downloading" do
       assert Upgrade.validate(["upgrade", "poison", "--download=false"]) ==
-               {:ok, {["poison"], %Options{download: false, compile: false}}}
+               {:ok, {["poison"], %Options{download: false}}}
     end
   end
 
@@ -240,7 +235,7 @@ defmodule UpgradeTest do
 
   describe "after_save" do
     test "skips downloading if download: false is set" do
-      assert Upgrade.after_save({["poison"], %Options{download: false, compile: false}}) == :ok
+      assert Upgrade.after_save({["poison"], %Options{download: false}}) == :ok
     end
 
     test ":install_deps_error when downloading fails" do
@@ -250,14 +245,8 @@ defmodule UpgradeTest do
                {:error, :install_deps_error, :download_failed}
     end
 
-    test "skips compiling if compile: false is set" do
+    test "successfully downloads" do
       Helpers.System.stub_update_deps()
-      assert Upgrade.after_save({["poison"], %Options{compile: false}}) == :ok
-    end
-
-    test "downloads and compiles" do
-      Helpers.System.stub_update_deps()
-      Helpers.System.stub_compile()
       assert Upgrade.after_save({["poison"], %Options{}}) == :ok
     end
   end

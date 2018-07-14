@@ -90,8 +90,7 @@ defmodule Wand.CLI.Commands.Add do
   ```
   --runtime determines whether to start the dependency. Defaults to true
   --read-app-file determines if the app file for the dependency is read. Defaults to true.
-  --download determines if mix deps.get is run after adding the package to wand.json. Defaults to true. If set to false, this implies --compile=false as well.
-  --compile determines if mix.compile is run after adding the package to wand.json.
+  --download determines if mix deps.get is run after adding the package to wand.json. Defaults to true.
   ```
   """
 
@@ -119,8 +118,7 @@ defmodule Wand.CLI.Commands.Add do
   defmodule Package do
     @moduledoc false
     @default_requirement Wand.Mode.get_requirement!(:caret, :latest)
-    defstruct compile: true,
-              compile_env: :prod,
+    defstruct compile_env: :prod,
               details: %Hex{},
               download: true,
               only: nil,

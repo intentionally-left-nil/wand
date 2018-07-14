@@ -12,11 +12,6 @@ defmodule Wand.CLI.Mix do
     |> strip_ok
   end
 
-  def compile() do
-    mix("deps.compile", print_output: true)
-    |> strip_ok
-  end
-
   def get_deps(root) do
     case mix("wand_core.init", get_output: true, cd: root) do
       {:ok, message} -> WandCore.Poison.decode(message)

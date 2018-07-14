@@ -17,7 +17,6 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   ## Options
   ```
-  --compile           Run mix compile after adding (default: **true**)
   --download          Run mix deps.get after adding (default: **true**)
   --latest            Upgrade to the latest version, ignoring wand.json restrictions
   --pre               Allow upgrading to prerelease versions, if available
@@ -52,8 +51,7 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   defmodule Options do
     @moduledoc false
-    defstruct compile: true,
-              download: true,
+    defstruct download: true,
               latest: false,
               pre: false,
               skip: [],
@@ -72,7 +70,7 @@ defmodule Wand.CLI.Commands.Upgrade do
   def help({:invalid_flag, flag}) do
     """
     #{flag} is invalid.
-    Allowed flags are --compile, --download, --exact, --latest, and --tilde.
+    Allowed flags are --download, --exact, --latest, --skip, and --tilde.
     See wand help upgrade --verbose for more information
     """
     |> Display.print()
@@ -111,10 +109,8 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   defp parse(commands, switches) do
     download = Keyword.get(switches, :download, true)
-    compile = download and Keyword.get(switches, :compile, true)
 
     options = %Options{
-      compile: compile,
       download: download,
       latest: Keyword.get(switches, :latest, false),
       mode: get_mode(switches),
@@ -138,7 +134,6 @@ defmodule Wand.CLI.Commands.Upgrade do
 
   defp get_flags(args) do
     base_flags = [
-      compile: :boolean,
       download: :boolean,
       latest: :boolean,
       pre: :boolean,
