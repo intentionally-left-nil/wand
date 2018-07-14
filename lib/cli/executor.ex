@@ -30,7 +30,6 @@ defmodule Wand.CLI.Executor do
 
         Error.get(:install_deps_error)
 
-
       {:error, error_key, data} ->
         module.handle_error(error_key, data)
         |> Display.error()

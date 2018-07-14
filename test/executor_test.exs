@@ -41,7 +41,11 @@ defmodule ExecutorTest do
       stub_options()
       stub_execute_return_wandfile()
       Helpers.WandFile.stub_save(%WandFile{})
-      expect(TestCommand, :after_save, fn :hello -> {:error, :install_deps_error, :compile_failed} end)
+
+      expect(TestCommand, :after_save, fn :hello ->
+        {:error, :install_deps_error, :compile_failed}
+      end)
+
       assert Executor.run(TestCommand, :hello) == Error.get(:install_deps_error)
     end
   end

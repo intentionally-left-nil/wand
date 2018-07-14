@@ -51,7 +51,8 @@ defmodule UpgradeTest do
     end
 
     test "upgrade all except" do
-      assert Upgrade.validate(["upgrade", "--skip=poison", "--skip=cowboy"]) == {:ok, {:all, %Options{skip: ["poison", "cowboy"]}}}
+      assert Upgrade.validate(["upgrade", "--skip=poison", "--skip=cowboy"]) ==
+               {:ok, {:all, %Options{skip: ["poison", "cowboy"]}}}
     end
 
     test "upgrade all packages if none passed in" do
@@ -122,7 +123,7 @@ defmodule UpgradeTest do
     end
 
     test "No-ops if the package is skipped" do
-        validate("~> 1.5.0", "~> 1.5.0", %Options{skip: ["poison"]}, no_hex: true)
+      validate("~> 1.5.0", "~> 1.5.0", %Options{skip: ["poison"]}, no_hex: true)
     end
 
     test "Updates a tilde match" do
@@ -230,8 +231,11 @@ defmodule UpgradeTest do
     file = %WandFile{
       dependencies: [Helpers.WandFile.mox(), Helpers.WandFile.poison()]
     }
+
     Helpers.Hex.stub_poison()
-    assert Upgrade.execute({:all, %Options{skip: ["mox"]}}, %{wand_file: file}) == {:ok, %Result{wand_file: file}}
+
+    assert Upgrade.execute({:all, %Options{skip: ["mox"]}}, %{wand_file: file}) ==
+             {:ok, %Result{wand_file: file}}
   end
 
   describe "after_save" do
@@ -241,18 +245,20 @@ defmodule UpgradeTest do
 
     test ":install_deps_error when downloading fails" do
       Helpers.System.stub_failed_update_deps()
-      assert Upgrade.after_save({["poison"], %Options{}}) == {:error, :install_deps_error, :download_failed}
+
+      assert Upgrade.after_save({["poison"], %Options{}}) ==
+               {:error, :install_deps_error, :download_failed}
     end
 
     test "skips compiling if compile: false is set" do
       Helpers.System.stub_update_deps()
-        assert Upgrade.after_save({["poison"], %Options{compile: false}}) == :ok
+      assert Upgrade.after_save({["poison"], %Options{compile: false}}) == :ok
     end
 
     test "downloads and compiles" do
       Helpers.System.stub_update_deps()
       Helpers.System.stub_compile()
-        assert Upgrade.after_save({["poison"], %Options{}}) == :ok
+      assert Upgrade.after_save({["poison"], %Options{}}) == :ok
     end
   end
 

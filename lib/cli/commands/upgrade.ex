@@ -119,7 +119,7 @@ defmodule Wand.CLI.Commands.Upgrade do
       latest: Keyword.get(switches, :latest, false),
       mode: get_mode(switches),
       pre: Keyword.get(switches, :pre, false),
-      skip: Keyword.get_values(switches, :skip),
+      skip: Keyword.get_values(switches, :skip)
     }
 
     {get_packages(commands), options}
@@ -142,7 +142,7 @@ defmodule Wand.CLI.Commands.Upgrade do
       download: :boolean,
       latest: :boolean,
       pre: :boolean,
-      skip: :keep,
+      skip: :keep
     ]
 
     latest_flags = [

@@ -34,7 +34,7 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
   end
 
   defp parse_names(:all, %WandFile{dependencies: dependencies}, options) do
-    Enum.map(dependencies, &(&1.name))
+    Enum.map(dependencies, & &1.name)
     |> remove_skips(options)
   end
 
@@ -55,7 +55,9 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
           {:ok, dependency} -> {dependency, :ok}
           {:error, error} -> {:error, {:error, error}}
         end
-      _dependency, error -> {:error, error}
+
+      _dependency, error ->
+        {:error, error}
     end)
     |> case do
       {dependencies, :ok} -> {:ok, %WandFile{file | dependencies: dependencies}}
@@ -123,7 +125,6 @@ defmodule Wand.CLI.Commands.Upgrade.Execute do
 
   defp download(%Options{download: false}), do: :ok
   defp download(_), do: DependencyDownloader.download()
-
 
   defp compile(%Options{compile: false}), do: :ok
   defp compile(_), do: DependencyDownloader.compile()

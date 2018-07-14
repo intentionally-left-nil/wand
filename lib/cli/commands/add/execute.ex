@@ -118,7 +118,6 @@ defmodule Wand.CLI.Commands.Add.Execute do
   defp download([%Package{download: download} | _]) when not download, do: :ok
   defp download(_), do: DependencyDownloader.download()
 
-
   defp compile([%Package{compile: compile} | _]) when not compile, do: :ok
   defp compile(_), do: DependencyDownloader.compile()
 end
